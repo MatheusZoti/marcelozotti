@@ -52,6 +52,7 @@ const canonica = new URL(Astro.url.pathname, Astro.site);
     <main id="conteudo">
       <slot />
     </main>
+    <slot name="rodape" />
 
     <script>
       import '../scripts/whatsapp';

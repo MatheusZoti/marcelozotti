@@ -1,0 +1,97 @@
+---
+// Botão flutuante de WhatsApp, só no celular.
+// Aparece depois do hero e some quando outro botão laranja (ou o rodapé) está na tela,
+// para nunca haver dois focos laranja ao mesmo tempo (regra do brand book).
+// Começa escondido: sem JavaScript, os botões das seções continuam funcionando.
+import { linkWhatsAppPorOrigem } from '../config/site';
+import IconeWhatsApp from './ui/IconeWhatsApp.astro';
+---
+
+<a
+  class="flutuante"
+  href={linkWhatsAppPorOrigem('flutuante')}
+  target="_blank"
+  rel="noopener"
+  data-cta="flutuante"
+  data-flutuante
+  aria-label="Falar com o Marcelo no WhatsApp (abre em uma nova aba)"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <IconeWhatsApp tamanho={26} />
+</a>
+
+<script>
+  const botao = document.querySelector<HTMLAnchorElement>('[data-flutuante]');
+  const celular = window.matchMedia('(max-width: 767px)');
+
+  if (botao && 'IntersectionObserver' in window) {
+    // o que, estando na tela, esconde o botão flutuante: o hero, outros focos laranja
+    // (botões e os valores de sobra da seção 4) e o rodapé
+    const bloqueios = [
+      ...document.querySelectorAll<HTMLElement>(
+        '.hero, .botao--acao, .barra--sobra, .causa__sobra, [data-rodape]',
+      ),
+    ];
+    const visiveis = new Set<Element>();
+
+    const atualizar = () => {
+      const mostrar = celular.matches && visiveis.size === 0;
+      botao.classList.toggle('flutuante--visivel', mostrar);
+      botao.toggleAttribute('aria-hidden', !mostrar);
+      botao.tabIndex = mostrar ? 0 : -1;
+    };
+
+    const observador = new IntersectionObserver((entradas) => {
+      entradas.forEach((entrada) =>
+        entrada.isIntersecting ? visiveis.add(entrada.target) : visiveis.delete(entrada.target),
+      );
+      atualizar();
+    });
+    bloqueios.forEach((el) => observador.observe(el));
+    celular.addEventListener('change', atualizar);
+  }
+</script>
+
+<style>
+  .flutuante {
+    position: fixed;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--laranja);
+    color: var(--navy);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--laranja) 60%, var(--offwhite)) inset,
+      0 12px 32px -8px color-mix(in oklab, var(--laranja) 70%, transparent),
+      0 6px 18px -6px rgb(0 0 0 / 0.6);
+    opacity: 0;
+    translate: 0 24px;
+    pointer-events: none;
+    transition:
+      opacity 260ms ease,
+      translate 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .flutuante--visivel {
+    opacity: 1;
+    translate: 0 0;
+    pointer-events: auto;
+  }
+
+  .flutuante:active {
+    scale: 0.96;
+  }
+
+  @media (min-width: 768px) {
+    .flutuante {
+      display: none;
+    }
+  }
+</style>

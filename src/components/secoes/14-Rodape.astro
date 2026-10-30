@@ -1,0 +1,160 @@
+---
+// Seção 14 · Rodapé (ref-04, parte de baixo): mesmo fundo do CTA final.
+// Único lugar com a assinatura completa do logo (≥ 280 px, regra do brand book).
+import logo from '../../assets/logos/logo-transparente-p-fundo-escuro.svg?url';
+import { linkWhatsAppPorOrigem, telefoneFormatado } from '../../config/site';
+import IconeWhatsApp from '../ui/IconeWhatsApp.astro';
+
+const ano = new Date().getFullYear();
+---
+
+<footer class="rodape" data-rodape>
+  <div class="container">
+    <div class="rodape__topo">
+      <img
+        class="rodape__logo"
+        src={logo}
+        alt="Marcelo Zotti, mentor de marketplaces"
+        width="300"
+        height="186"
+        loading="lazy"
+        decoding="async"
+      />
+
+      <div class="rodape__contato">
+        <p class="rotulo">Contato</p>
+        <a
+          class="rodape__whatsapp"
+          href={linkWhatsAppPorOrigem('rodape')}
+          target="_blank"
+          rel="noopener"
+          data-cta="rodape"
+        >
+          <IconeWhatsApp tamanho={18} />
+          <span>WhatsApp {telefoneFormatado()}</span>
+          <span class="visualmente-oculto">(abre o WhatsApp em uma nova aba)</span>
+        </a>
+        <ul class="rodape__atendimento" role="list">
+          <li>Online para todo o Brasil</li>
+          <li>Presencial em Curitiba e região</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rodape__base">
+      <p class="rodape__aviso">
+        Conteúdo educativo. Não há promessa de resultado ou faturamento: os resultados dependem de
+        cada operação e das decisões de cada empresa.
+      </p>
+      <p class="rodape__direitos">© {ano} Marcelo Zotti. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .rodape {
+    padding: 72px 0 calc(40px + env(safe-area-inset-bottom));
+    background: var(--navy-noite);
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 8%, transparent);
+  }
+
+  .rodape__topo {
+    display: grid;
+    gap: 40px;
+  }
+
+  .rodape__logo {
+    width: 280px; /* mínimo do brand book para a assinatura completa */
+    height: auto;
+    /* o arquivo já traz a área de proteção em volta do desenho */
+    margin-left: -18px;
+  }
+
+  .rodape__contato {
+    display: grid;
+    gap: 14px;
+    justify-items: start;
+  }
+
+  .rodape__whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-family: var(--fonte-mono);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--texto);
+    transition: color var(--transicao);
+  }
+
+  .rodape__whatsapp:hover {
+    color: var(--azul-luz);
+  }
+
+  .rodape__atendimento {
+    display: grid;
+    gap: 6px;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  .rodape__atendimento li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* quadradinhos azuis, como os marcadores do rodapé da ref-04 */
+  .rodape__atendimento li::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 1px;
+    background: var(--azul);
+  }
+
+  .rodape__base {
+    display: grid;
+    gap: 12px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 8%, transparent);
+    font-size: 0.8125rem;
+    color: var(--texto-apagado);
+  }
+
+  .rodape__aviso {
+    max-width: 44rem;
+  }
+
+  .rodape__direitos {
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .rodape {
+      padding-top: 88px;
+    }
+
+    .rodape__topo {
+      grid-template-columns: auto auto;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .rodape__logo {
+      width: 300px;
+    }
+
+    .rodape__base {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 32px;
+    }
+  }
+</style>

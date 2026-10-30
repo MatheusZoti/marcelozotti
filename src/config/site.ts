@@ -35,9 +35,18 @@ export const MENSAGENS_WHATSAPP = {
   faq: 'Olá, Marcelo! Li as perguntas frequentes na sua página e ainda tenho uma dúvida sobre a mentoria.',
   // Mensagem padrão; com JavaScript, o qualificador da seção 13 acrescenta as respostas.
   final: 'Olá, Marcelo! Vim pela sua página e quero conversar sobre a mentoria individual.',
+  rodape: 'Olá, Marcelo! Vim pela sua página e quero saber mais sobre a mentoria individual.',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;
+
+// Número para exibir na página, derivado da constante: "(41) 9962-6962" ou "(41) 99962-6962".
+export function telefoneFormatado(): string {
+  const local = WHATSAPP_NUMERO.slice(2); // sem o 55
+  const ddd = local.slice(0, 2);
+  const numero = local.slice(2);
+  return `(${ddd}) ${numero.slice(0, -4)}-${numero.slice(-4)}`;
+}
 
 export function linkWhatsApp(mensagem: string): string {
   return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensagem)}`;
