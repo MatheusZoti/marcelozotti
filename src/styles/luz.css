@@ -74,8 +74,9 @@
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--offwhite) 7%, transparent);
 }
 
-/* acesa: luz interna + brilho na borda */
-.placa--acesa {
+/* acesa: luz interna + brilho na borda (também quando a placa tem uma opção marcada) */
+.placa--acesa,
+.placa:has(input:checked) {
   background:
     radial-gradient(
       120% 90% at 20% 0%,

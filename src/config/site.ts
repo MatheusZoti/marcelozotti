@@ -21,6 +21,9 @@ export const MENSAGENS_WHATSAPP = {
   cabecalho: 'Olá, Marcelo! Vim pela sua página e quero saber mais sobre a mentoria individual.',
   hero: 'Olá, Marcelo! Vim pela sua página e quero conversar sobre a mentoria individual para a minha empresa.',
   flutuante: 'Olá, Marcelo! Vim pela sua página e quero saber mais sobre a mentoria individual.',
+  // Mensagem padrão; com JavaScript, a seção 3 troca pela lista do que a pessoa marcou.
+  identificacao:
+    'Olá, Marcelo! Vim pela sua página, me reconheci em algumas situações e quero conversar sobre a mentoria.',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;

@@ -1,0 +1,297 @@
+---
+// Seção 3 · "Você se reconhece?" (ref-05): placas apagadas que acendem quando marcadas.
+// Luz baixa: a única luz da seção vem do que a pessoa marca.
+// Sem JavaScript: as placas continuam marcáveis (CSS) e o botão usa a mensagem padrão.
+import { situacoes } from '../../conteudo/identificacao';
+import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+---
+
+<section class="identificacao" aria-labelledby="identificacao-titulo" data-identificacao>
+  <div class="identificacao__brilho" aria-hidden="true"></div>
+
+  <div class="container identificacao__grade">
+    <div class="identificacao__topo">
+      <p class="rotulo">Diagnóstico rápido</p>
+      <h2 id="identificacao-titulo" class="identificacao__titulo">Você se reconhece?</h2>
+      <p class="identificacao__sub">Marque o que acontece hoje na sua empresa.</p>
+    </div>
+
+    <fieldset class="identificacao__placas">
+      <legend class="visualmente-oculto">Situações que acontecem hoje na sua empresa</legend>
+      {
+        situacoes.map((situacao, i) => (
+          <label class="placa dor">
+            <input
+              class="visualmente-oculto"
+              type="checkbox"
+              name="situacao"
+              value={situacao.id}
+              data-resumo={situacao.resumo}
+            />
+            <span class="dor__topo" aria-hidden="true">
+              <span class="rotulo dor__area">
+                {String(i + 1).padStart(2, '0')} · {situacao.area}
+              </span>
+              <span class="dor__marca" />
+            </span>
+            <span class="dor__texto">{situacao.texto}</span>
+          </label>
+        ))
+      }
+    </fieldset>
+
+    <div class="identificacao__acao">
+      <p class="identificacao__contagem numero" aria-live="polite" data-contagem hidden></p>
+      <p class="identificacao__fecho">
+        Se você se viu em pelo menos uma dessas situações, vale uma conversa.
+      </p>
+      <BotaoWhatsApp origem="identificacao">Conversar com o Marcelo</BotaoWhatsApp>
+      <p class="identificacao__nota" data-nota hidden>O que você marcou já vai na mensagem.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { linkWhatsApp, MENSAGENS_WHATSAPP } from '../../config/site';
+
+  const secao = document.querySelector<HTMLElement>('[data-identificacao]');
+
+  if (secao) {
+    const caixas = [...secao.querySelectorAll<HTMLInputElement>('input[name="situacao"]')];
+    const botao = secao.querySelector<HTMLAnchorElement>('a[data-cta="identificacao"]');
+    const contagem = secao.querySelector<HTMLElement>('[data-contagem]');
+    const nota = secao.querySelector<HTMLElement>('[data-nota]');
+
+    const atualizar = () => {
+      const marcadas = caixas.filter((caixa) => caixa.checked);
+      const total = marcadas.length;
+
+      // a luz da seção cresce com o que foi marcado
+      secao.style.setProperty('--intensidade', String(total / caixas.length));
+
+      if (contagem) {
+        contagem.hidden = total === 0;
+        contagem.textContent = `${total} de ${caixas.length} marcadas`;
+      }
+      if (nota) nota.hidden = total === 0;
+
+      if (botao) {
+        const mensagem =
+          total === 0
+            ? MENSAGENS_WHATSAPP.identificacao
+            : [
+                'Olá, Marcelo! Vim pela sua página e me reconheci nestas situações:',
+                ...marcadas.map((caixa) => `• ${caixa.dataset.resumo}`),
+                'Quero conversar sobre a mentoria.',
+              ].join('\n');
+        botao.href = linkWhatsApp(mensagem);
+      }
+    };
+
+    caixas.forEach((caixa) => caixa.addEventListener('change', atualizar));
+    atualizar(); // o navegador pode restaurar marcações ao voltar para a página
+  }
+</script>
+
+<style>
+  .identificacao {
+    --intensidade: 0;
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding: 88px 0 96px;
+    background: var(--navy-noite);
+  }
+
+  /* brilho lateral que acende conforme as marcações */
+  .identificacao__brilho {
+    position: absolute;
+    z-index: -1;
+    right: -20%;
+    top: 10%;
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--azul) 45%, transparent),
+      transparent
+    );
+    opacity: calc(0.12 + var(--intensidade) * 0.6);
+    transition: opacity 600ms ease;
+  }
+
+  .identificacao__grade {
+    display: grid;
+    gap: 40px;
+  }
+
+  .identificacao__titulo {
+    margin-top: 12px;
+    font-size: var(--fs-h2);
+  }
+
+  .identificacao__sub {
+    margin-top: 12px;
+    color: var(--texto-suave);
+    font-size: var(--fs-lead);
+  }
+
+  /* ---------- Placas ---------- */
+  .identificacao__placas {
+    display: grid;
+    gap: 12px;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .dor {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 18px 20px;
+    cursor: pointer;
+    transition:
+      background-color var(--transicao),
+      border-color var(--transicao),
+      box-shadow var(--transicao),
+      transform var(--transicao);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .dor:hover {
+    border-color: color-mix(in oklab, var(--azul-fio) 35%, transparent);
+  }
+
+  .dor:active {
+    transform: scale(0.99);
+  }
+
+  .dor:has(input:focus-visible) {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 3px;
+  }
+
+  .dor__topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .dor__area {
+    font-size: 0.6875rem;
+  }
+
+  /* marcador em losango (45°, a diagonal da fita) */
+  .dor__marca {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin-right: 3px;
+    rotate: var(--ang-fita);
+    border: 1.5px solid color-mix(in oklab, var(--offwhite) 40%, transparent);
+    border-radius: 2px;
+    transition:
+      background-color var(--transicao),
+      border-color var(--transicao),
+      box-shadow var(--transicao);
+  }
+
+  .dor__texto {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--texto-suave);
+    transition: color var(--transicao);
+  }
+
+  .dor:has(input:checked) .dor__marca {
+    background: var(--offwhite);
+    border-color: var(--offwhite);
+    box-shadow: 0 0 12px var(--azul-luz);
+  }
+
+  .dor:has(input:checked) .dor__area {
+    color: var(--offwhite);
+  }
+
+  .dor:has(input:checked) .dor__texto {
+    color: var(--texto);
+  }
+
+  /* ---------- Ação ---------- */
+  .identificacao__contagem {
+    margin-bottom: 12px;
+    font-size: var(--fs-pequeno);
+    color: var(--azul-luz);
+    letter-spacing: 0.02em;
+  }
+
+  .identificacao__fecho {
+    max-width: 30rem;
+    margin-bottom: 20px;
+    font-size: var(--fs-lead);
+    font-weight: 600;
+  }
+
+  .identificacao__acao :global(.botao) {
+    width: 100%;
+  }
+
+  .identificacao__nota {
+    margin-top: 12px;
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  @media (min-width: 560px) {
+    .identificacao__acao :global(.botao) {
+      width: auto;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .identificacao__placas {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .dor {
+      min-height: 168px;
+      padding: 22px 22px 24px;
+      justify-content: space-between;
+    }
+  }
+
+  /* telas largas: título e ação fixos à esquerda, placas à direita */
+  @media (min-width: 1024px) {
+    .identificacao {
+      padding: 128px 0;
+    }
+
+    .identificacao__grade {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      grid-template-areas:
+        'topo placas'
+        'acao placas';
+      grid-template-rows: auto 1fr;
+      column-gap: 64px;
+      row-gap: 40px;
+    }
+
+    .identificacao__topo {
+      grid-area: topo;
+    }
+
+    .identificacao__placas {
+      grid-area: placas;
+    }
+
+    .identificacao__acao {
+      grid-area: acao;
+      align-self: start;
+      position: sticky;
+      top: 32px;
+    }
+  }
+</style>
