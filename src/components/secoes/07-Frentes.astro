@@ -1,0 +1,259 @@
+---
+// Seção 7 · As 7 frentes (ref-05): grade de placas de vidro, uma acesa por vez.
+// A luz percorre as frentes uma vez quando a seção aparece; passar o mouse acende a placa.
+// Sem JavaScript, a 01 fica acesa. A 8ª placa fecha a grade com a nota do pitch e o CTA.
+import { frentes, notaConteudo } from '../../conteudo/frentes';
+import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+---
+
+<section class="frentes" aria-labelledby="frentes-titulo" data-frentes>
+  <div class="frentes__luz" aria-hidden="true"></div>
+
+  <div class="container">
+    <header class="frentes__topo">
+      <p class="rotulo">O que você vai trabalhar</p>
+      <h2 id="frentes-titulo" class="frentes__titulo">
+        Da estratégia à execução nos marketplaces.
+      </h2>
+    </header>
+
+    <ol class="frentes__grade" role="list">
+      {
+        frentes.map((frente, i) => (
+          <li class:list={['placa', 'frente', { 'placa--acesa': i === 0 }]} data-frente>
+            <span class="numero frente__numero">{String(i + 1).padStart(2, '0')}</span>
+            <span class="frente__texto">
+              <span class="frente__titulo">{frente.titulo}</span>
+              <span class="frente__detalhe">{frente.detalhe}</span>
+            </span>
+          </li>
+        ))
+      }
+      <li class="placa frente frente--acao">
+        <p class="frente__nota">{notaConteudo}</p>
+        <BotaoWhatsApp origem="frentes">Falar da minha operação</BotaoWhatsApp>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<script>
+  const secao = document.querySelector<HTMLElement>('[data-frentes]');
+  const movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (secao) {
+    const placas = [...secao.querySelectorAll<HTMLElement>('[data-frente]')];
+    let ativa = 0;
+    let temporizador: number | undefined;
+    let percorreu = false;
+    let mouseSobre = false;
+
+    const acender = (indice: number) => {
+      placas[ativa]?.classList.remove('placa--acesa');
+      ativa = indice;
+      placas[ativa]?.classList.add('placa--acesa');
+    };
+
+    const parar = () => window.clearInterval(temporizador);
+
+    // uma volta só (01 → 07 → 01), para não ficar piscando enquanto a pessoa lê
+    const percorrer = () => {
+      if (movimentoReduzido || percorreu || mouseSobre) return;
+      parar();
+      temporizador = window.setInterval(() => {
+        const proxima = (ativa + 1) % placas.length;
+        acender(proxima);
+        if (proxima === 0) {
+          percorreu = true;
+          parar();
+        }
+      }, 1400);
+    };
+
+    placas.forEach((placa, i) => {
+      placa.addEventListener('mouseenter', () => {
+        mouseSobre = true;
+        parar();
+        acender(i);
+      });
+      placa.addEventListener('mouseleave', () => {
+        mouseSobre = false;
+      });
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        ([entrada]) => (entrada.isIntersecting ? percorrer() : parar()),
+        { threshold: 0.45 },
+      ).observe(secao.querySelector('ol') ?? secao);
+    }
+  }
+</script>
+
+<style>
+  .frentes {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding: 96px 0 104px;
+    background: var(--navy-noite);
+  }
+
+  .frentes__luz {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(45% 40% at 15% 30%, color-mix(in oklab, var(--azul) 26%, transparent), transparent 70%),
+      radial-gradient(45% 40% at 90% 85%, color-mix(in oklab, var(--azul) 22%, transparent), transparent 70%);
+  }
+
+  .frentes__titulo {
+    margin-top: 12px;
+    max-width: 16ch;
+    font-size: var(--fs-h2);
+  }
+
+  /* ---------- Grade ---------- */
+  .frentes__grade {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 48px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .frente {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 28px;
+    min-height: 176px;
+    padding: 16px 16px 18px;
+    transition:
+      background 600ms ease,
+      border-color 600ms ease,
+      box-shadow 600ms ease;
+  }
+
+  .frente__numero {
+    font-size: 1.5rem;
+    color: var(--texto-apagado);
+    transition:
+      color 600ms ease,
+      text-shadow 600ms ease;
+  }
+
+  .frente__texto {
+    display: grid;
+    gap: 6px;
+  }
+
+  .frente__titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  .frente__detalhe {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--texto-suave);
+  }
+
+  .frente.placa--acesa .frente__numero {
+    color: var(--offwhite);
+    text-shadow: 0 0 22px var(--azul);
+  }
+
+  /* celular (2 colunas): a 07 fecha a grade sozinha, então ocupa a linha inteira */
+  @media (max-width: 767px) {
+    .frente:nth-child(7) {
+      grid-column: 1 / -1;
+      min-height: 140px;
+    }
+  }
+
+  /* 8ª placa: nota + CTA, ocupa a linha inteira no celular */
+  .frente--acao {
+    grid-column: 1 / -1;
+    justify-content: center;
+    gap: 18px;
+    min-height: 0;
+    padding: 22px 18px;
+    background: transparent;
+    border-style: dashed;
+    border-color: color-mix(in oklab, var(--offwhite) 18%, transparent);
+    box-shadow: none;
+  }
+
+  .frente__nota {
+    font-family: var(--fonte-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    color: var(--texto-suave);
+  }
+
+  .frente--acao :global(.botao) {
+    width: 100%;
+    gap: 8px;
+    padding: 0 14px;
+    font-size: 0.9375rem;
+    white-space: nowrap;
+  }
+
+  @media (min-width: 768px) {
+    .frentes__grade {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .frente {
+      min-height: 210px;
+      padding: 20px 20px 22px;
+    }
+
+    .frente--acao {
+      grid-column: span 2;
+      min-height: 0;
+    }
+
+    .frente__titulo {
+      font-size: 1.125rem;
+    }
+
+    .frente__detalhe {
+      font-size: var(--fs-pequeno);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .frentes {
+      padding: 128px 0;
+    }
+
+    .frentes__grade {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 64px;
+    }
+
+    .frente {
+      aspect-ratio: 1 / 1; /* placas quadradas, como na ref-05 */
+      min-height: 0;
+      padding: 24px;
+    }
+
+    .frente__numero {
+      font-size: 2rem;
+    }
+
+    .frente--acao {
+      grid-column: auto;
+      justify-content: flex-end;
+      padding: 18px;
+    }
+  }
+</style>

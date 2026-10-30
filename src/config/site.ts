@@ -26,6 +26,8 @@ export const MENSAGENS_WHATSAPP = {
     'Olá, Marcelo! Vim pela sua página, me reconheci em algumas situações e quero conversar sobre a mentoria.',
   marcelo:
     'Olá, Marcelo! Conheci sua trajetória pela página e quero conversar sobre a mentoria individual.',
+  frentes:
+    'Olá, Marcelo! Vi as 7 frentes da mentoria na sua página e quero conversar sobre a minha operação.',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;
