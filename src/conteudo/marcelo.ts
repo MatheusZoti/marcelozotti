@@ -27,5 +27,13 @@ export const faturamento = {
   nota: 'Faturamento da operação do Marcelo, não do aluno. Não é promessa de resultado.',
 };
 
-// Fileira apagada da parede (ref-02): o que ele decide todos os dias. Decorativa.
-export const rotina = ['Produto', 'Fornecedor', 'Preço', 'Margem'];
+// Segunda fileira da parede: o que a pessoa tem com ele na mentoria (dados dos pitches).
+export const comEle = {
+  titulo: 'Na mentoria, com ele',
+  dados: [
+    { numero: '1:1', rotulo: 'individual: só você e ele' },
+    { numero: '8h', rotulo: 'ao vivo com o Marcelo' },
+    { numero: '7', rotulo: 'frentes, do diagnóstico ao crescimento' },
+    { numero: '2', rotulo: 'marketplaces: Mercado Livre e Shopee' },
+  ],
+};

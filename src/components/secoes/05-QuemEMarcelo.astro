@@ -1,10 +1,12 @@
 ---
 // Seção 5 · Quem é o Marcelo (ref-02): foto no escritório da Brazotti com corte a 45°,
-// bio e uma parede de números com uma fileira apagada em perspectiva. Luz alta.
+// bio e uma parede de números: acima, quem ele é (acesa); abaixo, o que a pessoa tem com ele
+// na mentoria (apagada). Luz alta.
 import { Image } from 'astro:assets';
 import fotoEscritorio from '../../assets/fotos/marcelo-escritorio-brazotti.jpg';
-import { bio, faturamento, provas, rotina } from '../../conteudo/marcelo';
+import { bio, comEle, faturamento, provas } from '../../conteudo/marcelo';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+import PlacaDado from '../ui/PlacaDado.astro';
 
 const parede = faturamento.exibir
   ? [...provas, { numero: faturamento.numero, rotulo: faturamento.rotulo, acesa: true }]
@@ -53,11 +55,13 @@ const parede = faturamento.exibir
         }
       </ul>
 
-      <div class="parede__apagada" aria-hidden="true">
-        {rotina.map((palavra) => <span class="placa parede__palavra">{palavra}</span>)}
-      </div>
-
       {faturamento.exibir && <p class="parede__nota">{faturamento.nota}</p>}
+
+      <!-- segunda fileira: placas apagadas (mas legíveis) com o que a pessoa tem na mentoria -->
+      <p class="rotulo parede__subtitulo">{comEle.titulo}</p>
+      <div class="parede__mentoria">
+        {comEle.dados.map((dado) => <PlacaDado numero={dado.numero} rotulo={dado.rotulo} />)}
+      </div>
     </div>
 
     <div class="marcelo__acao">
@@ -177,26 +181,16 @@ const parede = faturamento.exibir
     color: color-mix(in oklab, var(--offwhite) 88%, var(--azul));
   }
 
-  /* fileira apagada, inclinada em perspectiva como a última linha da ref-02 */
-  .parede__apagada {
+  /* segunda fileira: placas apagadas com o que a pessoa tem na mentoria */
+  .parede__subtitulo {
+    margin-top: 28px;
+    margin-bottom: 12px;
+  }
+
+  .parede__mentoria {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
-    margin-top: 14px;
-    transform: perspective(700px) rotateX(18deg);
-    transform-origin: top center;
-    opacity: 0.55;
-    mask-image: linear-gradient(180deg, #000 35%, transparent);
-  }
-
-  .parede__palavra {
-    padding: 22px 16px;
-    font-family: var(--fonte-mono);
-    font-size: 0.8125rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--texto-suave);
-    text-align: center;
   }
 
   .parede__nota {
@@ -236,8 +230,9 @@ const parede = faturamento.exibir
       gap: 12px;
     }
 
-    .parede__apagada {
+    .parede__mentoria {
       grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
     }
   }
 
