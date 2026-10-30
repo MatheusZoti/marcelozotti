@@ -1,0 +1,222 @@
+---
+// Seção 8 · Para quem é / para quem não é + pré-requisito. Luz baixa.
+// "Para quem é" numa placa acesa; "para quem não é" sem placa, apagado.
+// Entre as duas, as diagonais da fita (brand book, "linguagem gráfica") a 45°.
+import { paraQuemE, paraQuemNaoE, preRequisito, titulo } from '../../conteudo/publico';
+---
+
+<section class="publico" aria-labelledby="publico-titulo">
+  <div class="container">
+    <header>
+      <p class="rotulo">Para quem é</p>
+      <h2 id="publico-titulo" class="publico__titulo">{titulo}</h2>
+    </header>
+
+    <div class="publico__colunas">
+      <div class="placa placa--acesa publico__sim">
+        <h3 class="publico__subtitulo">É para você se</h3>
+        <ol class="publico__perfis" role="list">
+          {
+            paraQuemE.map((perfil, i) => (
+              <li class="perfil">
+                <span class="rotulo perfil__rotulo">
+                  {String(i + 1).padStart(2, '0')} · {perfil.rotulo}
+                </span>
+                <p class="perfil__situacao">{perfil.situacao}</p>
+                <p class="perfil__detalhe">{perfil.detalhe}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <div class="publico__diagonais" aria-hidden="true">
+        <span></span>
+        <span></span>
+      </div>
+
+      <div class="publico__nao">
+        <h3 class="publico__subtitulo">Não é para</h3>
+        <ul class="publico__lista" role="list">
+          {paraQuemNaoE.map((item) => <li>{item}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <p class="publico__requisito">
+      <span class="rotulo publico__requisito-rotulo">Pré-requisito</span>
+      <span class="publico__requisito-texto">{preRequisito}</span>
+    </p>
+  </div>
+</section>
+
+<style>
+  .publico {
+    padding: 96px 0 104px;
+    background: var(--navy-profundo);
+  }
+
+  .publico__titulo {
+    margin-top: 12px;
+    max-width: 20ch;
+    font-size: var(--fs-h2);
+  }
+
+  .publico__colunas {
+    display: grid;
+    gap: 40px;
+    margin-top: 48px;
+  }
+
+  .publico__subtitulo {
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------- Para quem é ---------- */
+  .publico__sim {
+    padding: 26px 22px 28px;
+  }
+
+  .publico__perfis {
+    display: grid;
+    gap: 24px;
+    margin-top: 22px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .perfil + .perfil {
+    padding-top: 24px;
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 14%, transparent);
+  }
+
+  .perfil__rotulo {
+    font-size: 0.6875rem;
+    color: color-mix(in oklab, var(--offwhite) 88%, var(--azul));
+  }
+
+  .perfil__situacao {
+    margin-top: 10px;
+    font-size: var(--fs-lead);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .perfil__detalhe {
+    margin-top: 6px;
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  /* ---------- Diagonais da fita (divisória) ---------- */
+  .publico__diagonais {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    height: 34px;
+  }
+
+  .publico__diagonais span {
+    width: 14px;
+    height: 100%;
+    transform: skewX(calc(var(--ang-fita) * -1));
+    background: var(--azul);
+    border-radius: 2px;
+  }
+
+  .publico__diagonais span:first-child {
+    background: color-mix(in oklab, var(--azul) 45%, var(--navy));
+  }
+
+  /* ---------- Para quem não é ---------- */
+  .publico__nao {
+    padding: 0 4px;
+  }
+
+  .publico__nao .publico__subtitulo {
+    color: var(--texto-suave);
+  }
+
+  .publico__lista {
+    display: grid;
+    gap: 16px;
+    margin-top: 22px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .publico__lista li {
+    position: relative;
+    padding-left: 28px;
+    font-size: var(--fs-pequeno);
+    line-height: 1.55;
+    color: var(--texto-suave);
+  }
+
+  /* marcador: losango vazado (a placa apagada em miniatura) */
+  .publico__lista li::before {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0.45em;
+    width: 9px;
+    height: 9px;
+    rotate: var(--ang-fita);
+    border: 1.5px solid var(--texto-apagado);
+    border-radius: 1px;
+  }
+
+  /* ---------- Pré-requisito ---------- */
+  .publico__requisito {
+    display: grid;
+    gap: 6px;
+    margin-top: 40px;
+    padding: 18px 20px;
+    border-left: 3px solid var(--azul-luz);
+    background: linear-gradient(90deg, color-mix(in oklab, var(--azul) 18%, transparent), transparent);
+  }
+
+  .publico__requisito-rotulo {
+    color: var(--azul-luz);
+  }
+
+  .publico__requisito-texto {
+    font-size: var(--fs-lead);
+    font-weight: 700;
+  }
+
+  @media (min-width: 900px) {
+    .publico {
+      padding: 128px 0;
+    }
+
+    .publico__colunas {
+      grid-template-columns: minmax(0, 1.15fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 48px;
+      margin-top: 64px;
+    }
+
+    .publico__sim {
+      padding: 36px 34px 38px;
+    }
+
+    .publico__diagonais {
+      height: 120px;
+      gap: 18px;
+    }
+
+    .publico__diagonais span {
+      width: 16px;
+    }
+
+    .publico__requisito {
+      grid-template-columns: auto 1fr;
+      align-items: baseline;
+      gap: 20px;
+      margin-top: 56px;
+      padding: 22px 28px;
+    }
+  }
+</style>
