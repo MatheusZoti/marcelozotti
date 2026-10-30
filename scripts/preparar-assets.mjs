@@ -19,6 +19,13 @@ const fotos = [
     recorte: { left: 691, top: 979, width: 2880, height: 3600 }, // 4:5, rosto no terço superior, mãos inteiras
     largura: 1200,
   },
+  {
+    origem: 'Foto da operacao.jpg',
+    destino: 'operacao-pb.jpg', // textura de fundo da seção 4 (já é P&B), aparece a 16% de opacidade
+    largura: 1280,
+    qualidade: 65,
+    desfoque: 1.2, // leve: some no escuro e comprime muito melhor
+  },
 ];
 
 const logos = [
@@ -31,11 +38,12 @@ await mkdir(saidaLogos, { recursive: true });
 
 for (const foto of fotos) {
   const destino = path.join(saidaFotos, foto.destino);
-  await sharp(path.join(pastaFotos, foto.origem))
-    .rotate()
-    .extract(foto.recorte)
-    .resize({ width: foto.largura })
-    .jpeg({ quality: 84, mozjpeg: true })
+  let imagem = sharp(path.join(pastaFotos, foto.origem)).rotate();
+  if (foto.recorte) imagem = imagem.extract(foto.recorte);
+  imagem = imagem.resize({ width: foto.largura });
+  if (foto.desfoque) imagem = imagem.blur(foto.desfoque);
+  await imagem
+    .jpeg({ quality: foto.qualidade ?? 84, mozjpeg: true })
     .toFile(destino);
   console.log('foto ', foto.destino);
 }

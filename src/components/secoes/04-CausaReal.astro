@@ -1,0 +1,467 @@
+---
+// Seção 4 · A causa real (ref-03): título grande, gráfico em cascata e conclusão com barra lateral.
+// A troca entre "preço cheio" e "com desconto" é feita só com CSS (funciona sem JavaScript).
+// Luz baixa: a foto P&B da operação aparece como textura escura no topo.
+import { Image } from 'astro:assets';
+import fotoOperacao from '../../assets/fotos/operacao-pb.jpg';
+import { cenarios, formatarReais, quedaDaSobra } from '../../conteudo/causa';
+
+const [cheio, desconto] = cenarios;
+
+// junta as parcelas dos dois cenários pela posição
+const parcelas = cheio.parcelas.map((parcela, i) => ({
+  ...parcela,
+  b: desconto.parcelas[i],
+}));
+---
+
+<section class="causa" aria-labelledby="causa-titulo">
+  <div class="causa__fundo" aria-hidden="true">
+    <Image
+      src={fotoOperacao}
+      alt=""
+      widths={[640, 960, 1280]}
+      sizes="100vw"
+      quality={55}
+      loading="lazy"
+    />
+  </div>
+
+  <div class="container">
+    <header class="causa__topo">
+      <p class="rotulo">A causa real</p>
+      <h2 id="causa-titulo" class="causa__titulo">
+        Não é falta de esforço. <span>É falta de método.</span>
+      </h2>
+      <p class="causa__texto">
+        Quem vende em marketplace costuma trabalhar muito: responde cliente, ajusta anúncio, acompanha
+        concorrente. O que falta quase sempre é uma forma de decidir: saber quanto custa cada venda,
+        qual preço fecha a conta e onde vale investir.
+      </p>
+    </header>
+
+    <div class="causa__painel">
+      <div class="causa__painel-topo">
+        <h3 class="causa__painel-titulo">
+          Antes de baixar o seu preço, veja a conta que quase ninguém faz.
+        </h3>
+
+        <fieldset class="causa__cenarios">
+          <legend class="visualmente-oculto">Escolha o cenário do exemplo</legend>
+          {
+            cenarios.map((cenario) => (
+              <label class="causa__cenario">
+                <input
+                  class="visualmente-oculto"
+                  type="radio"
+                  name="cenario"
+                  value={cenario.id}
+                  checked={cenario.id === 'cheio'}
+                />
+                <span>{cenario.rotulo}</span>
+                <span class="numero">R$ {cenario.preco}</span>
+              </label>
+            ))
+          }
+        </fieldset>
+      </div>
+
+      <ol class="cascata" aria-label="De onde sai cada real de uma venda (exemplo ilustrativo)">
+        {
+          parcelas.map((p) => (
+            <li
+              class={`barra barra--${p.tipo}`}
+              style={`--ini-a:${p.ini};--fim-a:${p.fim};--ini-b:${p.b.ini};--fim-b:${p.b.fim}`}
+            >
+              <span class="barra__nome">{p.nome}</span>
+              <span class="barra__valor numero">
+                <span class="so-a">{formatarReais(p.valor)}</span>
+                <span class="so-b">{formatarReais(p.b.valor)}</span>
+              </span>
+              <span class="barra__trilho" aria-hidden="true">
+                <span class="barra__preenchimento" />
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="causa__conclusao">
+        <p class="causa__sobra">
+          <span class="so-a">
+            De cada venda de R$ {cheio.preco}, sobram
+            <strong class="numero">{formatarReais(cheio.sobra)}</strong>.
+          </span>
+          <span class="so-b">
+            Com 10% de desconto, de cada venda de R$ {desconto.preco} sobram
+            <strong class="numero">{formatarReais(desconto.sobra)}</strong>.
+          </span>
+        </p>
+        <p class="causa__licao">
+          10% a menos no preço pode significar {quedaDaSobra}% a menos de sobra. Método é fazer essa
+          conta antes de decidir, e não depois.
+        </p>
+      </div>
+
+      <p class="causa__aviso">
+        Exemplo ilustrativo com números redondos. Comissões, frete e impostos variam por marketplace,
+        categoria e regime tributário. Na mentoria, a conta é feita com os números da sua operação.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .causa {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding: 96px 0 104px;
+    background: linear-gradient(180deg, var(--navy-noite), var(--navy-profundo) 40%);
+  }
+
+  /* textura: foto P&B da operação, bem escura, só no topo */
+  .causa__fundo {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 640px;
+    z-index: -1;
+    opacity: 0.16;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 25%, #000 45%, transparent 100%);
+  }
+
+  .causa__fundo :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ---------- Topo (ref-03: título gigante + texto ao lado) ---------- */
+  .causa__titulo {
+    margin-top: 12px;
+    font-size: clamp(2.25rem, 1.3rem + 4.4vw, 4.75rem);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .causa__titulo span {
+    display: block;
+    color: var(--azul-luz);
+  }
+
+  .causa__texto {
+    margin-top: 24px;
+    max-width: 34rem;
+    font-size: var(--fs-lead);
+    color: var(--texto-suave);
+  }
+
+  /* ---------- Painel do gráfico ---------- */
+  .causa__painel {
+    margin-top: 56px;
+  }
+
+  .causa__painel-topo {
+    display: grid;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+
+  .causa__painel-titulo {
+    max-width: 30rem;
+    font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  /* seletor de cenário */
+  .causa__cenarios {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+    margin: 0;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
+    border-radius: 16px;
+    background: color-mix(in oklab, var(--navy) 70%, transparent);
+    min-width: 0;
+  }
+
+  .causa__cenario {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: var(--fs-pequeno);
+    font-weight: 600;
+    color: var(--texto-suave);
+    cursor: pointer;
+    transition:
+      background-color var(--transicao),
+      color var(--transicao);
+  }
+
+  .causa__cenario .numero {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .causa__cenario:has(input:checked) {
+    background: var(--azul);
+    color: var(--offwhite);
+  }
+
+  .causa__cenario:has(input:focus-visible) {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 2px;
+  }
+
+  /* troca de cenário só com CSS */
+  .so-b {
+    display: none;
+  }
+
+  .causa:has(input[value='desconto']:checked) .so-a {
+    display: none;
+  }
+
+  .causa:has(input[value='desconto']:checked) .so-b {
+    display: inline;
+  }
+
+  .barra {
+    --ini: var(--ini-a);
+    --fim: var(--fim-a);
+  }
+
+  .causa:has(input[value='desconto']:checked) .barra {
+    --ini: var(--ini-b);
+    --fim: var(--fim-b);
+  }
+
+  /* ---------- Cascata: barras horizontais no celular ---------- */
+  .cascata {
+    display: grid;
+    gap: 18px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .barra {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'nome valor'
+      'trilho trilho';
+    gap: 8px 12px;
+    align-items: baseline;
+  }
+
+  .barra__nome {
+    grid-area: nome;
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+  }
+
+  .barra__valor {
+    grid-area: valor;
+    font-size: 0.9375rem;
+    color: var(--texto);
+  }
+
+  .barra__trilho {
+    grid-area: trilho;
+    position: relative;
+    height: 14px;
+    border-radius: 4px;
+    background: color-mix(in oklab, var(--navy) 80%, transparent);
+    overflow: hidden;
+  }
+
+  .barra__preenchimento {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--ini) * 1%);
+    width: calc((var(--fim) - var(--ini)) * 1%);
+    border-radius: 4px;
+    transition:
+      left 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      width 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      bottom 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      height 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  /* total: azul que clareia (gradiente da ref-03, sem o rosa) */
+  .barra--total .barra__preenchimento {
+    background: linear-gradient(90deg, var(--azul), var(--azul-luz));
+  }
+
+  /* saídas: o dinheiro que vai embora, em azul apagado */
+  .barra--saida .barra__preenchimento {
+    background: color-mix(in oklab, var(--azul) 52%, var(--navy));
+  }
+
+  .barra--saida .barra__valor {
+    color: var(--texto-suave);
+  }
+
+  /* sobra: a peça acesa da composição; o número é o único foco laranja */
+  .barra--sobra .barra__nome {
+    color: var(--texto);
+  }
+
+  .barra--sobra .barra__preenchimento {
+    background: linear-gradient(90deg, var(--azul-luz), var(--offwhite));
+    box-shadow: 0 0 18px var(--azul-luz);
+  }
+
+  .barra--sobra .barra__valor,
+  .causa__sobra strong {
+    color: var(--laranja);
+  }
+
+  /* ---------- Conclusão (barra lateral, como a "Conclusión" da ref-03) ---------- */
+  .causa__conclusao {
+    margin-top: 40px;
+    padding-left: 18px;
+    border-left: 3px solid;
+    border-image: linear-gradient(180deg, var(--azul-luz), transparent) 1;
+  }
+
+  .causa__sobra {
+    font-size: var(--fs-lead);
+    font-weight: 700;
+  }
+
+  .causa__sobra strong {
+    font-weight: 600;
+  }
+
+  .causa__licao {
+    margin-top: 8px;
+    max-width: 38rem;
+    color: var(--texto-suave);
+  }
+
+  .causa__aviso {
+    margin-top: 28px;
+    max-width: 44rem;
+    font-size: 0.8125rem;
+    color: var(--texto-apagado);
+  }
+
+  @media (min-width: 560px) {
+    .causa__cenarios {
+      justify-self: start;
+    }
+  }
+
+  /* ---------- Telas largas: colunas verticais como na ref-03 ---------- */
+  @media (min-width: 900px) {
+    .causa__topo {
+      display: grid;
+      grid-template-columns: auto minmax(0, 24rem);
+      grid-template-areas:
+        'rotulo rotulo'
+        'titulo texto';
+      column-gap: 56px;
+      align-items: end;
+    }
+
+    .causa__topo .rotulo {
+      grid-area: rotulo;
+    }
+
+    .causa__titulo {
+      grid-area: titulo;
+    }
+
+    .causa__texto {
+      grid-area: texto;
+      margin-top: 0;
+      font-size: var(--fs-corpo);
+    }
+
+    .causa__painel {
+      margin-top: 80px;
+    }
+
+    .causa__painel-topo {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      margin-bottom: 48px;
+    }
+
+    .cascata {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      align-items: end;
+      padding-top: 8px;
+      border-bottom: 1px solid color-mix(in oklab, var(--offwhite) 30%, transparent);
+    }
+
+    .barra {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        'valor'
+        'trilho'
+        'nome';
+      gap: 12px;
+      text-align: center;
+    }
+
+    .barra__valor {
+      font-size: 1.125rem;
+    }
+
+    .barra__trilho {
+      height: clamp(240px, 26vw, 340px);
+      border-radius: 6px 6px 0 0;
+    }
+
+    .barra__preenchimento {
+      left: 0;
+      right: 0;
+      width: auto;
+      top: auto;
+      bottom: calc(var(--ini) * 1%);
+      height: calc((var(--fim) - var(--ini)) * 1%);
+      border-radius: 6px 6px 0 0;
+    }
+
+    .barra--total .barra__preenchimento {
+      background: linear-gradient(0deg, var(--azul-luz), var(--azul) 70%);
+    }
+
+    .barra--sobra .barra__preenchimento {
+      background: linear-gradient(0deg, var(--offwhite), var(--azul-luz));
+    }
+
+    .barra__nome {
+      order: 3;
+      min-height: 2.6em;
+      padding-top: 4px;
+      font-size: 0.6875rem;
+    }
+
+    .barra--sobra .barra__valor {
+      font-size: 1.375rem;
+    }
+
+    .causa__conclusao {
+      margin-top: 48px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .cascata {
+      gap: 24px;
+    }
+  }
+</style>
