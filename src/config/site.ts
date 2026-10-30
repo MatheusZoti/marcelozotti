@@ -24,6 +24,8 @@ export const MENSAGENS_WHATSAPP = {
   // Mensagem padrão; com JavaScript, a seção 3 troca pela lista do que a pessoa marcou.
   identificacao:
     'Olá, Marcelo! Vim pela sua página, me reconheci em algumas situações e quero conversar sobre a mentoria.',
+  marcelo:
+    'Olá, Marcelo! Conheci sua trajetória pela página e quero conversar sobre a mentoria individual.',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;

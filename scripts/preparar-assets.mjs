@@ -20,6 +20,12 @@ const fotos = [
     largura: 1200,
   },
   {
+    origem: 'VISITA_BRAZOTTI-122.jpg',
+    destino: 'marcelo-escritorio-brazotti.jpg', // seção 5: à mesa, com o logo da Brazotti ao fundo
+    recorte: { left: 1210, top: 0, width: 4234, height: 3387 }, // 5:4
+    largura: 1400,
+  },
+  {
     origem: 'Foto da operacao.jpg',
     destino: 'operacao-pb.jpg', // textura de fundo da seção 4 (já é P&B), aparece a 16% de opacidade
     largura: 1280,

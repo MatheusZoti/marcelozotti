@@ -1,0 +1,275 @@
+---
+// Seção 5 · Quem é o Marcelo (ref-02): foto no escritório da Brazotti com corte a 45°,
+// bio e uma parede de números com uma fileira apagada em perspectiva. Luz alta.
+import { Image } from 'astro:assets';
+import fotoEscritorio from '../../assets/fotos/marcelo-escritorio-brazotti.jpg';
+import { bio, faturamento, provas, rotina } from '../../conteudo/marcelo';
+import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+
+const parede = faturamento.exibir
+  ? [...provas, { numero: faturamento.numero, rotulo: faturamento.rotulo, acesa: true }]
+  : provas;
+---
+
+<section class="marcelo" aria-labelledby="marcelo-titulo">
+  <div class="marcelo__luz" aria-hidden="true"></div>
+
+  <div class="container">
+    <div class="marcelo__grade">
+      <div class="marcelo__foto">
+        <Image
+          src={fotoEscritorio}
+          alt="Marcelo Zotti sorrindo à mesa de trabalho, com o logo da Brazotti na parede ao fundo"
+          widths={[400, 640, 900, 1200]}
+          sizes="(min-width: 1024px) 560px, 92vw"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="marcelo__texto">
+        <p class="rotulo">Quem é o Marcelo</p>
+        <h2 id="marcelo-titulo" class="marcelo__titulo">
+          Experiência de quem vive o marketplace na prática.
+        </h2>
+        {bio.map((paragrafo) => <p class="marcelo__bio">{paragrafo}</p>)}
+      </div>
+    </div>
+
+    <div class="parede">
+      <ul class="parede__fileira" role="list">
+        {
+          parede.map((prova) => (
+            <li
+              class:list={[
+                'placa',
+                'prova',
+                { 'placa--acesa': prova.acesa, 'prova--palavra': !/\d/.test(prova.numero) },
+              ]}
+            >
+              <span class="prova__numero">{prova.numero}</span>
+              <span class="prova__rotulo">{prova.rotulo}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="parede__apagada" aria-hidden="true">
+        {rotina.map((palavra) => <span class="placa parede__palavra">{palavra}</span>)}
+      </div>
+
+      {faturamento.exibir && <p class="parede__nota">{faturamento.nota}</p>}
+    </div>
+
+    <div class="marcelo__acao">
+      <BotaoWhatsApp origem="marcelo">Conversar com o Marcelo</BotaoWhatsApp>
+    </div>
+  </div>
+</section>
+
+<style>
+  .marcelo {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding: 96px 0 104px;
+    background: var(--navy-profundo);
+  }
+
+  /* luz alta: brilho azul atrás da parede + grade fina (ref-02), recortada em diagonal */
+  .marcelo__luz {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(60% 40% at 50% 72%, color-mix(in oklab, var(--azul) 42%, transparent), transparent 70%),
+      radial-gradient(50% 35% at 85% 10%, color-mix(in oklab, var(--azul) 22%, transparent), transparent 70%);
+  }
+
+  .marcelo__luz::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--offwhite) 5%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--offwhite) 5%, transparent) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: linear-gradient(var(--ang-luz), transparent 45%, #000 80%);
+  }
+
+  /* ---------- Foto + texto ---------- */
+  .marcelo__grade {
+    display: grid;
+    gap: 40px;
+  }
+
+  .marcelo__foto {
+    filter: drop-shadow(0 24px 60px color-mix(in oklab, var(--azul) 35%, transparent));
+  }
+
+  /* corte a 45° no canto: a diagonal da fita como moldura (brand book) */
+  .marcelo__foto :global(img) {
+    width: 100%;
+    aspect-ratio: 5 / 4;
+    object-fit: cover;
+    border-radius: var(--raio);
+    clip-path: polygon(0 0, calc(100% - 72px) 0, 100% 72px, 100% 100%, 0 100%);
+  }
+
+  .marcelo__titulo {
+    margin-top: 12px;
+    font-size: var(--fs-h2);
+  }
+
+  .marcelo__bio {
+    margin-top: 20px;
+    color: var(--texto-suave);
+  }
+
+  .marcelo__bio:first-of-type {
+    margin-top: 24px;
+    font-size: var(--fs-lead);
+    color: var(--texto);
+  }
+
+  /* ---------- Parede de números (ref-02) ---------- */
+  .parede {
+    margin-top: 64px;
+  }
+
+  .parede__fileira {
+    display: grid;
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .prova {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 22px 22px;
+  }
+
+  .prova__numero {
+    flex: none;
+    font-family: var(--fonte-mono);
+    font-size: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  /* mono é para números; palavras (Brazotti, Clientes) vão em Manrope, um pouco menores */
+  .prova--palavra .prova__numero {
+    font-family: var(--fonte);
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  .prova__rotulo {
+    font-size: var(--fs-pequeno);
+    line-height: 1.4;
+    color: var(--texto-suave);
+  }
+
+  .placa--acesa .prova__rotulo {
+    color: color-mix(in oklab, var(--offwhite) 88%, var(--azul));
+  }
+
+  /* fileira apagada, inclinada em perspectiva como a última linha da ref-02 */
+  .parede__apagada {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+    transform: perspective(700px) rotateX(18deg);
+    transform-origin: top center;
+    opacity: 0.55;
+    mask-image: linear-gradient(180deg, #000 35%, transparent);
+  }
+
+  .parede__palavra {
+    padding: 22px 16px;
+    font-family: var(--fonte-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+    text-align: center;
+  }
+
+  .parede__nota {
+    margin-top: 16px;
+    font-size: 0.8125rem;
+    color: var(--texto-apagado);
+  }
+
+  .marcelo__acao {
+    margin-top: 40px;
+  }
+
+  .marcelo__acao :global(.botao) {
+    width: 100%;
+  }
+
+  @media (min-width: 560px) {
+    .marcelo__acao {
+      display: flex;
+      justify-content: center;
+    }
+
+    .marcelo__acao :global(.botao) {
+      width: auto;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .parede__fileira {
+      grid-auto-columns: minmax(0, 1fr); /* 3 ou 4 placas, conforme o faturamento for liberado */
+      grid-auto-flow: column;
+    }
+
+    .prova {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .parede__apagada {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .marcelo {
+      padding: 136px 0 128px;
+    }
+
+    .marcelo__grade {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 72px;
+    }
+
+    .marcelo__foto :global(img) {
+      clip-path: polygon(0 0, calc(100% - 104px) 0, 100% 104px, 100% 100%, 0 100%);
+    }
+
+    .parede {
+      margin-top: 96px;
+    }
+
+    /* número e rótulo lado a lado, como na ref-02 */
+    .prova {
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+      padding: 28px 28px;
+    }
+
+    .marcelo__acao {
+      margin-top: 32px;
+    }
+  }
+</style>
