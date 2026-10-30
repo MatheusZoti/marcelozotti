@@ -32,6 +32,7 @@ export const MENSAGENS_WHATSAPP = {
     'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual online. Pode me passar os detalhes?',
   'formato-presencial':
     'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual presencial, em Curitiba. Pode me passar os detalhes?',
+  faq: 'Olá, Marcelo! Li as perguntas frequentes na sua página e ainda tenho uma dúvida sobre a mentoria.',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;

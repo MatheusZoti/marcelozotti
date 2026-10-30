@@ -1,0 +1,177 @@
+---
+// Seção 12 · FAQ de objeções. Luz mínima, só tipografia.
+// <details>/<summary> nativo: abre e fecha sem JavaScript. Onde o navegador permite,
+// a abertura é animada (::details-content); nos outros, abre direto.
+import { perguntas } from '../../conteudo/faq';
+import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+
+// dados estruturados para buscadores (FAQPage)
+const dadosFaq = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: perguntas.map(({ pergunta, resposta }) => ({
+    '@type': 'Question',
+    name: pergunta,
+    acceptedAnswer: { '@type': 'Answer', text: resposta },
+  })),
+};
+---
+
+<section class="faq" aria-labelledby="faq-titulo">
+  <div class="container faq__grade">
+    <div class="faq__topo">
+      <p class="rotulo">Perguntas frequentes</p>
+      <h2 id="faq-titulo" class="faq__titulo">Antes de chamar no WhatsApp.</h2>
+      <div class="faq__ajuda">
+        <p>Ficou alguma dúvida que não está aqui?</p>
+        <BotaoWhatsApp origem="faq" variante="contorno">Perguntar ao Marcelo</BotaoWhatsApp>
+      </div>
+    </div>
+
+    <div class="faq__lista">
+      {
+        perguntas.map(({ pergunta, resposta }) => (
+          <details class="pergunta">
+            <summary class="pergunta__titulo">
+              <span>{pergunta}</span>
+              <span class="pergunta__marca" aria-hidden="true" />
+            </summary>
+            <p class="pergunta__resposta">{resposta}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(dadosFaq)} />
+</section>
+
+<style>
+  .faq {
+    padding: 96px 0 104px;
+    background: var(--navy-profundo);
+  }
+
+  .faq__grade {
+    display: grid;
+    gap: 40px;
+  }
+
+  .faq__titulo {
+    margin-top: 12px;
+    font-size: var(--fs-h2);
+    max-width: 14ch;
+  }
+
+  .faq__ajuda {
+    display: none; /* no celular, o CTA final logo abaixo já cumpre esse papel */
+  }
+
+  /* ---------- Lista ---------- */
+  .faq__lista {
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
+  }
+
+  .pergunta {
+    border-bottom: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
+  }
+
+  .pergunta__titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 0;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    line-height: 1.4;
+    cursor: pointer;
+    list-style: none;
+    transition: color var(--transicao);
+  }
+
+  .pergunta__titulo::-webkit-details-marker {
+    display: none;
+  }
+
+  .pergunta__titulo:hover {
+    color: var(--azul-luz);
+  }
+
+  /* marcador: losango vazado que se preenche ao abrir */
+  .pergunta__marca {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    margin-right: 4px;
+    rotate: var(--ang-fita);
+    border: 1.5px solid color-mix(in oklab, var(--offwhite) 45%, transparent);
+    border-radius: 1px;
+    transition:
+      background-color var(--transicao),
+      border-color var(--transicao),
+      box-shadow var(--transicao);
+  }
+
+  .pergunta[open] .pergunta__marca {
+    background: var(--azul-luz);
+    border-color: var(--azul-luz);
+    box-shadow: 0 0 12px var(--azul);
+  }
+
+  .pergunta__resposta {
+    max-width: 40rem;
+    padding: 0 32px 24px 0;
+    color: var(--texto-suave);
+  }
+
+  /* abertura animada onde houver suporte */
+  @supports selector(::details-content) {
+    .pergunta {
+      interpolate-size: allow-keywords;
+    }
+
+    .pergunta::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition:
+        block-size 320ms cubic-bezier(0.2, 0.7, 0.2, 1),
+        content-visibility 320ms allow-discrete;
+    }
+
+    .pergunta[open]::details-content {
+      block-size: auto;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .faq {
+      padding: 128px 0;
+    }
+
+    .faq__grade {
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 72px;
+      align-items: start;
+    }
+
+    .faq__topo {
+      position: sticky;
+      top: 40px;
+    }
+
+    .faq__ajuda {
+      display: grid;
+      justify-items: start;
+      gap: 14px;
+      margin-top: 32px;
+      color: var(--texto-suave);
+      font-size: var(--fs-pequeno);
+    }
+
+    .pergunta__titulo {
+      font-size: 1.1875rem;
+      padding: 26px 0;
+    }
+  }
+</style>
