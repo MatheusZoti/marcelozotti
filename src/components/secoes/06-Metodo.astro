@@ -1,0 +1,287 @@
+---
+// Seção 6 · O método (ref-05): três placas de vidro que acendem em sequência ao rolar,
+// ligadas por elos em losango. Luz média.
+// Sem JavaScript (ou com movimento reduzido), as três já aparecem acesas.
+import { objetivo, passos } from '../../conteudo/metodo';
+---
+
+<section class="metodo" aria-labelledby="metodo-titulo" data-metodo>
+  <div class="metodo__luz" aria-hidden="true">
+    <div class="feixe metodo__feixe"></div>
+  </div>
+
+  <div class="container">
+    <header class="metodo__topo">
+      <p class="rotulo">O método</p>
+      <h2 id="metodo-titulo" class="metodo__titulo">
+        Mais estrutura. Mais estratégia. <span>Melhores decisões.</span>
+      </h2>
+      <p class="metodo__objetivo">{objetivo}</p>
+    </header>
+
+    <ol class="metodo__passos" role="list">
+      {
+        passos.map((passo, i) => (
+          <li class="placa placa--acesa passo" data-passo>
+            <span class="passo__etapa" aria-hidden="true">
+              Etapa
+            </span>
+            <span class="numero passo__numero">{String(i + 1).padStart(2, '0')}</span>
+            <div class="passo__corpo">
+              <h3 class="passo__verbo">{passo.verbo}</h3>
+              <p class="passo__frase">{passo.frase}</p>
+            </div>
+            <p class="passo__pratica">{passo.pratica}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<script>
+  const secao = document.querySelector<HTMLElement>('[data-metodo]');
+  const movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (secao && !movimentoReduzido && 'IntersectionObserver' in window) {
+    const placas = [...secao.querySelectorAll<HTMLElement>('[data-passo]')];
+    // a seção fica abaixo da dobra, então apagar aqui não pisca na tela
+    placas.forEach((placa) => placa.classList.remove('placa--acesa'));
+
+    let ultimoAceso = 0;
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        entradas
+          .filter((entrada) => entrada.isIntersecting)
+          .map((entrada) => entrada.target as HTMLElement)
+          .sort((a, b) => placas.indexOf(a) - placas.indexOf(b))
+          .forEach((placa) => {
+            observador.unobserve(placa);
+            // quando várias entram juntas (desktop), acendem uma depois da outra
+            const agora = performance.now();
+            const quando = Math.max(agora, ultimoAceso + 450);
+            ultimoAceso = quando;
+            window.setTimeout(() => placa.classList.add('placa--acesa'), quando - agora);
+          });
+      },
+      { threshold: 0.6, rootMargin: '0px 0px -12% 0px' },
+    );
+
+    placas.forEach((placa) => observador.observe(placa));
+  }
+</script>
+
+<style>
+  .metodo {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding: 96px 0 104px;
+    background: linear-gradient(180deg, var(--navy-profundo), var(--navy-noite));
+  }
+
+  .metodo__luz {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.55;
+    mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+  }
+
+  .metodo__feixe {
+    --feixe-largura: 260px;
+    --feixe-x: 30%;
+    --feixe-y: -10%;
+    --feixe-altura: 130%;
+  }
+
+  /* ---------- Topo ---------- */
+  .metodo__titulo {
+    margin-top: 12px;
+    font-size: var(--fs-h2);
+    max-width: 18ch;
+  }
+
+  .metodo__titulo span {
+    color: var(--azul-luz);
+  }
+
+  .metodo__objetivo {
+    margin-top: 20px;
+    max-width: 36rem;
+    font-size: var(--fs-lead);
+    color: var(--texto-suave);
+  }
+
+  /* ---------- Passos ---------- */
+  .metodo__passos {
+    display: grid;
+    gap: 40px; /* espaço para o elo entre as placas */
+    margin-top: 56px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .passo {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'numero etapa'
+      'corpo corpo'
+      'pratica pratica';
+    gap: 0 12px;
+    padding: 24px 22px 26px;
+    transition:
+      background 700ms ease,
+      border-color 700ms ease,
+      box-shadow 700ms ease;
+  }
+
+  /* rótulo vertical em mono na borda, como na ref-05 */
+  .passo__etapa {
+    grid-area: etapa;
+    writing-mode: vertical-rl;
+    font-family: var(--fonte-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--texto-apagado);
+  }
+
+  .passo__numero {
+    grid-area: numero;
+    font-size: clamp(2.75rem, 2rem + 3vw, 4rem);
+    color: var(--texto-apagado);
+    transition:
+      color 700ms ease,
+      text-shadow 700ms ease;
+  }
+
+  .passo__corpo {
+    grid-area: corpo;
+    margin-top: 28px;
+  }
+
+  .passo__verbo {
+    font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
+    color: var(--texto-suave);
+    transition: color 700ms ease;
+  }
+
+  .passo__frase {
+    margin-top: 6px;
+    font-size: var(--fs-lead);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--texto-suave);
+  }
+
+  .passo__pratica {
+    grid-area: pratica;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 10%, transparent);
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  .passo.placa--acesa .passo__numero {
+    color: var(--offwhite);
+    text-shadow: 0 0 28px var(--azul);
+  }
+
+  .passo.placa--acesa .passo__verbo {
+    color: var(--texto);
+  }
+
+  .passo.placa--acesa .passo__etapa {
+    color: var(--texto-suave);
+  }
+
+  /* elo entre placas: losango a 45° que acende junto com a placa seguinte */
+  .passo:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -27px;
+    width: 14px;
+    height: 14px;
+    translate: -50% 0;
+    rotate: var(--ang-fita);
+    border: 1.5px solid color-mix(in oklab, var(--offwhite) 25%, transparent);
+    border-radius: 2px;
+    transition:
+      background-color 700ms ease,
+      border-color 700ms ease,
+      box-shadow 700ms ease;
+  }
+
+  .passo:has(+ .placa--acesa)::after {
+    background: var(--azul-luz);
+    border-color: var(--azul-luz);
+    box-shadow: 0 0 14px var(--azul);
+  }
+
+  @media (min-width: 900px) {
+    .metodo {
+      padding: 128px 0;
+    }
+
+    .metodo__topo {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+      grid-template-areas:
+        'rotulo rotulo'
+        'titulo objetivo';
+      column-gap: 56px;
+      align-items: end;
+    }
+
+    .metodo__topo .rotulo {
+      grid-area: rotulo;
+    }
+
+    .metodo__titulo {
+      grid-area: titulo;
+    }
+
+    .metodo__objetivo {
+      grid-area: objetivo;
+      margin-top: 0;
+      font-size: var(--fs-corpo);
+    }
+
+    /* subgrid: verbos e textos alinhados entre as três placas, mesmo com alturas diferentes */
+    .metodo__passos {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: auto minmax(96px, 1fr) auto auto;
+      column-gap: 40px;
+      row-gap: 0;
+      margin-top: 72px;
+    }
+
+    .passo {
+      grid-row: span 4;
+      grid-template-rows: subgrid;
+      grid-template-areas:
+        'numero etapa'
+        '. .'
+        'corpo corpo'
+        'pratica pratica';
+      padding: 28px 26px 30px;
+    }
+
+    .passo__corpo {
+      margin-top: 0;
+    }
+
+    .passo:not(:last-child)::after {
+      left: auto;
+      right: -27px;
+      top: 50%;
+      bottom: auto;
+      translate: 0 -50%;
+    }
+  }
+</style>
