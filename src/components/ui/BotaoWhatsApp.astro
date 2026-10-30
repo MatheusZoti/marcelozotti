@@ -1,6 +1,6 @@
 ---
 // Botão/link para o WhatsApp do Marcelo.
-// variante "acao": o único elemento laranja da composição (texto navy, nunca branco).
+// variante "acao": o único foco laranja da composição, com o visual de luz (.botao-luz).
 // variante "contorno": CTA secundário (cabeçalho), sem laranja.
 import { linkWhatsAppPorOrigem, type OrigemCta } from '../../config/site';
 import IconeWhatsApp from './IconeWhatsApp.astro';
@@ -15,7 +15,7 @@ const { origem, variante = 'acao', class: classe } = Astro.props;
 ---
 
 <a
-  class:list={['botao', `botao--${variante}`, classe]}
+  class:list={['botao', `botao--${variante}`, { 'botao-luz': variante === 'acao' }, classe]}
   href={linkWhatsAppPorOrigem(origem)}
   target="_blank"
   rel="noopener"
@@ -42,22 +42,15 @@ const { origem, variante = 'acao', class: classe } = Astro.props;
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* o visual de luz vem da classe global .botao-luz (styles/luz.css) */
   .botao--acao {
-    min-height: 56px;
-    padding: 0 28px;
+    min-height: 60px;
+    padding: 0 32px;
     font-size: 1.0625rem;
-    background: var(--laranja);
-    color: var(--navy);
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--laranja) 60%, var(--offwhite)) inset,
-      0 10px 32px -10px color-mix(in oklab, var(--laranja) 70%, transparent);
   }
 
   .botao--acao:hover {
     transform: translateY(-2px);
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--laranja) 60%, var(--offwhite)) inset,
-      0 16px 40px -10px color-mix(in oklab, var(--laranja) 85%, transparent);
   }
 
   .botao--acao:active {

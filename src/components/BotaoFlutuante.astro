@@ -8,7 +8,7 @@ import IconeWhatsApp from './ui/IconeWhatsApp.astro';
 ---
 
 <a
-  class="flutuante"
+  class="flutuante botao-luz"
   href={linkWhatsAppPorOrigem('flutuante')}
   target="_blank"
   rel="noopener"
@@ -63,13 +63,7 @@ import IconeWhatsApp from './ui/IconeWhatsApp.astro';
     place-items: center;
     width: 58px;
     height: 58px;
-    border-radius: 50%;
-    background: var(--laranja);
-    color: var(--navy);
-    box-shadow:
-      0 0 0 1px color-mix(in oklab, var(--laranja) 60%, var(--offwhite)) inset,
-      0 12px 32px -8px color-mix(in oklab, var(--laranja) 70%, transparent),
-      0 6px 18px -6px rgb(0 0 0 / 0.6);
+    border-radius: 50%; /* o visual de luz vem de .botao-luz (styles/luz.css) */
     opacity: 0;
     translate: 0 24px;
     pointer-events: none;

@@ -92,6 +92,115 @@
     0 0 44px -10px color-mix(in oklab, var(--azul) 75%, transparent);
 }
 
+/* ---------- Botão de luz: o foco laranja (CTA de WhatsApp) ----------
+   Pílula escura com uma luz laranja que nasce do fundo e balança devagar, borda em degradê
+   que gira e um halo pontilhado em volta. O texto off-white fica na parte escura, acima da
+   luz (nunca texto claro sobre laranja chapado). Com movimento reduzido, tudo fica parado. */
+@property --brilho-x {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 50%;
+}
+
+@property --borda-angulo {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.botao-luz {
+  position: relative;
+  isolation: isolate;
+  color: var(--offwhite);
+  text-shadow: 0 1px 14px color-mix(in oklab, var(--navy-noite) 90%, transparent);
+}
+
+/* halo pontilhado (meio-tom) em volta do botão */
+.botao-luz::before {
+  content: '';
+  position: absolute;
+  inset: -22px -34px;
+  z-index: -2;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--laranja) 60%, transparent) 0.9px,
+    transparent 1.5px
+  );
+  background-size: 7px 7px;
+  mask-image: radial-gradient(closest-side, #000 30%, transparent);
+  opacity: 0.6;
+  transition: opacity var(--transicao);
+}
+
+/* corpo: escuro, luz laranja subindo do fundo, toque azul na lateral, grão e borda que gira */
+.botao-luz::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  border: 1.5px solid transparent;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.12'/%3E%3C/svg%3E")
+      padding-box,
+    radial-gradient(
+        58% 100% at var(--brilho-x) 112%,
+        color-mix(in oklab, var(--offwhite) 88%, var(--laranja)) 0%,
+        color-mix(in oklab, var(--laranja) 70%, var(--offwhite)) 18%,
+        var(--laranja) 36%,
+        color-mix(in oklab, var(--laranja) 45%, transparent) 60%,
+        transparent 78%
+      )
+      padding-box,
+    radial-gradient(
+        38% 90% at 100% 112%,
+        color-mix(in oklab, var(--azul) 60%, transparent),
+        transparent 70%
+      )
+      padding-box,
+    linear-gradient(180deg, #0a1628, var(--navy-noite)) padding-box,
+    conic-gradient(
+        from var(--borda-angulo),
+        var(--laranja),
+        color-mix(in oklab, var(--offwhite) 50%, transparent) 25%,
+        color-mix(in oklab, var(--offwhite) 16%, transparent) 55%,
+        color-mix(in oklab, var(--laranja) 70%, var(--offwhite)) 85%,
+        var(--laranja)
+      )
+      border-box;
+  box-shadow:
+    0 14px 34px -14px color-mix(in oklab, var(--laranja) 60%, transparent),
+    0 22px 40px -18px rgb(0 0 0 / 0.85);
+  animation:
+    botao-luz-balanca 5s ease-in-out infinite alternate,
+    botao-luz-borda 7s linear infinite;
+  transition: filter var(--transicao);
+}
+
+.botao-luz:hover::after {
+  filter: brightness(1.14) saturate(1.08);
+}
+
+.botao-luz:hover::before {
+  opacity: 0.7;
+}
+
+@keyframes botao-luz-balanca {
+  from {
+    --brilho-x: 30%;
+  }
+  to {
+    --brilho-x: 70%;
+  }
+}
+
+@keyframes botao-luz-borda {
+  to {
+    --borda-angulo: 360deg;
+  }
+}
+
 /* sem blur no celular: a placa fica quase opaca; com blur, pode deixar o fundo aparecer */
 @media (min-width: 1024px) {
   .placa {
