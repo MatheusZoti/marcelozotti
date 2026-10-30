@@ -1,0 +1,79 @@
+---
+// Botão/link para o WhatsApp do Marcelo.
+// variante "acao": o único elemento laranja da composição (texto navy, nunca branco).
+// variante "contorno": CTA secundário (cabeçalho), sem laranja.
+import { linkWhatsAppPorOrigem, type OrigemCta } from '../../config/site';
+import IconeWhatsApp from './IconeWhatsApp.astro';
+
+interface Props {
+  origem: OrigemCta;
+  variante?: 'acao' | 'contorno';
+  class?: string;
+}
+
+const { origem, variante = 'acao', class: classe } = Astro.props;
+---
+
+<a
+  class:list={['botao', `botao--${variante}`, classe]}
+  href={linkWhatsAppPorOrigem(origem)}
+  target="_blank"
+  rel="noopener"
+  data-cta={origem}
+>
+  <IconeWhatsApp tamanho={variante === 'acao' ? 22 : 18} />
+  <span><slot /></span>
+  <span class="visualmente-oculto">(abre o WhatsApp em uma nova aba)</span>
+</a>
+
+<style>
+  .botao {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 999px;
+    transition:
+      transform var(--transicao),
+      box-shadow var(--transicao),
+      background-color var(--transicao);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .botao--acao {
+    min-height: 56px;
+    padding: 0 28px;
+    font-size: 1.0625rem;
+    background: var(--laranja);
+    color: var(--navy);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--laranja) 60%, var(--offwhite)) inset,
+      0 10px 32px -10px color-mix(in oklab, var(--laranja) 70%, transparent);
+  }
+
+  .botao--acao:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--laranja) 60%, var(--offwhite)) inset,
+      0 16px 40px -10px color-mix(in oklab, var(--laranja) 85%, transparent);
+  }
+
+  .botao--acao:active {
+    transform: translateY(0);
+  }
+
+  .botao--contorno {
+    min-height: 44px;
+    padding: 0 18px;
+    font-size: var(--fs-pequeno);
+    color: var(--texto);
+    background: color-mix(in oklab, var(--offwhite) 5%, transparent);
+    border: 1px solid color-mix(in oklab, var(--offwhite) 22%, transparent);
+  }
+
+  .botao--contorno:hover {
+    background: color-mix(in oklab, var(--offwhite) 11%, transparent);
+  }
+</style>

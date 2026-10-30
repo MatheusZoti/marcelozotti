@@ -1,0 +1,56 @@
+---
+// Placa de vidro com número protagonista e rótulo pequeno (ref-02 / ref-05).
+interface Props {
+  numero: string;
+  rotulo: string;
+  acesa?: boolean;
+  class?: string;
+}
+
+const { numero, rotulo, acesa = false, class: classe } = Astro.props;
+---
+
+<div class:list={['placa', 'placa-dado', { 'placa--acesa': acesa }, classe]}>
+  <span class="numero placa-dado__numero">{numero}</span>
+  <span class="placa-dado__rotulo">{rotulo}</span>
+</div>
+
+<style>
+  .placa-dado {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 16px 16px;
+    min-height: 100px;
+  }
+
+  .placa-dado__numero {
+    font-size: var(--fs-numero);
+    color: var(--texto);
+  }
+
+  .placa-dado__rotulo {
+    font-family: var(--fonte-mono);
+    font-size: 0.6875rem;
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+  }
+
+  .placa--acesa .placa-dado__rotulo {
+    color: color-mix(in oklab, var(--offwhite) 88%, var(--azul));
+  }
+
+  @media (min-width: 1024px) {
+    .placa-dado {
+      padding: 18px 20px 20px;
+      min-height: 132px;
+    }
+
+    .placa-dado__rotulo {
+      font-size: 0.75rem;
+    }
+  }
+</style>

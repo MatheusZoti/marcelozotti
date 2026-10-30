@@ -1,0 +1,51 @@
+---
+// Cabeçalho: só o símbolo MZ (a assinatura completa exige ≥ 280 px, então fica no rodapé).
+import Simbolo from '../assets/logos/simbolo-transparente-p-fundo-escuro.svg';
+import BotaoWhatsApp from './ui/BotaoWhatsApp.astro';
+---
+
+<header class="cabecalho">
+  <div class="container cabecalho__linha">
+    <a class="cabecalho__marca" href="/" aria-label="Marcelo Zotti, página inicial">
+      <Simbolo class="cabecalho__simbolo" aria-hidden="true" />
+    </a>
+    <BotaoWhatsApp origem="cabecalho" variante="contorno">Falar no WhatsApp</BotaoWhatsApp>
+  </div>
+</header>
+
+<style>
+  .cabecalho {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 10;
+    padding-top: 12px;
+  }
+
+  .cabecalho__linha {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .cabecalho__marca {
+    display: block;
+    /* o SVG já inclui a área de proteção (X) em volta do desenho */
+    margin-left: -12px;
+  }
+
+  .cabecalho__simbolo {
+    width: 104px; /* desenho ≈ 88 px, acima do mínimo de 64 px do brand book */
+    height: auto;
+  }
+
+  @media (min-width: 1024px) {
+    .cabecalho {
+      padding-top: 20px;
+    }
+
+    .cabecalho__simbolo {
+      width: 128px;
+    }
+  }
+</style>

@@ -1,0 +1,57 @@
+/* Tokens da marca (Brand Book v1.0). Só cores da paleta oficial e derivados dela. */
+:root {
+  /* Paleta oficial */
+  --navy: #0b1f3b;
+  --azul: #2563eb;
+  --laranja: #f59e0b; /* ação: só o botão do WhatsApp */
+  --offwhite: #f4f7fb;
+  --grafite: #1f2937;
+
+  /* Derivados (mesma família de cor, só mais escuros ou mais claros) */
+  --navy-profundo: #06111f; /* fundo quase preto das referências */
+  --navy-noite: #030a14;
+  --azul-luz: color-mix(in oklab, var(--azul) 55%, var(--offwhite)); /* núcleo do feixe */
+  --azul-fio: color-mix(in oklab, var(--azul) 70%, var(--offwhite)); /* bordas acesas */
+
+  /* Texto sobre fundo escuro */
+  --texto: var(--offwhite);
+  --texto-suave: color-mix(in oklab, var(--offwhite) 72%, var(--navy)); /* ≈ 9:1 sobre navy-profundo */
+  --texto-apagado: color-mix(in oklab, var(--offwhite) 50%, var(--navy));
+
+  /* Tipografia */
+  --fonte: 'Manrope Variable', Manrope, Inter, system-ui, sans-serif;
+  --fonte-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+
+  --fs-rotulo: 0.75rem;
+  --fs-pequeno: 0.875rem;
+  --fs-corpo: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --fs-h2: clamp(1.875rem, 1.4rem + 2.2vw, 3rem);
+  --fs-h1: clamp(2.25rem, 1.45rem + 3.6vw, 4.25rem);
+  --fs-numero: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+
+  /* Espaço */
+  --gutter: 16px;
+  --largura-max: 1200px;
+  --raio: 20px;
+  --raio-pequeno: 12px;
+
+  /* Ângulos do símbolo MZ */
+  --ang-fita: 45deg; /* diagonal da fita: cortes e molduras */
+  --ang-luz: 67.5deg; /* inclinação de feixes e colunas de luz */
+  --desvio-luz: 22.5deg; /* 90° − 67,5°: rotação de um elemento vertical para chegar a 67,5° */
+
+  --transicao: 240ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --gutter: 48px;
+  }
+}

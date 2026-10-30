@@ -1,6 +1,6 @@
 # Planejamento do ambiente: landing page das mentorias
 
-> Status: **aguardando aprovação**. Nenhum código do site foi escrito ainda.
+> Status: **aprovado** em 30/10/2026. Hero construído e validado em 390 / 768 / 1440 px.
 > Fontes lidas: `CLAUDE.md`, `Brand-Book-Marcelo-Zotti.pdf` (33 p.), os dois pitches (`.pptx`), as 5 referências visuais e as 9 fotos originais.
 
 ---
@@ -31,7 +31,7 @@ marcelozotti/
 ├─ docs/PLANEJAMENTO.md          este documento
 ├─ logos/                        logos oficiais (fonte única, importados direto daqui)
 ├─ scripts/
-│  └─ otimizar-fotos.mjs         gera as versões web a partir de "Fotos do profissional/"
+│  └─ preparar-assets.mjs        gera versões web das fotos e dos logos (npm run assets)
 ├─ public/                       favicon, imagem Open Graph, robots.txt
 ├─ src/
 │  ├─ config/site.ts             WHATSAPP (UMA constante), mensagens por origem, ID do GTM, URL do site
@@ -42,7 +42,8 @@ marcelozotti/
 │  │  ├─ base.css                reset, tipografia, layout
 │  │  └─ luz.css                 feixe, colunas de luz, brilho de borda, vidro fosco
 │  ├─ components/
-│  │  ├─ ui/                     BotaoWhatsApp, PlacaVidro, Numero, Rotulo, VideoFachada, Feixe
+│  │  ├─ Cabecalho.astro
+│  │  ├─ ui/                     BotaoWhatsApp, IconeWhatsApp, PlacaDado (+ classes .placa / .feixe em luz.css)
 │  │  └─ secoes/                 01-Hero.astro … 14-Rodape.astro (uma por seção do mapa)
 │  ├─ scripts/                   whatsapp.ts (links + dataLayer + qualificador), video.ts
 │  ├─ layouts/Base.astro         <head>: SEO, Open Graph, GTM, fontes
@@ -69,7 +70,7 @@ Se quiser versionar tudo isso, a saída é tornar o repositório privado.
 - **Contraste** (WCAG AA, do brand book): off-white sobre navy 15,4:1; navy sobre laranja 7,7:1 (texto do botão é navy, nunca branco).
 - **Tipografia**: Manrope 800 nos títulos, 400/500 no texto; JetBrains Mono em números, etapas (`01`–`07`), rótulos e microcopy técnica.
 - **Ângulos**: feixes e colunas de luz inclinados a **67,5°**; cortes entre seções e molduras a **45°** (a diagonal da fita). Nada de luz vertical "padrão SaaS".
-- **Logo**: assinatura completa só com ≥ 280 px de largura (regra do brand book). No cabeçalho do celular (390 px) entra só o **símbolo MZ**; a assinatura completa aparece no hero em telas largas e no rodapé. Sem sombra ou brilho sobre o logo.
+- **Logo**: assinatura completa só com ≥ 280 px de largura (regra do brand book) e ela é empilhada (símbolo sobre o nome), alta demais para um cabeçalho. Por isso o cabeçalho usa só o **símbolo MZ** em todas as telas e a assinatura completa fica no rodapé. Sem sombra ou brilho sobre o logo.
 - **Vidro fosco**: `backdrop-filter` só em até 3–4 placas visíveis por vez; no celular, placas usam gradiente sólido (sem blur) para não pesar.
 
 ---
@@ -138,5 +139,5 @@ Se quiser versionar tudo isso, a saída é tornar o repositório privado.
 ## 7. Próximo passo após a aprovação
 
 1. Criar o projeto Astro, tokens e componentes base (`BotaoWhatsApp`, `PlacaVidro`, `Feixe`).
-2. Rodar `scripts/otimizar-fotos.mjs` para gerar as versões web.
+2. Rodar `npm run assets` (scripts/preparar-assets.mjs) para gerar as versões web.
 3. Construir o hero e validar o visual em 390 / 768 / 1440 px antes de seguir para as outras seções.

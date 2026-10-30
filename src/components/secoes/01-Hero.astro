@@ -1,0 +1,349 @@
+---
+// Seção 1 · Hero (ref-01): Marcelo na placa central, sob um feixe de luz a 67,5°,
+// com placas de dados reais do formato orbitando. Luz no máximo.
+import { Picture } from 'astro:assets';
+import fotoHero from '../../assets/fotos/hero-marcelo-galpao.jpg';
+import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+import PlacaDado from '../ui/PlacaDado.astro';
+
+const provas = [
+  'Fundador da Brazotti Distribuidora',
+  'Online para todo o Brasil',
+  'Presencial em Curitiba e região',
+];
+
+const dados = [
+  { numero: '6+', rotulo: 'anos vendendo em marketplaces', acesa: true },
+  { numero: '4', rotulo: 'encontros individuais' },
+  { numero: '8h', rotulo: 'de mentoria ao vivo' },
+  { numero: '~30', rotulo: 'dias de acompanhamento', acesa: true },
+];
+---
+
+<section class="hero" aria-labelledby="hero-titulo">
+  <div class="hero__luz" aria-hidden="true">
+    <div class="feixe hero__feixe"></div>
+    <div class="hero__brilho"></div>
+  </div>
+
+  <div class="container hero__grade">
+    <div class="hero__texto">
+      <p class="rotulo hero__selo">Mentoria individual · Mercado Livre e Shopee</p>
+
+      <h1 id="hero-titulo" class="hero__titulo">
+        Você já tem os produtos. <span>Agora é hora de vender&nbsp;mais.</span>
+      </h1>
+
+      <p class="hero__lead">
+        Acompanhamento individual com um empresário que vive o marketplace todos os dias. Estratégia,
+        números e decisões aplicados aos seus produtos, no online ou no presencial.
+      </p>
+
+      <div class="hero__acao">
+        <BotaoWhatsApp origem="hero">Quero conversar com o Marcelo</BotaoWhatsApp>
+        <p class="hero__nota">Conversa direta com o Marcelo no WhatsApp, sem compromisso.</p>
+      </div>
+
+      <ul class="hero__provas" role="list">
+        {provas.map((prova) => <li>{prova}</li>)}
+      </ul>
+    </div>
+
+    <div class="hero__palco">
+      <figure class="placa placa--acesa hero__foto">
+        <Picture
+          src={fotoHero}
+          formats={['avif', 'webp']}
+          widths={[360, 540, 720, 960]}
+          sizes="(min-width: 1024px) 400px, 86vw"
+          alt="Marcelo Zotti explicando, de camiseta azul, no galpão da operação da Brazotti Distribuidora"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+
+      <div class="hero__dados">
+        {
+          dados.map((dado, i) => (
+            <PlacaDado
+              class={`hero__dado hero__dado--${i + 1}`}
+              numero={dado.numero}
+              rotulo={dado.rotulo}
+              acesa={dado.acesa}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding: 104px 0 72px;
+    background:
+      radial-gradient(120% 70% at 50% 0%, var(--navy) 0%, transparent 70%),
+      linear-gradient(180deg, var(--navy-profundo) 60%, var(--navy-noite) 100%);
+  }
+
+  /* ---------- Luz ---------- */
+  .hero__luz {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .hero__feixe {
+    --feixe-largura: 300px;
+    --feixe-x: 62%;
+    --feixe-y: -20%;
+    --feixe-altura: 150%;
+  }
+
+  .hero__brilho {
+    position: absolute;
+    left: 50%;
+    top: 62%;
+    width: 520px;
+    height: 520px;
+    translate: -50% -50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--azul) 40%, transparent),
+      transparent
+    );
+  }
+
+  /* ---------- Texto ---------- */
+  .hero__grade {
+    display: grid;
+    gap: 56px;
+  }
+
+  .hero__selo {
+    display: inline-block;
+    padding: 7px 12px;
+    margin-bottom: 20px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 14%, transparent);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--navy) 60%, transparent);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em; /* cabe em uma linha a 390 px */
+  }
+
+  @media (min-width: 560px) {
+    .hero__selo {
+      letter-spacing: 0.1em;
+    }
+  }
+
+  .hero__titulo {
+    font-size: var(--fs-h1);
+  }
+
+  /* segunda frase com luz azulada, como o título da ref-01 */
+  .hero__titulo span {
+    display: block;
+    background: linear-gradient(100deg, var(--offwhite) 10%, var(--azul-luz) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero__lead {
+    margin-top: 20px;
+    max-width: 34rem;
+    font-size: var(--fs-lead);
+    color: var(--texto-suave);
+  }
+
+  .hero__acao {
+    margin-top: 32px;
+  }
+
+  .hero__acao :global(.botao) {
+    width: 100%;
+  }
+
+  .hero__nota {
+    margin-top: 12px;
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  .hero__provas {
+    display: grid;
+    gap: 10px;
+    margin-top: 32px;
+    padding: 20px 0 0;
+    list-style: none;
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 10%, transparent);
+    font-family: var(--fonte-mono);
+    font-size: 0.8125rem;
+    color: var(--texto-suave);
+  }
+
+  .hero__provas li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  /* marcador: losango a 45° (a diagonal da fita) */
+  .hero__provas li::before {
+    content: '';
+    flex: none;
+    width: 7px;
+    height: 7px;
+    background: var(--azul);
+    rotate: var(--ang-fita);
+    box-shadow: 0 0 10px var(--azul);
+  }
+
+  /* ---------- Palco: foto + placas ---------- */
+  .hero__palco {
+    position: relative;
+  }
+
+  .hero__foto {
+    width: 88%;
+    margin-inline: auto;
+    padding: 8px;
+    border-radius: 28px;
+  }
+
+  .hero__foto :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    border-radius: 21px;
+    /* degradê navy sobre a foto (regra do brand book) */
+    mask-image: linear-gradient(180deg, #000 60%, transparent 100%);
+  }
+
+  .hero__dados {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: -64px; /* a primeira fileira sobe sobre o pé desfocado da foto */
+  }
+
+  .hero__dados :global(.hero__dado) {
+    animation: placa-entra 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .hero__dados :global(.hero__dado--2) {
+    animation-delay: 80ms;
+  }
+  .hero__dados :global(.hero__dado--3) {
+    animation-delay: 160ms;
+  }
+  .hero__dados :global(.hero__dado--4) {
+    animation-delay: 240ms;
+  }
+
+  @keyframes placa-entra {
+    from {
+      opacity: 0;
+      translate: 0 16px;
+    }
+  }
+
+  @media (min-width: 560px) {
+    .hero__acao :global(.botao) {
+      width: auto;
+    }
+
+    .hero__foto {
+      width: 72%;
+    }
+
+    .hero__dados {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* ---------- Telas largas: texto à esquerda, palco em órbita à direita ---------- */
+  @media (min-width: 1024px) {
+    .hero {
+      padding: 120px 0 96px;
+      min-height: min(100svh, 940px);
+      display: flex;
+      align-items: center;
+    }
+
+    .hero__feixe {
+      --feixe-largura: 420px;
+      --feixe-x: 74%;
+      --feixe-y: -30%;
+      --feixe-altura: 170%;
+    }
+
+    .hero__brilho {
+      left: 74%;
+      top: 52%;
+      width: 760px;
+      height: 760px;
+    }
+
+    .hero__grade {
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 48px;
+    }
+
+    .hero__palco {
+      aspect-ratio: 1 / 1.08;
+    }
+
+    .hero__foto {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 70%;
+      translate: -50% -50%;
+    }
+
+    .hero__dados {
+      position: absolute;
+      inset: 0;
+      display: block;
+      margin: 0;
+    }
+
+    .hero__dados :global(.hero__dado) {
+      position: absolute;
+      width: 34%;
+    }
+
+    /* posições escolhidas para não cobrir o rosto nem as mãos */
+    .hero__dados :global(.hero__dado--1) {
+      left: -2%;
+      top: 9%;
+    }
+    .hero__dados :global(.hero__dado--2) {
+      left: -6%;
+      top: 58%;
+    }
+    .hero__dados :global(.hero__dado--3) {
+      right: -4%;
+      top: 3%;
+    }
+    .hero__dados :global(.hero__dado--4) {
+      right: -6%;
+      bottom: 6%;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .hero__provas {
+      grid-auto-flow: column;
+      justify-content: start;
+      gap: 28px;
+    }
+  }
+</style>

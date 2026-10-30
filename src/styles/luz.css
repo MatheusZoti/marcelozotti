@@ -1,0 +1,101 @@
+/* Efeitos de luz e vidro (referências 01, 04 e 05).
+   Regras: luz sempre inclinada a 67,5°; vidro fosco (blur) só em telas largas; nada disso esconde conteúdo. */
+
+/* ---------- Feixe: faixa de luz que surge do escuro ---------- */
+.feixe {
+  position: absolute;
+  pointer-events: none;
+  width: var(--feixe-largura, 360px);
+  height: var(--feixe-altura, 170%);
+  left: var(--feixe-x, 50%);
+  top: var(--feixe-y, -35%);
+  translate: -50% 0;
+  rotate: var(--desvio-luz);
+  z-index: 0;
+}
+
+.feixe::before,
+.feixe::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  /* some nas pontas: a luz nasce e morre no escuro */
+  mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 62%, transparent 100%);
+}
+
+/* halo largo */
+.feixe::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--azul) 35%, transparent) 25%,
+    color-mix(in oklab, var(--azul) 70%, transparent) 50%,
+    color-mix(in oklab, var(--azul) 35%, transparent) 75%,
+    transparent 100%
+  );
+  filter: blur(48px);
+}
+
+/* núcleo mais claro e estreito */
+.feixe::after {
+  inset: 0 34%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--azul-luz) 70%, transparent) 50%,
+    transparent
+  );
+  filter: blur(22px);
+  opacity: 0.75;
+  animation: feixe-respira 9s ease-in-out infinite alternate;
+}
+
+@keyframes feixe-respira {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+/* ---------- Placa de vidro (ref-05) ---------- */
+.placa {
+  position: relative;
+  border-radius: var(--raio);
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in oklab, var(--azul) 16%, transparent),
+      color-mix(in oklab, var(--navy) 70%, transparent) 65%
+    ),
+    color-mix(in oklab, var(--navy-profundo) var(--placa-opacidade, 88%), transparent);
+  border: 1px solid color-mix(in oklab, var(--offwhite) 9%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--offwhite) 7%, transparent);
+}
+
+/* acesa: luz interna + brilho na borda */
+.placa--acesa {
+  background:
+    radial-gradient(
+      120% 90% at 20% 0%,
+      color-mix(in oklab, var(--azul) 62%, transparent),
+      color-mix(in oklab, var(--azul) 18%, transparent) 55%,
+      transparent 80%
+    ),
+    color-mix(in oklab, var(--navy) 80%, transparent);
+  border-color: color-mix(in oklab, var(--azul-fio) 55%, transparent);
+  box-shadow:
+    inset 0 0 28px color-mix(in oklab, var(--azul) 45%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--offwhite) 30%, transparent),
+    0 0 44px -10px color-mix(in oklab, var(--azul) 75%, transparent);
+}
+
+/* sem blur no celular: a placa fica quase opaca; com blur, pode deixar o fundo aparecer */
+@media (min-width: 1024px) {
+  .placa {
+    --placa-opacidade: 55%;
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    backdrop-filter: blur(14px) saturate(120%);
+  }
+}

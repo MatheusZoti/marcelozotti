@@ -1,0 +1,60 @@
+---
+import '@fontsource-variable/manrope/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/luz.css';
+import { GTM_ID, SITE } from '../config/site';
+
+interface Props {
+  titulo?: string;
+  descricao?: string;
+}
+
+const { titulo = SITE.titulo, descricao = SITE.descricao } = Astro.props;
+const canonica = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descricao} />
+    <link rel="canonical" href={canonica} />
+    <meta name="theme-color" content="#06111f" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={manropeLatin} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:site_name" content={SITE.nome} />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descricao} />
+    <meta property="og:url" content={canonica} />
+    <!-- PENDENTE: imagem Open Graph 1200×630 -->
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {
+      GTM_ID && (
+        <script is:inline define:vars={{ GTM_ID }}>
+          (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer',GTM_ID);
+        </script>
+      )
+    }
+  </head>
+  <body>
+    <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
+    <slot name="cabecalho" />
+    <main id="conteudo">
+      <slot />
+    </main>
+
+    <script>
+      import '../scripts/whatsapp';
+    </script>
+  </body>
+</html>
