@@ -28,6 +28,10 @@ export const MENSAGENS_WHATSAPP = {
     'Olá, Marcelo! Conheci sua trajetória pela página e quero conversar sobre a mentoria individual.',
   frentes:
     'Olá, Marcelo! Vi as 7 frentes da mentoria na sua página e quero conversar sobre a minha operação.',
+  'formato-online':
+    'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual online. Pode me passar os detalhes?',
+  'formato-presencial':
+    'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual presencial, em Curitiba. Pode me passar os detalhes?',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;

@@ -1,0 +1,392 @@
+---
+// Seção 10 · Formatos: Online x Presencial. Sem preço. Luz alta.
+// Dados comuns em placas de número (ref-02); os dois formatos são placas grandes (ref-05)
+// que funcionam como escolha: a escolhida acende e o único botão laranja segue a escolha.
+// Tudo com CSS (:has), funciona sem JavaScript.
+import {
+  diferencial,
+  duracao,
+  formatos,
+  notaInvestimento,
+  numeros,
+  titulo,
+} from '../../conteudo/formatos';
+import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+import PlacaDado from '../ui/PlacaDado.astro';
+---
+
+<section class="formatos" aria-labelledby="formatos-titulo" id="formatos">
+  <div class="formatos__luz" aria-hidden="true"></div>
+
+  <div class="container">
+    <header>
+      <p class="rotulo">Formatos</p>
+      <h2 id="formatos-titulo" class="formatos__titulo">{titulo}</h2>
+    </header>
+
+    <!-- O que é igual nos dois formatos -->
+    <div class="formatos__comum">
+      <p class="rotulo formatos__subrotulo">Nos dois formatos</p>
+      <div class="formatos__numeros">
+        {numeros.map((n) => <PlacaDado numero={n.numero} rotulo={n.rotulo} acesa={n.acesa} />)}
+      </div>
+      <p class="formatos__duracao">{duracao}</p>
+
+      <div class="formatos__diferencial">
+        <h3 class="formatos__diferencial-titulo">{diferencial.titulo}</h3>
+        <ul class="formatos__itens" role="list">
+          {
+            diferencial.itens.map((item) => (
+              <li>
+                <span class="formatos__item-nome">{item.nome}</span>
+                <span class="formatos__item-texto">{item.texto}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Escolha do formato -->
+    <fieldset class="formatos__escolha">
+      <legend class="rotulo formatos__subrotulo">Escolha o formato</legend>
+      <div class="formatos__placas">
+        {
+          formatos.map((formato) => (
+            <div class="placa formato">
+              <input
+                class="visualmente-oculto"
+                type="radio"
+                name="formato"
+                id={`formato-${formato.id}`}
+                value={formato.id}
+                checked={formato.id === 'online'}
+              />
+              <div class="formato__topo">
+                <span class="rotulo">Mentoria individual</span>
+                <span class="formato__marca" aria-hidden="true" />
+              </div>
+              <label class="formato__nome" for={`formato-${formato.id}`}>
+                {formato.nome}
+              </label>
+              <p class="formato__resumo">{formato.resumo}</p>
+              <ul class="formato__detalhes" role="list">
+                {formato.detalhes.map((detalhe) => <li>{detalhe}</li>)}
+              </ul>
+              <p class:list={['formato__alcance', { 'formato__alcance--restrito': formato.restrito }]}>
+                {formato.alcance}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <div class="formatos__acao">
+      {
+        formatos.map((formato) => (
+          <BotaoWhatsApp origem={formato.cta} class={`formatos__botao formatos__botao--${formato.id}`}>
+            {formato.textoBotao}
+          </BotaoWhatsApp>
+        ))
+      }
+      <p class="formatos__nota">{notaInvestimento}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .formatos {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    padding: 96px 0 104px;
+    background: var(--navy-profundo);
+  }
+
+  .formatos__luz {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(70% 40% at 50% 68%, color-mix(in oklab, var(--azul) 34%, transparent), transparent 70%),
+      radial-gradient(40% 30% at 0% 0%, color-mix(in oklab, var(--azul) 16%, transparent), transparent 70%);
+  }
+
+  .formatos__titulo {
+    margin-top: 12px;
+    max-width: 18ch;
+    font-size: var(--fs-h2);
+  }
+
+  .formatos__subrotulo {
+    display: block;
+    margin-bottom: 16px;
+    padding: 0;
+  }
+
+  /* ---------- Comum aos dois ---------- */
+  .formatos__comum {
+    margin-top: 48px;
+  }
+
+  .formatos__numeros {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .formatos__duracao {
+    margin-top: 14px;
+    font-family: var(--fonte-mono);
+    font-size: 0.8125rem;
+    color: var(--texto-suave);
+  }
+
+  .formatos__diferencial {
+    margin-top: 40px;
+  }
+
+  .formatos__diferencial-titulo {
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+    letter-spacing: -0.02em;
+  }
+
+  .formatos__itens {
+    display: grid;
+    gap: 18px;
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .formatos__itens li {
+    display: grid;
+    gap: 4px;
+    padding-left: 22px;
+    position: relative;
+  }
+
+  .formatos__itens li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.5em;
+    width: 8px;
+    height: 8px;
+    rotate: var(--ang-fita);
+    background: var(--azul);
+    box-shadow: 0 0 10px var(--azul);
+  }
+
+  .formatos__item-nome {
+    font-weight: 700;
+  }
+
+  .formatos__item-texto {
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  /* ---------- Escolha ---------- */
+  .formatos__escolha {
+    margin: 64px 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .formatos__placas {
+    display: grid;
+    gap: 12px;
+  }
+
+  .formato {
+    display: flex;
+    flex-direction: column;
+    padding: 24px 22px 26px;
+    cursor: pointer;
+    transition:
+      background 400ms ease,
+      border-color 400ms ease,
+      box-shadow 400ms ease;
+  }
+
+  .formato:has(input:focus-visible) {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 3px;
+  }
+
+  .formato__topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* marcador de escolha: losango que se preenche */
+  .formato__marca {
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+    rotate: var(--ang-fita);
+    border: 1.5px solid color-mix(in oklab, var(--offwhite) 40%, transparent);
+    border-radius: 2px;
+    transition:
+      background-color 300ms ease,
+      box-shadow 300ms ease;
+  }
+
+  .formato:has(input:checked) .formato__marca {
+    background: var(--offwhite);
+    border-color: var(--offwhite);
+    box-shadow: 0 0 12px var(--azul-luz);
+  }
+
+  /* o rótulo do nome cobre a placa inteira: clicar em qualquer ponto escolhe o formato */
+  .formato__nome {
+    margin-top: 18px;
+    font-size: clamp(2rem, 1.6rem + 2vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .formato__nome::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .formato__resumo {
+    margin-top: 10px;
+    font-size: var(--fs-lead);
+    font-weight: 600;
+  }
+
+  .formato__detalhes {
+    display: grid;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  .formato__detalhes li::before {
+    content: '— ';
+    color: var(--texto-apagado);
+  }
+
+  .formato__alcance {
+    align-self: flex-start;
+    margin-top: 22px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 18%, transparent);
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--texto-suave);
+  }
+
+  /* presencial: restrição sempre visível, em destaque */
+  .formato__alcance--restrito {
+    border-color: color-mix(in oklab, var(--azul-luz) 60%, transparent);
+    background: color-mix(in oklab, var(--azul) 22%, transparent);
+    color: var(--offwhite);
+  }
+
+  /* ---------- Ação: um só botão laranja, conforme a escolha ---------- */
+  .formatos__acao {
+    margin-top: 32px;
+  }
+
+  .formatos__acao :global(.botao) {
+    width: 100%;
+  }
+
+  .formatos__acao :global(.formatos__botao--presencial) {
+    display: none;
+  }
+
+  .formatos:has(input[value='presencial']:checked) .formatos__acao :global(.formatos__botao--online) {
+    display: none;
+  }
+
+  .formatos:has(input[value='presencial']:checked) .formatos__acao :global(.formatos__botao--presencial) {
+    display: inline-flex;
+  }
+
+  .formatos__nota {
+    margin-top: 14px;
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  @media (min-width: 560px) {
+    .formatos__acao {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .formatos__acao :global(.botao) {
+      width: auto;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .formatos__numeros {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .formatos__itens {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .formatos__placas {
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .formato {
+      padding: 30px 30px 32px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .formatos {
+      padding: 128px 0;
+    }
+
+    .formatos__comum {
+      margin-top: 64px;
+    }
+
+    .formatos__escolha {
+      margin-top: 80px;
+    }
+
+    .formato {
+      min-height: 340px;
+      padding: 36px 36px 38px;
+    }
+
+    .formato__alcance {
+      margin-top: auto;
+    }
+
+    .formato__detalhes {
+      margin-bottom: 24px;
+    }
+
+    .formatos__acao {
+      margin-top: 40px;
+    }
+  }
+</style>
