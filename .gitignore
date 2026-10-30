@@ -1,0 +1,25 @@
+# Repositório público: material interno fica só local (ver docs/PLANEJAMENTO.md)
+referencias/
+Fotos do profissional/
+videos/
+site/
+selo-garantia-7-dias.png
+
+# Dependências e build
+node_modules/
+dist/
+.astro/
+.vercel/
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Sistema e editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log
