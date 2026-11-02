@@ -364,6 +364,10 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
 
   /* ---------- Telas largas: colunas verticais como na ref-03 ---------- */
   @media (min-width: 900px) {
+    .causa {
+      padding: 128px 0;
+    }
+
     .causa__topo {
       display: grid;
       grid-template-columns: auto minmax(0, 24rem);
@@ -447,7 +451,7 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
       order: 3;
       min-height: 2.6em;
       padding-top: 4px;
-      font-size: 0.6875rem;
+      font-size: 0.75rem; /* mínimo de 12 px para rótulos */
     }
 
     .barra--sobra .barra__valor {

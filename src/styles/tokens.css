@@ -16,7 +16,7 @@
   /* Texto sobre fundo escuro */
   --texto: var(--offwhite);
   --texto-suave: color-mix(in oklab, var(--offwhite) 72%, var(--navy)); /* ≈ 9:1 sobre navy-profundo */
-  --texto-apagado: color-mix(in oklab, var(--offwhite) 50%, var(--navy));
+  --texto-apagado: color-mix(in oklab, var(--offwhite) 58%, var(--navy)); /* ≥ 4,5:1 até sobre as placas */
 
   /* Tipografia */
   --fonte: 'Manrope Variable', Manrope, Inter, system-ui, sans-serif;

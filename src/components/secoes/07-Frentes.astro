@@ -104,8 +104,8 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     inset: 0;
     z-index: -1;
     background:
-      radial-gradient(45% 40% at 15% 30%, color-mix(in oklab, var(--azul) 26%, transparent), transparent 70%),
-      radial-gradient(45% 40% at 90% 85%, color-mix(in oklab, var(--azul) 22%, transparent), transparent 70%);
+      radial-gradient(45% 40% at 15% 30%, color-mix(in oklab, var(--azul) 14%, transparent), transparent 70%),
+      radial-gradient(45% 40% at 90% 85%, color-mix(in oklab, var(--azul) 12%, transparent), transparent 70%);
   }
 
   .frentes__titulo {
@@ -232,6 +232,10 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   @media (min-width: 1024px) {
     .frentes {
       padding: 128px 0;
+    }
+
+    .frentes__titulo {
+      max-width: 22ch;
     }
 
     .frentes__grade {

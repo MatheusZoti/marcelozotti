@@ -84,7 +84,7 @@ import { objetivo, passos } from '../../conteudo/metodo';
     position: absolute;
     inset: 0;
     z-index: -1;
-    opacity: 0.55;
+    opacity: 0.28; /* degrau abaixo da seção 5: a luz vem das placas */
     mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
   }
 
@@ -143,7 +143,7 @@ import { objetivo, passos } from '../../conteudo/metodo';
     grid-area: etapa;
     writing-mode: vertical-rl;
     font-family: var(--fonte-mono);
-    font-size: 0.6875rem;
+    font-size: 0.75rem; /* mínimo de 12 px para rótulos */
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--texto-apagado);
