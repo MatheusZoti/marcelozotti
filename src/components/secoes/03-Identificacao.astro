@@ -12,7 +12,9 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   <div class="container identificacao__grade">
     <div class="identificacao__topo">
       <p class="rotulo">Diagnóstico rápido</p>
-      <h2 id="identificacao-titulo" class="identificacao__titulo">Você se reconhece?</h2>
+      <h2 id="identificacao-titulo" class="identificacao__titulo">
+        6 travas comuns em marketplace. <span>Quais estão na sua operação?</span>
+      </h2>
       <p class="identificacao__sub">Marque o que acontece hoje na sua empresa.</p>
     </div>
 
@@ -128,6 +130,11 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   .identificacao__titulo {
     margin-top: 12px;
     font-size: var(--fs-h2);
+  }
+
+  .identificacao__titulo span {
+    display: block;
+    color: var(--azul-luz);
   }
 
   .identificacao__sub {

@@ -1,7 +1,7 @@
 // Seção 10 · Formatos. Fonte: slides "Formato", "Diferencial" e "Investimento" dos dois pitches.
 // SEM PREÇO (regra do projeto): investimento e condições são passados pelo Marcelo no WhatsApp.
 
-export const titulo = 'Acompanhamento individual e personalizado.';
+export const titulo = 'Dois jeitos de ter o Marcelo ao seu lado.';
 
 export const numeros = [
   { numero: '4', rotulo: 'encontros' },
