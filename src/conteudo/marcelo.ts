@@ -6,18 +6,6 @@ export const bio = [
   'Minha trajetória reúne experiência comercial, negociação e gestão empresarial. Na mentoria, ensino o que aplico na minha operação e explico o porquê de cada decisão.',
 ];
 
-export interface Prova {
-  numero: string;
-  rotulo: string;
-  acesa?: boolean;
-}
-
-export const provas: Prova[] = [
-  { numero: '6+', rotulo: 'anos de experiência em vendas nos marketplaces', acesa: true },
-  { numero: 'Brazotti', rotulo: 'distribuidora fundada e administrada por ele' },
-  { numero: 'Clientes', rotulo: 'gestão e orientação de operações de terceiros' },
-];
-
 // PENDENTE: só ligar com documentação do cliente (regra do CLAUDE.md e do brand book).
 // Sempre como faturamento, nunca como lucro, e com a nota de que não é promessa.
 export const faturamento = {
@@ -27,13 +15,45 @@ export const faturamento = {
   nota: 'Faturamento da operação do Marcelo, não do aluno. Não é promessa de resultado.',
 };
 
-// Segunda fileira da parede: o que a pessoa tem com ele na mentoria (dados dos pitches).
-export const comEle = {
-  titulo: 'Na mentoria, com ele',
-  dados: [
-    { numero: '1:1', rotulo: 'individual: só você e ele' },
-    { numero: '8h', rotulo: 'ao vivo com o Marcelo' },
-    { numero: '7', rotulo: 'frentes, do diagnóstico ao crescimento' },
-    { numero: '2', rotulo: 'marketplaces: Mercado Livre e Shopee' },
-  ],
+// Bento da seção 5: quem ele é (experiência, operação, atuação) e o que a pessoa tem com ele
+// na mentoria (formato, horas ao vivo, frentes, marketplaces). Fontes: pitches e brand book.
+export const bento = {
+  experiencia: {
+    rotulo: 'Experiência',
+    numero: '6+',
+    texto: 'anos vendendo em marketplaces, à frente de uma operação real.',
+  },
+  operacao: {
+    rotulo: 'Operação própria',
+    titulo: 'Brazotti Distribuidora',
+    texto: 'Fundada e administrada pelo Marcelo.',
+  },
+  // brand book, "Provas de autoridade": experiência própria, mercado e ensino
+  atuacao: {
+    rotulo: 'Na prática',
+    titulo: 'Ensina o que aplica',
+    itens: ['Operação própria', 'Operações de clientes', 'Mentorias práticas'],
+  },
+  individual: {
+    rotulo: 'Formato',
+    numero: '1:1',
+    texto: 'Individual: só você e ele.',
+  },
+  aoVivo: {
+    rotulo: 'Ao vivo',
+    numero: '8h',
+    texto: '4 encontros de 2h, um por semana.',
+    encontros: 4,
+  },
+  frentes: {
+    rotulo: 'Conteúdo',
+    numero: '7',
+    texto: 'frentes, do diagnóstico ao crescimento.',
+  },
+  foco: {
+    rotulo: 'Foco',
+    numero: '2',
+    texto: 'marketplaces',
+    canais: ['Mercado Livre', 'Shopee'],
+  },
 };

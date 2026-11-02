@@ -26,6 +26,15 @@ const fotos = [
     largura: 1400,
   },
   {
+    origem: 'foto principal da operacao.jpg',
+    // bento da seção 5: só o estoque, sem pessoas (parceiro sem autorização) e sem marca de
+    // fornecedor legível (brand book: preservar fornecedores)
+    destino: 'estoque-brazotti.jpg',
+    recorte: { left: 806, top: 806, width: 3360, height: 1680 }, // 2:1
+    largura: 1200,
+    qualidade: 78,
+  },
+  {
     origem: 'Foto da operacao.jpg',
     destino: 'operacao-pb.jpg', // textura de fundo da seção 4 (já é P&B), aparece a 16% de opacidade
     largura: 1280,

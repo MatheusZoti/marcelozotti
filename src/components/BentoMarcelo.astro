@@ -1,0 +1,470 @@
+---
+// Bento da seção 5 (referência: bento escuro com luz azul e mini-widgets).
+// Cada bloco mostra um dado real dos pitches/brand book desenhado como um pequeno gráfico.
+// Uma placa acesa (a experiência), o resto apagado; a foto é do estoque real da Brazotti.
+import { Image } from 'astro:assets';
+import fotoEstoque from '../assets/fotos/estoque-brazotti.jpg';
+import { bento, faturamento } from '../conteudo/marcelo';
+import { frentes } from '../conteudo/frentes';
+
+const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrentes, foco } = bento;
+---
+
+<ul class="bento" role="list">
+  <!-- A · experiência: o número protagonista, a única placa acesa -->
+  <li class="placa placa--acesa bloco bloco--experiencia">
+    <span class="rotulo bloco__rotulo">{experiencia.rotulo}</span>
+    <div class="bloco__base">
+      <span class="numero bloco__gigante">{experiencia.numero}</span>
+      <p class="bloco__texto">{experiencia.texto}</p>
+      {
+        faturamento.exibir && (
+          <p class="bloco__faturamento">
+            <strong class="numero">{faturamento.numero}</strong> {faturamento.rotulo}
+            <span>{faturamento.nota}</span>
+          </p>
+        )
+      }
+    </div>
+  </li>
+
+  <!-- B · operação própria: foto real do estoque com degradê navy (regra do brand book) -->
+  <li class="placa bloco bloco--operacao">
+    <Image
+      class="bloco__foto"
+      src={fotoEstoque}
+      alt="Estoque da Brazotti Distribuidora, com paletes de caixas e prateleiras de produtos"
+      widths={[480, 720, 1000]}
+      sizes="(min-width: 1024px) 590px, 92vw"
+      loading="lazy"
+    />
+    <span class="rotulo bloco__rotulo">{operacao.rotulo}</span>
+    <div class="bloco__base">
+      <h3 class="bloco__titulo">{operacao.titulo}</h3>
+      <p class="bloco__texto">{operacao.texto}</p>
+    </div>
+  </li>
+
+  <!-- C · atuação: mini-lista no estilo de tabela -->
+  <li class="placa bloco bloco--atuacao">
+    <span class="rotulo bloco__rotulo">{atuacao.rotulo}</span>
+    <ul class="atuacao" role="list">
+      {atuacao.itens.map((item) => <li>{item}</li>)}
+    </ul>
+    <h3 class="bloco__titulo bloco__titulo--menor">{atuacao.titulo}</h3>
+  </li>
+
+  <!-- D · 1:1: dois círculos, você e ele -->
+  <li class="placa bloco bloco--individual">
+    <span class="rotulo bloco__rotulo">{individual.rotulo}</span>
+    <div class="dupla" aria-hidden="true">
+      <span class="dupla__circulo dupla__circulo--voce"></span>
+      <span class="dupla__circulo dupla__circulo--ele"></span>
+    </div>
+    <div class="bloco__base">
+      <span class="numero bloco__numero">{individual.numero}</span>
+      <p class="bloco__texto">{individual.texto}</p>
+    </div>
+  </li>
+
+  <!-- E · 8h: linha do tempo com os 4 encontros de 2h -->
+  <li class="placa bloco bloco--aovivo">
+    <span class="rotulo bloco__rotulo">{aoVivo.rotulo}</span>
+    <div class="aovivo">
+      <div class="bloco__base">
+        <span class="numero bloco__numero">{aoVivo.numero}</span>
+        <p class="bloco__texto">{aoVivo.texto}</p>
+      </div>
+      <ol class="encontros" aria-label="4 encontros de 2 horas">
+        {
+          Array.from({ length: aoVivo.encontros }, (_, i) => (
+            <li class="encontro">
+              <span class="encontro__barra" />
+              <span class="encontro__legenda">
+                {i + 1}º · 2h
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </li>
+
+  <!-- F · 7 frentes: etiquetas que somem nas bordas -->
+  <li class="placa bloco bloco--frentes">
+    <span class="rotulo bloco__rotulo">{blocoFrentes.rotulo}</span>
+    <ul class="etiquetas" role="list" aria-label="As 7 frentes">
+      {frentes.map((frente) => <li>{frente.titulo}</li>)}
+    </ul>
+    <div class="bloco__base">
+      <span class="numero bloco__numero">{blocoFrentes.numero}</span>
+      <p class="bloco__texto">{blocoFrentes.texto}</p>
+    </div>
+  </li>
+
+  <!-- G · 2 marketplaces -->
+  <li class="placa bloco bloco--foco">
+    <span class="rotulo bloco__rotulo">{foco.rotulo}</span>
+    <ul class="canais" role="list">
+      {foco.canais.map((canal) => <li>{canal}</li>)}
+    </ul>
+    <div class="bloco__base">
+      <span class="numero bloco__numero">{foco.numero}</span>
+      <p class="bloco__texto">{foco.texto}</p>
+    </div>
+  </li>
+</ul>
+
+<style>
+  /* ---------- Grade ---------- */
+  .bento {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .bloco {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 18px;
+    min-height: 196px;
+    padding: 18px;
+    transition:
+      border-color var(--transicao),
+      transform var(--transicao);
+  }
+
+  .bloco--experiencia,
+  .bloco--operacao,
+  .bloco--aovivo {
+    grid-column: span 2;
+  }
+
+  @media (hover: hover) {
+    .bloco:hover {
+      border-color: color-mix(in oklab, var(--azul-fio) 45%, transparent);
+    }
+  }
+
+  .bloco__rotulo {
+    position: relative;
+    z-index: 1;
+  }
+
+  .bloco--operacao .bloco__rotulo {
+    color: var(--offwhite);
+    text-shadow: 0 1px 10px var(--navy-noite);
+  }
+
+  .bloco__base {
+    position: relative;
+    z-index: 1;
+  }
+
+  .bloco__numero {
+    display: block;
+    font-size: clamp(2.25rem, 1.8rem + 1.6vw, 3rem);
+  }
+
+  .bloco__titulo {
+    font-size: 1.375rem;
+    letter-spacing: -0.02em;
+  }
+
+  .bloco__titulo--menor {
+    font-size: 1.125rem;
+  }
+
+  .bloco__texto {
+    margin-top: 6px;
+    font-size: var(--fs-pequeno);
+    line-height: 1.45;
+    color: var(--texto-suave);
+  }
+
+  /* ---------- A · experiência (acesa) ---------- */
+  .bloco--experiencia {
+    min-height: 280px;
+    /* luz azul subindo do canto, cortada por um feixe a 67,5° (como o "88%" da referência) */
+    background:
+      linear-gradient(
+        calc(var(--desvio-luz) + 90deg),
+        transparent 52%,
+        color-mix(in oklab, var(--azul-luz) 16%, transparent) 60%,
+        transparent 68%
+      ),
+      radial-gradient(
+        120% 90% at 10% 110%,
+        color-mix(in oklab, var(--azul) 85%, transparent),
+        color-mix(in oklab, var(--azul) 30%, transparent) 50%,
+        transparent 80%
+      ),
+      var(--navy);
+  }
+
+  .bloco__gigante {
+    display: block;
+    font-size: clamp(5rem, 3rem + 9vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+    color: var(--offwhite);
+    text-shadow: 0 0 40px color-mix(in oklab, var(--azul) 70%, transparent);
+  }
+
+  .bloco--experiencia .bloco__texto {
+    max-width: 20rem;
+    margin-top: 12px;
+    font-size: var(--fs-corpo);
+    color: color-mix(in oklab, var(--offwhite) 90%, var(--azul));
+  }
+
+  .bloco__faturamento {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 20%, transparent);
+    font-size: var(--fs-pequeno);
+    color: color-mix(in oklab, var(--offwhite) 90%, var(--azul));
+  }
+
+  .bloco__faturamento span {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--texto-suave);
+  }
+
+  /* ---------- B · operação (foto) ---------- */
+  .bloco--operacao {
+    min-height: 240px;
+  }
+
+  .bloco--operacao :global(.bloco__foto) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+  }
+
+  /* degradê navy sobre a foto para o texto ler (brand book: "sobre foto, com faixa") */
+  .bloco--operacao::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--navy-noite) 85%, transparent), transparent 38%),
+      linear-gradient(0deg, var(--navy-noite) 5%, color-mix(in oklab, var(--navy-noite) 70%, transparent) 40%, transparent 75%);
+  }
+
+  /* ---------- C · atuação ---------- */
+  .atuacao {
+    display: grid;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--texto-suave);
+  }
+
+  .atuacao li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--offwhite) 9%, transparent);
+  }
+
+  .atuacao li::before {
+    content: '';
+    flex: none;
+    width: 7px;
+    height: 7px;
+    rotate: var(--ang-fita);
+    background: var(--azul);
+    box-shadow: 0 0 8px var(--azul);
+  }
+
+  /* ---------- D · 1:1 ---------- */
+  .dupla {
+    display: flex;
+    align-self: flex-start;
+  }
+
+  .dupla__circulo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .dupla__circulo--voce {
+    border: 1.5px solid color-mix(in oklab, var(--offwhite) 55%, transparent);
+  }
+
+  .dupla__circulo--ele {
+    margin-left: -12px;
+    background: radial-gradient(circle at 35% 30%, var(--offwhite), color-mix(in oklab, var(--azul-luz) 70%, var(--navy)));
+    box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 60%, transparent);
+  }
+
+  /* ---------- E · 8h: linha do tempo ---------- */
+  .aovivo {
+    display: grid;
+    gap: 18px;
+  }
+
+  .encontros {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .encontro {
+    display: grid;
+    gap: 8px;
+  }
+
+  .encontro__barra {
+    height: 10px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--azul), var(--azul-luz));
+    box-shadow: 0 0 12px color-mix(in oklab, var(--azul) 55%, transparent);
+  }
+
+  .encontro__legenda {
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    color: var(--texto-suave);
+  }
+
+  /* ---------- F · 7 frentes: etiquetas que somem nas bordas ---------- */
+  .etiquetas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 88px;
+    overflow: hidden;
+    padding: 0;
+    list-style: none;
+    /* somem embaixo e à direita, como as trilhas da referência */
+    mask-image:
+      linear-gradient(180deg, #000 45%, transparent),
+      linear-gradient(90deg, #000 72%, transparent);
+    mask-composite: intersect;
+  }
+
+  .etiquetas li {
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 14%, transparent);
+    background: color-mix(in oklab, var(--offwhite) 4%, transparent);
+    font-size: 0.75rem;
+    white-space: nowrap;
+    color: var(--texto-suave);
+  }
+
+  .etiquetas li:first-child {
+    border-color: color-mix(in oklab, var(--azul-fio) 55%, transparent);
+    color: var(--texto);
+  }
+
+  /* ---------- G · 2 marketplaces ---------- */
+  .canais {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .canais li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 16%, transparent);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .canais li::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--azul-luz);
+  }
+
+  /* ---------- Tablet ---------- */
+  @media (min-width: 768px) {
+    .bento {
+      gap: 14px;
+    }
+
+    .bloco {
+      padding: 22px;
+    }
+
+    .aovivo {
+      grid-template-columns: auto 1fr;
+      align-items: end;
+      gap: 28px;
+    }
+  }
+
+  /* ---------- Desktop: grade 4 × 3 ---------- */
+  @media (min-width: 1024px) {
+    .bento {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-auto-rows: minmax(220px, auto);
+      gap: 16px;
+    }
+
+    .bloco {
+      min-height: 0;
+      padding: 26px;
+    }
+
+    .bloco--experiencia {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+    }
+
+    .bloco--operacao {
+      grid-column: 3 / 5;
+      grid-row: 1;
+    }
+
+    .bloco--atuacao {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    .bloco--individual {
+      grid-column: 4;
+      grid-row: 2;
+    }
+
+    .bloco--aovivo {
+      grid-column: 1 / 3;
+      grid-row: 3;
+    }
+
+    .bloco--frentes {
+      grid-column: 3;
+      grid-row: 3;
+    }
+
+    .bloco--foco {
+      grid-column: 4;
+      grid-row: 3;
+    }
+  }
+</style>

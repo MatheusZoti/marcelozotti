@@ -1,16 +1,11 @@
 ---
 // Seção 5 · Quem é o Marcelo (ref-02): foto no escritório da Brazotti com corte a 45°,
-// bio e uma parede de números: acima, quem ele é (acesa); abaixo, o que a pessoa tem com ele
-// na mentoria (apagada). Luz alta.
+// bio e um bento com o que ele é e o que a pessoa tem com ele na mentoria. Luz alta.
 import { Image } from 'astro:assets';
 import fotoEscritorio from '../../assets/fotos/marcelo-escritorio-brazotti.jpg';
-import { bio, comEle, faturamento, provas } from '../../conteudo/marcelo';
+import { bio } from '../../conteudo/marcelo';
+import BentoMarcelo from '../BentoMarcelo.astro';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
-import PlacaDado from '../ui/PlacaDado.astro';
-
-const parede = faturamento.exibir
-  ? [...provas, { numero: faturamento.numero, rotulo: faturamento.rotulo, acesa: true }]
-  : provas;
 ---
 
 <section class="marcelo" aria-labelledby="marcelo-titulo">
@@ -37,31 +32,8 @@ const parede = faturamento.exibir
       </div>
     </div>
 
-    <div class="parede">
-      <ul class="parede__fileira" role="list">
-        {
-          parede.map((prova) => (
-            <li
-              class:list={[
-                'placa',
-                'prova',
-                { 'placa--acesa': prova.acesa, 'prova--palavra': !/\d/.test(prova.numero) },
-              ]}
-            >
-              <span class="prova__numero">{prova.numero}</span>
-              <span class="prova__rotulo">{prova.rotulo}</span>
-            </li>
-          ))
-        }
-      </ul>
-
-      {faturamento.exibir && <p class="parede__nota">{faturamento.nota}</p>}
-
-      <!-- segunda fileira: placas apagadas (mas legíveis) com o que a pessoa tem na mentoria -->
-      <p class="rotulo parede__subtitulo">{comEle.titulo}</p>
-      <div class="parede__mentoria">
-        {comEle.dados.map((dado) => <PlacaDado numero={dado.numero} rotulo={dado.rotulo} />)}
-      </div>
+    <div class="marcelo__bento">
+      <BentoMarcelo />
     </div>
 
     <div class="marcelo__acao">
@@ -79,7 +51,7 @@ const parede = faturamento.exibir
     background: var(--navy-profundo);
   }
 
-  /* luz alta: brilho azul atrás da parede + grade fina (ref-02), recortada em diagonal */
+  /* luz alta: brilho azul atrás do bento + grade fina, recortada em diagonal */
   .marcelo__luz {
     position: absolute;
     inset: 0;
@@ -135,68 +107,9 @@ const parede = faturamento.exibir
     color: var(--texto);
   }
 
-  /* ---------- Parede de números (ref-02) ---------- */
-  .parede {
+  /* ---------- Bento ---------- */
+  .marcelo__bento {
     margin-top: 64px;
-  }
-
-  .parede__fileira {
-    display: grid;
-    gap: 12px;
-    padding: 0;
-    list-style: none;
-  }
-
-  .prova {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 22px 22px;
-  }
-
-  .prova__numero {
-    flex: none;
-    font-family: var(--fonte-mono);
-    font-size: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
-    font-weight: 500;
-    letter-spacing: -0.04em;
-    line-height: 1;
-  }
-
-  /* mono é para números; palavras (Brazotti, Clientes) vão em Manrope, um pouco menores */
-  .prova--palavra .prova__numero {
-    font-family: var(--fonte);
-    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-  }
-
-  .prova__rotulo {
-    font-size: var(--fs-pequeno);
-    line-height: 1.4;
-    color: var(--texto-suave);
-  }
-
-  .placa--acesa .prova__rotulo {
-    color: color-mix(in oklab, var(--offwhite) 88%, var(--azul));
-  }
-
-  /* segunda fileira: placas apagadas com o que a pessoa tem na mentoria */
-  .parede__subtitulo {
-    margin-top: 28px;
-    margin-bottom: 12px;
-  }
-
-  .parede__mentoria {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .parede__nota {
-    margin-top: 16px;
-    font-size: 0.8125rem;
-    color: var(--texto-apagado);
   }
 
   .marcelo__acao {
@@ -218,24 +131,6 @@ const parede = faturamento.exibir
     }
   }
 
-  @media (min-width: 768px) {
-    .parede__fileira {
-      grid-auto-columns: minmax(0, 1fr); /* 3 ou 4 placas, conforme o faturamento for liberado */
-      grid-auto-flow: column;
-    }
-
-    .prova {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .parede__mentoria {
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-  }
-
   @media (min-width: 1024px) {
     .marcelo {
       padding: 128px 0;
@@ -251,16 +146,8 @@ const parede = faturamento.exibir
       clip-path: polygon(0 0, calc(100% - 104px) 0, 100% 104px, 100% 100%, 0 100%);
     }
 
-    .parede {
+    .marcelo__bento {
       margin-top: 96px;
-    }
-
-    /* número e rótulo lado a lado, como na ref-02 */
-    .prova {
-      flex-direction: row;
-      align-items: center;
-      gap: 20px;
-      padding: 28px 28px;
     }
 
     .marcelo__acao {
