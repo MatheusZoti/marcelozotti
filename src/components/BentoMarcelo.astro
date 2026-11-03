@@ -884,10 +884,11 @@ const trilhos = [frentes.slice(0, 4), frentes.slice(4)];
     }
   }
 
+  /* "S1 · 2h": rótulo e duração juntos, sem encostar no rótulo da semana ao lado */
   .encontro__legenda {
     display: flex;
-    justify-content: space-between;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 0 6px;
     font-family: var(--fonte-mono);
     font-size: 0.75rem;
     color: var(--texto-suave);
@@ -896,6 +897,11 @@ const trilhos = [frentes.slice(0, 4), frentes.slice(4)];
 
   .encontro__legenda > span:last-child {
     color: var(--texto);
+  }
+
+  .encontro__legenda > span:last-child::before {
+    content: '· ';
+    color: var(--texto-apagado);
   }
 
   /* no celular, "S1 · 2h" cabe melhor que "Sem. 1 · 2h" */
@@ -1042,6 +1048,28 @@ const trilhos = [frentes.slice(0, 4), frentes.slice(4)];
     .bloco--foco:hover .app:last-child {
       rotate: 6deg;
       transition-delay: 60ms;
+    }
+  }
+
+  /* ---------- Celular estreito: blocos de texto ocupam a largura toda ----------
+     "Na prática" (lista) e as frentes (trilhos) ficam inteiros; 1:1 e Foco formam a dupla. */
+  @media (max-width: 559px) {
+    .bloco--atuacao,
+    .bloco--frentes {
+      grid-column: span 2;
+      min-height: 0;
+    }
+
+    .bloco--aovivo {
+      order: 1;
+    }
+
+    .bloco--frentes {
+      order: 2;
+    }
+
+    .bloco--frentes .trilhos {
+      margin-block: 4px;
     }
   }
 

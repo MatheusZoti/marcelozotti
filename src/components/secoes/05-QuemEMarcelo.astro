@@ -71,6 +71,8 @@ const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' '
     background:
       radial-gradient(60% 40% at 50% 72%, color-mix(in oklab, var(--azul) 42%, transparent), transparent 70%),
       radial-gradient(50% 35% at 85% 10%, color-mix(in oklab, var(--azul) 22%, transparent), transparent 70%);
+    /* some no topo: sem emenda com a seção anterior */
+    mask-image: linear-gradient(180deg, transparent, #000 14%);
   }
 
   .marcelo__luz::after {
@@ -81,7 +83,11 @@ const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' '
       linear-gradient(color-mix(in oklab, var(--offwhite) 5%, transparent) 1px, transparent 1px),
       linear-gradient(90deg, color-mix(in oklab, var(--offwhite) 5%, transparent) 1px, transparent 1px);
     background-size: 56px 56px;
-    mask-image: linear-gradient(var(--ang-luz), transparent 45%, #000 80%);
+    /* diagonal a 67,5° + some no topo, para não marcar a emenda com a seção anterior */
+    mask-image:
+      linear-gradient(var(--ang-luz), transparent 45%, #000 80%),
+      linear-gradient(180deg, transparent, #000 18%);
+    mask-composite: intersect;
   }
 
   /* ---------- Foto + texto ---------- */
