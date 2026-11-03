@@ -5,47 +5,46 @@
 
 export interface Situacao {
   id: string;
-  area: string;
-  texto: string;
+  titulo: string; // nome curto do problema (o que a pessoa lê primeiro)
+  texto: string; // uma frase só
   resumo: string;
 }
 
 export const situacoes: Situacao[] = [
   {
     id: 'comeco',
-    area: 'Começo',
-    texto:
-      'Você tem produtos e clientes na loja física, mas não sabe por onde começar no Mercado Livre e na Shopee.',
+    titulo: 'Por onde começar',
+    texto: 'Tem produtos, mas não sabe como começar no Mercado Livre e na Shopee.',
     resumo: 'tenho produtos, mas não sei por onde começar nos marketplaces',
   },
   {
     id: 'margem',
-    area: 'Margem',
-    texto: 'Você já vende, mas não sabe dizer quanto sobra de verdade depois de taxas, frete e custos.',
+    titulo: 'Quanto sobra',
+    texto: 'Vende, mas não sabe quanto sobra depois de taxas, frete e custos.',
     resumo: 'não sei quanto sobra depois de taxas, frete e custos',
   },
   {
     id: 'preco',
-    area: 'Preço',
-    texto: 'Para acompanhar a concorrência, você baixa o preço. E a margem vai junto.',
+    titulo: 'Guerra de preço',
+    texto: 'Baixa o preço para competir, e a margem vai junto.',
     resumo: 'baixo o preço para acompanhar a concorrência',
   },
   {
     id: 'anuncios',
-    area: 'Anúncios',
-    texto: 'Seus anúncios não aparecem ou não convertem, e você não sabe o que mudar primeiro.',
+    titulo: 'Anúncios parados',
+    texto: 'Seus anúncios não aparecem ou não vendem.',
     resumo: 'meus anúncios não aparecem ou não convertem',
   },
   {
     id: 'operacao',
-    area: 'Operação',
-    texto: 'Envios, reputação e dúvidas de clientes tomam o seu dia, e o crescimento fica para depois.',
+    titulo: 'Rotina que trava',
+    texto: 'Envios e atendimento tomam o dia; o crescimento fica para depois.',
     resumo: 'a operação toma meu dia e o crescimento fica para depois',
   },
   {
     id: 'publicidade',
-    area: 'Publicidade',
-    texto: 'Você investe em publicidade sem saber se o retorno compensa.',
+    titulo: 'Publicidade às cegas',
+    texto: 'Investe em Mercado Ads ou Shopee Ads sem saber se compensa.',
     resumo: 'invisto em publicidade sem saber se compensa',
   },
 ];

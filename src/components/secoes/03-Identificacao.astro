@@ -40,12 +40,13 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
             />
             <span class="dor__varredura" aria-hidden="true" />
             <span class="dor__topo" aria-hidden="true">
-              <span class="rotulo dor__area">
-                {String(i + 1).padStart(2, '0')} · {situacao.area}
-              </span>
+              <span class="numero dor__numero">{String(i + 1).padStart(2, '0')}</span>
               <span class="dor__marca" />
             </span>
-            <span class="dor__texto">{situacao.texto}</span>
+            <span class="dor__corpo">
+              <span class="dor__titulo">{situacao.titulo}</span>
+              <span class="dor__texto">{situacao.texto}</span>
+            </span>
           </label>
         ))
       }
@@ -329,8 +330,25 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     gap: 12px;
   }
 
-  .dor__area {
-    font-size: 0.75rem; /* mínimo de 12 px para rótulos */
+  .dor__numero {
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    color: var(--texto-apagado);
+    transition: color var(--transicao);
+  }
+
+  .dor__corpo {
+    display: grid;
+    gap: 4px;
+  }
+
+  /* o título é o que a pessoa lê primeiro: grande, claro e em caixa normal */
+  .dor__titulo {
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--texto);
   }
 
   /* marcador em losango (45°, a diagonal da fita) */
@@ -386,8 +404,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   }
 
   .dor__texto {
-    font-size: 1.0625rem;
-    font-weight: 600;
+    font-size: 0.9375rem;
     line-height: 1.45;
     color: var(--texto-suave);
     transition: color var(--transicao);
@@ -399,12 +416,16 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     box-shadow: 0 0 12px var(--azul-luz);
   }
 
-  .dor:has(input:checked) .dor__area {
+  .dor:has(input:checked) .dor__numero {
+    color: var(--azul-luz);
+  }
+
+  .dor:has(input:checked) .dor__titulo {
     color: var(--offwhite);
   }
 
   .dor:has(input:checked) .dor__texto {
-    color: var(--texto);
+    color: color-mix(in oklab, var(--offwhite) 85%, var(--azul));
   }
 
   /* ---------- Ação ---------- */
