@@ -2,26 +2,71 @@
 // Seção 7 · As 7 frentes (ref-05): grade de placas de vidro, uma acesa por vez.
 // A luz percorre as frentes uma vez quando a seção aparece; passar o mouse acende a placa.
 // Sem JavaScript, a 01 fica acesa. A 8ª placa fecha a grade com a nota do pitch e o CTA.
+// Movimento: as letras de "improviso" chegam tortas e se alinham (a operação saindo do
+// improviso); as placas viram para a frente como peças de um painel; a luz percorre as 7 com
+// uma barra de tempo, e o ícone de cada frente "liga" quando ela acende.
 import { frentes, notaConteudo } from '../../conteudo/frentes';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+
+// ícones das frentes (traço de 1,75 em grade de 24), na mesma ordem de `frentes`
+const icones = [
+  // diagnóstico: lupa com batimento
+  '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/><path d="M7 10.5h1.6l1-2 1.8 4 1-2H14"/>',
+  // estruturação das contas: camadas
+  '<path d="m12 3 9 4.5-9 4.5-9-4.5Z"/><path d="m3 12 9 4.5 9-4.5"/><path d="m3 16.5 9 4.5 9-4.5"/>',
+  // concorrência: barras comparadas
+  '<path d="M3 20.5h18"/><rect x="5" y="11" width="3.5" height="9.5" rx=".8"/><rect x="10.25" y="5" width="3.5" height="15.5" rx=".8"/><rect x="15.5" y="8" width="3.5" height="12.5" rx=".8"/>',
+  // precificação: etiqueta de preço
+  '<path d="M3 12.2V4.5A1.5 1.5 0 0 1 4.5 3h7.7a1.5 1.5 0 0 1 1.06.44l7.3 7.3a1.5 1.5 0 0 1 0 2.12l-7.7 7.7a1.5 1.5 0 0 1-2.12 0l-7.3-7.3A1.5 1.5 0 0 1 3 12.2Z"/><circle cx="7.8" cy="7.8" r="1.3"/>',
+  // anúncios: imagem com o cursor clicando
+  '<rect x="3" y="4" width="14" height="12" rx="1.5"/><path d="m3 13 3.5-3.5 3 3 2-2 2.5 2.5"/><path d="m14.5 14.5 6 2.2-2.6 1.1-1.1 2.6Z"/>',
+  // logística: caixa
+  '<path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5"/><path d="M12 12v9"/>',
+  // crescimento: seta subindo a 45°
+  '<path d="M3 17 9.5 10.5l4 4L21 7"/><path d="M15 7h6v6"/>',
+];
+
+// "improviso.": cada letra (e o ponto) chega torta (valores fixos, iguais em todo build) e se alinha
+const tortas = [-14, 9, -6, 12, -10, 7, -12, 10, -8, 0];
+const improviso = 'improviso.'.split('').map((letra, i) => ({
+  letra,
+  giro: `${tortas[i]}deg`,
+  queda: `${(i % 3) * 0.12 - 0.12}em`,
+}));
 ---
 
 <section class="frentes" aria-labelledby="frentes-titulo" data-frentes>
   <div class="frentes__luz" aria-hidden="true"></div>
 
   <div class="container">
-    <header class="frentes__topo">
-      <p class="rotulo">O que você vai trabalhar</p>
+    <header class="frentes__topo" data-revelar>
+      <p class="rotulo rotulo-digita" style="--letras: 25">O que você vai trabalhar</p>
       <h2 id="frentes-titulo" class="frentes__titulo">
-        7 frentes para tirar a sua operação do improviso.
+        <span class="frentes__titulo-base">7 frentes para tirar a sua operação do</span>
+        <span class="frentes__improviso">
+          <span class="visualmente-oculto">improviso</span>
+          {/* em uma linha só: espaço entre as tags viraria espaço antes do ponto */}
+          <span aria-hidden="true">{improviso.map((l, i) => <span class="frentes__letra" style={`--i:${i};--giro:${l.giro};--queda:${l.queda}`}>{l.letra}</span>)}</span>
+        </span>
       </h2>
     </header>
 
-    <ol class="frentes__grade" role="list">
+    <ol class="frentes__grade" role="list" data-revelar-grupo="(min-width: 768px)">
       {
         frentes.map((frente, i) => (
-          <li class:list={['placa', 'frente', { 'placa--acesa': i === 0 }]} data-frente>
-            <span class="numero frente__numero">{String(i + 1).padStart(2, '0')}</span>
+          <li
+            class:list={['placa', 'holofote', 'frente', { 'placa--acesa': i === 0 }]}
+            style={`--i:${i}`}
+            data-frente
+            data-revelar
+          >
+            <span class="frente__topo">
+              <span class="numero frente__numero">{String(i + 1).padStart(2, '0')}</span>
+              <span class="frente__icone" aria-hidden="true">
+                <svg viewBox="0 0 24 24" set:html={icones[i]} />
+              </span>
+            </span>
+            <span class="frente__tempo" aria-hidden="true" />
             <span class="frente__texto">
               <span class="frente__titulo">{frente.titulo}</span>
               <span class="frente__detalhe">{frente.detalhe}</span>
@@ -29,7 +74,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
           </li>
         ))
       }
-      <li class="placa frente frente--acao">
+      <li class="placa frente frente--acao" style="--i:7" data-revelar>
         <p class="frente__nota">{notaConteudo}</p>
         <BotaoWhatsApp origem="frentes">Falar da minha operação</BotaoWhatsApp>
       </li>
@@ -47,6 +92,9 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     let temporizador: number | undefined;
     let percorreu = false;
     let mouseSobre = false;
+    let visivel = false;
+    // com a revelação ligada, a volta só começa depois que as placas terminam de entrar
+    let liberado = !document.documentElement.classList.contains('revelar');
 
     const acender = (indice: number) => {
       placas[ativa]?.classList.remove('placa--acesa');
@@ -54,12 +102,17 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
       placas[ativa]?.classList.add('placa--acesa');
     };
 
-    const parar = () => window.clearInterval(temporizador);
+    const parar = () => {
+      window.clearInterval(temporizador);
+      secao.classList.remove('frentes--percorrendo');
+    };
 
     // uma volta só (01 → 07 → 01), para não ficar piscando enquanto a pessoa lê
     const percorrer = () => {
-      if (movimentoReduzido || percorreu || mouseSobre) return;
+      if (movimentoReduzido || percorreu || mouseSobre || !liberado || !visivel) return;
       parar();
+      // a barra de tempo da placa acesa enche no ritmo da troca
+      secao.classList.add('frentes--percorrendo');
       temporizador = window.setInterval(() => {
         const proxima = (ativa + 1) % placas.length;
         acender(proxima);
@@ -83,9 +136,33 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(
-        ([entrada]) => (entrada.isIntersecting ? percorrer() : parar()),
+        ([entrada]) => {
+          visivel = entrada.isIntersecting;
+          if (visivel) percorrer();
+          else parar();
+        },
         { threshold: 0.45 },
       ).observe(secao.querySelector('ol') ?? secao);
+    }
+
+    // espera a primeira placa ser revelada + o tempo da entrada em cascata
+    const primeira = placas[0];
+    if (!liberado && primeira) {
+      const liberar = () => {
+        window.setTimeout(() => {
+          liberado = true;
+          percorrer();
+        }, 1500);
+      };
+      if (primeira.hasAttribute('data-revelado')) liberar();
+      else {
+        const observador = new MutationObserver(() => {
+          if (!primeira.hasAttribute('data-revelado')) return;
+          observador.disconnect();
+          liberar();
+        });
+        observador.observe(primeira, { attributes: true, attributeFilter: ['data-revelado'] });
+      }
     }
   }
 </script>
@@ -114,6 +191,34 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     font-size: var(--fs-h2);
   }
 
+  /* ---------- Entrada do topo ---------- */
+  .frentes__titulo-base {
+    animation: mov-sobe 1000ms var(--saida) 360ms backwards;
+  }
+
+  .frentes__improviso {
+    white-space: nowrap;
+  }
+
+  /* as letras chegam tortas e desalinhadas e se encaixam no lugar, uma a uma */
+  .frentes__letra {
+    display: inline-block;
+    animation: frentes-alinha 900ms var(--mola) calc(950ms + var(--i) * 55ms) backwards;
+  }
+
+  @keyframes frentes-alinha {
+    from {
+      opacity: 0;
+      rotate: var(--giro);
+      translate: 0 var(--queda);
+      color: var(--azul-luz);
+      text-shadow: 0 0 18px var(--azul);
+    }
+    60% {
+      color: var(--azul-luz);
+    }
+  }
+
   /* ---------- Grade ---------- */
   .frentes__grade {
     display: grid;
@@ -125,6 +230,8 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   }
 
   .frente {
+    --atraso: var(--lote, 0ms);
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -134,7 +241,108 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     transition:
       background 600ms ease,
       border-color 600ms ease,
-      box-shadow 600ms ease;
+      box-shadow 600ms ease,
+      translate 500ms var(--saida);
+    /* entrada: as placas viram para a frente, como peças de um painel */
+    transform-origin: 50% 100%;
+    animation: frentes-vira 900ms var(--saida) var(--atraso) backwards;
+  }
+
+  @keyframes frentes-vira {
+    from {
+      opacity: 0;
+      transform: perspective(900px) rotateX(-58deg) translateY(18px);
+      filter: blur(6px);
+    }
+  }
+
+  .frente__topo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  /* ícone em vidro: apagado em repouso, "liga" quando a frente acende */
+  .frente__icone {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 10%, transparent);
+    background: color-mix(in oklab, var(--offwhite) 4%, transparent);
+    color: var(--texto-apagado);
+    transition:
+      color 500ms ease,
+      background-color 500ms ease,
+      border-color 500ms ease,
+      box-shadow 500ms ease,
+      rotate 500ms var(--mola),
+      scale 500ms var(--mola);
+  }
+
+  .frente__icone svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .frente.placa--acesa .frente__icone {
+    color: var(--offwhite);
+    border-color: color-mix(in oklab, var(--azul-fio) 70%, transparent);
+    background: color-mix(in oklab, var(--azul) 55%, transparent);
+    box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 70%, transparent);
+    animation: frentes-liga 700ms var(--mola);
+  }
+
+  @keyframes frentes-liga {
+    from {
+      scale: 0.7;
+      rotate: -20deg;
+    }
+  }
+
+  /* barra de tempo: enche enquanto a luz está nesta frente (só durante a volta) */
+  .frente__tempo {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--azul), var(--azul-luz));
+    box-shadow: 0 0 10px var(--azul-luz);
+    transform-origin: left center;
+    scale: 0 1;
+    opacity: 0;
+  }
+
+  .frentes--percorrendo .frente.placa--acesa .frente__tempo {
+    opacity: 1;
+    animation: frentes-tempo 1400ms linear;
+  }
+
+  @keyframes frentes-tempo {
+    to {
+      scale: 1 1;
+    }
+  }
+
+  @media (hover: hover) {
+    .frente[data-frente]:hover {
+      translate: 0 -4px;
+    }
+
+    .frente[data-frente]:hover .frente__icone {
+      rotate: -8deg;
+      scale: 1.08;
+    }
   }
 
   .frente__numero {
@@ -177,6 +385,10 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   }
 
   /* 8ª placa: nota + CTA, ocupa a linha inteira no celular */
+  .frente--acao .frente__nota {
+    animation: mov-sobe 800ms var(--saida) calc(var(--atraso) + 300ms) backwards;
+  }
+
   .frente--acao {
     grid-column: 1 / -1;
     justify-content: center;
@@ -211,8 +423,15 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     }
 
     .frente {
+      /* placas entram juntas, em cascata pela ordem */
+      --atraso: calc(var(--lote, 0ms) + var(--i) * 40ms);
       min-height: 210px;
       padding: 20px 20px 22px;
+    }
+
+    .frente__tempo {
+      left: 20px;
+      right: 20px;
     }
 
     .frente--acao {
@@ -252,6 +471,22 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
     .frente__numero {
       font-size: 2rem;
+    }
+
+    .frente__icone {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+    }
+
+    .frente__icone svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .frente__tempo {
+      left: 24px;
+      right: 24px;
     }
 
     .frente--acao {

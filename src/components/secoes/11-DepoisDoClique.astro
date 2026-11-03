@@ -4,17 +4,42 @@
 // subidas a 45° (o desenho do Z do símbolo). As medidas da escada são em % da largura,
 // então o SVG (que mantém a proporção) acompanha em qualquer tela e o ângulo fica em 45°.
 // Celular: linha vertical simples.
+// (sem vector-effect: com ele o Chrome calcula o tracejado fora da escala do pathLength)
+// Movimento: a escada se desenha da esquerda para a direita e cada passo aparece quando a
+// linha chega nele (o losango estoura, o ícone acende). Depois, uma luz percorre a escada do
+// clique até o encontro, sem parar; o último losango pulsa. No celular, cada trecho da linha
+// desce até o próximo passo quando ele aparece.
 import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique';
+
+const palavras = titulo.split(' ');
+const trajeto = 'M0 110 H256.67 L306.67 60 H603.33 L653.33 10 H760';
+
+// ícones dos passos (traço de 1,75 em grade de 24): enviar, conversar, marcar a data
+const icones = [
+  '<path d="M21 3 3 10.5l7 2.5 2.5 7Z"/><path d="m10 13 4.5-4.5"/>',
+  '<path d="M4 4.5h11a2 2 0 0 1 2 2V12a2 2 0 0 1-2 2H9l-4 3.2V14H4a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2Z"/><path d="M20 9a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-.5v2.6L16.5 18H12"/>',
+  '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15.5 2 2 4-4"/>',
+];
 ---
 
 <section class="clique" aria-labelledby="clique-titulo">
   <div class="container">
-    <header>
-      <p class="rotulo">Como funciona depois do clique</p>
-      <h2 id="clique-titulo" class="clique__titulo">{titulo}</h2>
+    <header data-revelar>
+      <p class="rotulo rotulo-digita" style="--letras: 30">Como funciona depois do clique</p>
+      <h2 id="clique-titulo" class="clique__titulo">
+        {
+          palavras.map((palavra, i) => (
+            <>
+              <span class="clique__palavra" style={`--i:${i}`}>
+                {palavra}
+              </span>{' '}
+            </>
+          ))
+        }
+      </h2>
     </header>
 
-    <div class="clique__trilha">
+    <div class="clique__trilha" data-revelar>
       <svg
         class="clique__linha"
         viewBox="0 0 1000 130"
@@ -30,19 +55,34 @@ import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique'
         </defs>
         <!-- marcadores em x = 0 / 346,67 / 693,33 e y = 110 / 60 / 10; cada subida tem 50 × 50 (45°) -->
         <path
-          d="M0 110 H256.67 L306.67 60 H603.33 L653.33 10 H760"
+          class="clique__traco"
+          d={trajeto}
           fill="none"
           stroke="url(#clique-fita)"
-          stroke-width="2"
-          vector-effect="non-scaling-stroke"></path>
+          stroke-width="2.2"
+          pathLength="1"></path>
+        <!-- a luz que corre pela escada: um traço curto que anda de uma ponta à outra -->
+        <path
+          class="clique__cometa"
+          d={trajeto}
+          fill="none"
+          stroke-width="3.4"
+          stroke-linecap="round"
+          pathLength="1"></path>
       </svg>
 
-      <ol class="clique__passos" role="list">
+      <ol class="clique__passos" role="list" data-revelar-grupo="(min-width: 900px)">
         {
           passos.map((passo, i) => (
-            <li class="passo-clique">
+            <li class="passo-clique" style={`--i:${i}`} data-revelar>
+              <span class="passo-clique__fio" aria-hidden="true" />
               <span class="passo-clique__marca" aria-hidden="true" />
-              <span class="numero passo-clique__numero">{String(i + 1).padStart(2, '0')}</span>
+              <span class="passo-clique__cabeca">
+                <span class="numero passo-clique__numero">{String(i + 1).padStart(2, '0')}</span>
+                <span class="passo-clique__icone" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" set:html={icones[i]} />
+                </span>
+              </span>
               <h3 class="passo-clique__titulo">{passo.titulo}</h3>
               <p class="passo-clique__texto">{passo.texto}</p>
             </li>
@@ -51,7 +91,10 @@ import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique'
       </ol>
     </div>
 
-    <p class="clique__nota">{semCompromisso}</p>
+    <p class="clique__nota" data-revelar>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"></path></svg>
+      {semCompromisso}
+    </p>
   </div>
 </section>
 
@@ -69,6 +112,11 @@ import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique'
     font-size: var(--fs-h2);
   }
 
+  .clique__palavra {
+    display: inline-block;
+    animation: mov-sobe 900ms var(--saida) calc(500ms + var(--i) * 70ms) backwards;
+  }
+
   /* ---------- Celular: trilha vertical ---------- */
   .clique__trilha {
     position: relative;
@@ -84,13 +132,108 @@ import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique'
     gap: 36px;
     padding: 0 0 0 30px;
     list-style: none;
-    border-left: 2px solid;
-    border-image: linear-gradient(180deg, color-mix(in oklab, var(--azul) 40%, transparent), var(--azul-luz)) 1;
     margin-left: 7px;
   }
 
   .passo-clique {
+    /* quando a linha chega neste passo (celular: na hora em que ele aparece) */
+    --chega: var(--lote, 0ms);
     position: relative;
+  }
+
+  /* celular: o trecho de linha desce do losango deste passo até o próximo */
+  .passo-clique__fio {
+    position: absolute;
+    left: -31px;
+    top: calc(0.55rem + 6px);
+    bottom: calc(-36px - 0.55rem - 6px);
+    width: 2px;
+    background: linear-gradient(180deg, var(--azul-luz), color-mix(in oklab, var(--azul) 50%, transparent));
+    transform-origin: top center;
+    animation: clique-desce 900ms cubic-bezier(0.6, 0, 0.3, 1) calc(var(--chega) + 300ms) backwards;
+  }
+
+  .passo-clique:last-child .passo-clique__fio {
+    display: none;
+  }
+
+  @keyframes clique-desce {
+    from {
+      scale: 1 0;
+    }
+  }
+
+  /* o conteúdo do passo sobe quando a linha chega */
+  .passo-clique__cabeca,
+  .passo-clique__titulo,
+  .passo-clique__texto {
+    animation: mov-sobe 900ms var(--saida) calc(var(--chega) + 100ms) backwards;
+  }
+
+  .passo-clique__titulo {
+    animation-delay: calc(var(--chega) + 180ms);
+  }
+
+  .passo-clique__texto {
+    animation-delay: calc(var(--chega) + 260ms);
+  }
+
+  .passo-clique__cabeca {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* ícone em vidro ao lado do número */
+  .passo-clique__icone {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    border: 1px solid color-mix(in oklab, var(--azul-fio) 40%, transparent);
+    background: color-mix(in oklab, var(--azul) 22%, transparent);
+    color: var(--azul-fio);
+    transition:
+      background-color 400ms ease,
+      color 400ms ease,
+      rotate 500ms var(--mola),
+      box-shadow 400ms ease;
+    animation: clique-icone 700ms var(--mola) calc(var(--chega) + 250ms) backwards;
+  }
+
+  .passo-clique__icone svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @keyframes clique-icone {
+    from {
+      scale: 0;
+      rotate: -30deg;
+    }
+  }
+
+  @media (hover: hover) {
+    .passo-clique:hover .passo-clique__icone {
+      background: var(--azul);
+      color: var(--offwhite);
+      rotate: -8deg;
+      box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 70%, transparent);
+    }
+
+    .passo-clique:hover .passo-clique__marca {
+      scale: 1.4;
+    }
+
+    .passo-clique:hover .passo-clique__texto {
+      color: var(--texto);
+    }
   }
 
   /* losango a 45° sobre a linha */
@@ -104,6 +247,19 @@ import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique'
     background: var(--azul-luz);
     box-shadow: 0 0 12px var(--azul);
     border-radius: 1px;
+    transition: scale 400ms var(--mola);
+    /* estoura quando a linha chega */
+    animation: clique-marca 700ms var(--mola) var(--chega) backwards;
+  }
+
+  @keyframes clique-marca {
+    from {
+      scale: 0;
+      box-shadow: 0 0 0 0 var(--azul-luz);
+    }
+    50% {
+      box-shadow: 0 0 0 10px color-mix(in oklab, var(--azul-luz) 25%, transparent);
+    }
   }
 
   .passo-clique__numero {
@@ -121,13 +277,29 @@ import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique'
     margin-top: 6px;
     max-width: 30rem;
     color: var(--texto-suave);
+    transition: color 400ms ease;
   }
 
   .clique__nota {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-top: 48px;
     font-family: var(--fonte-mono);
     font-size: 0.8125rem;
     color: var(--texto-suave);
+    animation: mov-sobe 900ms var(--saida) calc(var(--lote, 0ms) * 8 + 200ms) backwards;
+  }
+
+  .clique__nota svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: var(--azul-luz);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   /* ---------- Desktop: escada a 45° ---------- */
@@ -150,6 +322,76 @@ import { passos, semCompromisso, titulo } from '../../conteudo/depois-do-clique'
       /* y = 10 do viewBox cai no topo da trilha (margens em % usam a largura) */
       margin-top: -1%;
       overflow: visible;
+    }
+
+    .passo-clique__fio {
+      display: none;
+    }
+
+    /* a escada se desenha da esquerda para a direita... */
+    .clique__traco {
+      stroke-dasharray: 1;
+      animation: clique-traco 1900ms cubic-bezier(0.5, 0, 0.3, 1) 200ms backwards;
+    }
+
+    @keyframes clique-traco {
+      from {
+        stroke-dashoffset: 1;
+      }
+    }
+
+    /* ...e cada passo aparece quando a linha chega nele (marcas em 0%, ~40% e ~80% do caminho) */
+    .passo-clique {
+      --chega: calc(200ms + var(--i) * 640ms);
+    }
+
+    /* a luz que percorre a escada, do clique até o encontro, a cada ~5 s */
+    .clique__cometa {
+      stroke: var(--offwhite);
+      stroke-dasharray: 0.06 1.2;
+      stroke-dashoffset: 0.06;
+      filter: drop-shadow(0 0 6px var(--azul-luz));
+      animation: clique-cometa 5s cubic-bezier(0.45, 0, 0.3, 1) 2600ms infinite;
+    }
+
+    @keyframes clique-cometa {
+      0% {
+        stroke-dashoffset: 0.06;
+        opacity: 0;
+      }
+      5% {
+        opacity: 1;
+      }
+      45% {
+        stroke-dashoffset: -1;
+        opacity: 1;
+      }
+      50%,
+      100% {
+        stroke-dashoffset: -1;
+        opacity: 0;
+      }
+    }
+
+    /* o último losango (o encontro) pulsa depois que a luz chega */
+    .passo-clique:last-child .passo-clique__marca {
+      animation:
+        clique-marca 700ms var(--mola) var(--chega) backwards,
+        clique-destino 2.5s ease-out calc(var(--chega) + 1000ms) infinite;
+    }
+
+    @keyframes clique-destino {
+      0% {
+        box-shadow:
+          0 0 18px var(--azul-luz),
+          0 0 0 0 color-mix(in oklab, var(--azul-luz) 60%, transparent);
+      }
+      70%,
+      100% {
+        box-shadow:
+          0 0 18px var(--azul-luz),
+          0 0 0 12px transparent;
+      }
     }
 
     .clique__passos {

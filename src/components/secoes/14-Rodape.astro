@@ -1,6 +1,9 @@
 ---
 // Seção 14 · Rodapé (ref-04, parte de baixo): mesmo fundo do CTA final.
 // Único lugar com a assinatura completa do logo (≥ 280 px, regra do brand book).
+// Movimento (discreto, é o fim da página): uma luz corre pela linha de cima; o logo abre num
+// corte a 45° e um reflexo passa só sobre o desenho dele (de novo no hover); os contatos entram
+// em sequência; a linha da base se desenha. "Voltar ao topo" fecha a página.
 import logo from '../../assets/logos/logo-transparente-p-fundo-escuro.svg?url';
 import { linkWhatsAppPorOrigem, telefoneFormatado } from '../../config/site';
 import IconeWhatsApp from '../ui/IconeWhatsApp.astro';
@@ -10,19 +13,21 @@ const ano = new Date().getFullYear();
 
 <footer class="rodape" data-rodape>
   <div class="container">
-    <div class="rodape__topo">
-      <img
-        class="rodape__logo"
-        src={logo}
-        alt="Marcelo Zotti, mentor de marketplaces"
-        width="300"
-        height="186"
-        loading="lazy"
-        decoding="async"
-      />
+    <div class="rodape__topo" data-revelar>
+      <span class="rodape__marca" style={`--logo: url(${logo})`}>
+        <img
+          class="rodape__logo"
+          src={logo}
+          alt="Marcelo Zotti, mentor de marketplaces"
+          width="300"
+          height="186"
+          loading="lazy"
+          decoding="async"
+        />
+      </span>
 
       <div class="rodape__contato">
-        <p class="rotulo">Contato</p>
+        <p class="rotulo rotulo-digita" style="--letras: 7">Contato</p>
         <a
           class="rodape__whatsapp"
           href={linkWhatsAppPorOrigem('rodape')}
@@ -35,27 +40,55 @@ const ano = new Date().getFullYear();
           <span class="visualmente-oculto">(abre o WhatsApp em uma nova aba)</span>
         </a>
         <ul class="rodape__atendimento" role="list">
-          <li>Online para todo o Brasil</li>
-          <li>Presencial em Curitiba e região</li>
+          <li style="--i:0">Online para todo o Brasil</li>
+          <li style="--i:1">Presencial em Curitiba e região</li>
         </ul>
       </div>
     </div>
 
-    <div class="rodape__base">
+    <div class="rodape__base" data-revelar>
       <p class="rodape__aviso">
         Conteúdo educativo. Não há promessa de resultado ou faturamento: os resultados dependem de
         cada operação e das decisões de cada empresa.
       </p>
-      <p class="rodape__direitos">© {ano} Marcelo Zotti. Todos os direitos reservados.</p>
+      <div class="rodape__fim">
+        <p class="rodape__direitos">© {ano} Marcelo Zotti. Todos os direitos reservados.</p>
+        <a class="rodape__subir" href="#conteudo">
+          Voltar ao topo
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"></path></svg>
+        </a>
+      </div>
     </div>
   </div>
 </footer>
 
 <style>
   .rodape {
+    position: relative;
+    overflow: clip;
     padding: 72px 0 calc(40px + env(safe-area-inset-bottom));
     background: var(--navy-noite);
     border-top: 1px solid color-mix(in oklab, var(--offwhite) 8%, transparent);
+  }
+
+  /* luz que corre pela linha de cima do rodapé quando ele aparece */
+  .rodape__topo::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 30%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--azul-luz), var(--offwhite), transparent);
+    box-shadow: 0 0 12px var(--azul-luz);
+    translate: -100% 0;
+    animation: rodape-corre 2200ms cubic-bezier(0.45, 0, 0.3, 1) 200ms both;
+  }
+
+  @keyframes rodape-corre {
+    to {
+      translate: 340% 0;
+    }
   }
 
   .rodape__topo {
@@ -63,11 +96,77 @@ const ano = new Date().getFullYear();
     gap: 40px;
   }
 
-  .rodape__logo {
+  /* invólucro do logo: recebe o corte de entrada e o reflexo (o desenho não é alterado) */
+  .rodape__marca {
+    position: relative;
+    display: block;
     width: 280px; /* mínimo do brand book para a assinatura completa */
-    height: auto;
     /* o arquivo já traz a área de proteção em volta do desenho */
     margin-left: -18px;
+    animation: rodape-logo 1300ms var(--saida) 150ms backwards;
+  }
+
+  .rodape__logo {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* abre num corte a 45° (a diagonal da fita), de baixo à esquerda para cima à direita */
+  @keyframes rodape-logo {
+    from {
+      opacity: 0;
+      clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%);
+    }
+    to {
+      clip-path: polygon(0 -60%, 160% -60%, 160% 100%, 0 100%);
+    }
+  }
+
+  /* reflexo: uma faixa de luz recortada no formato do próprio logo */
+  .rodape__marca::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        calc(var(--desvio-luz) + 90deg),
+        transparent 40%,
+        color-mix(in oklab, var(--offwhite) 55%, transparent) 50%,
+        transparent 60%
+      )
+      no-repeat;
+    background-size: 300% 100%;
+    background-position: 100% 0;
+    -webkit-mask: var(--logo) no-repeat 0 0 / 100% 100%;
+    mask: var(--logo) no-repeat 0 0 / 100% 100%;
+    /* soma luz: o azul e o laranja clareiam onde a faixa passa (o branco continua branco) */
+    mix-blend-mode: plus-lighter;
+    animation: rodape-reflexo 1600ms var(--saida) 1100ms backwards;
+  }
+
+  @keyframes rodape-reflexo {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+
+  @media (hover: hover) {
+    .rodape__marca:hover::after {
+      animation: rodape-reflexo-hover 1200ms var(--saida);
+    }
+
+    @keyframes rodape-reflexo-hover {
+      from {
+        background-position: 100% 0;
+      }
+      to {
+        background-position: 0 0;
+      }
+    }
   }
 
   .rodape__contato {
@@ -77,6 +176,7 @@ const ano = new Date().getFullYear();
   }
 
   .rodape__whatsapp {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -87,10 +187,46 @@ const ano = new Date().getFullYear();
     text-decoration: none;
     color: var(--texto);
     transition: color var(--transicao);
+    animation: mov-sobe 900ms var(--saida) 500ms backwards;
   }
 
-  .rodape__whatsapp:hover {
-    color: var(--azul-luz);
+  /* sublinhado de luz que cresce da esquerda no hover */
+  .rodape__whatsapp::after {
+    content: '';
+    position: absolute;
+    left: 28px;
+    right: 0;
+    bottom: 8px;
+    height: 1px;
+    background: var(--azul-luz);
+    box-shadow: 0 0 8px var(--azul-luz);
+    transform-origin: left center;
+    scale: 0 1;
+    transition: scale 500ms var(--saida);
+  }
+
+  .rodape__whatsapp :global(svg) {
+    transition: rotate 500ms var(--mola);
+  }
+
+  @media (hover: hover) {
+    .rodape__whatsapp:hover {
+      color: var(--azul-luz);
+    }
+
+    .rodape__whatsapp:hover::after {
+      scale: 1 1;
+    }
+
+    .rodape__whatsapp:hover :global(svg) {
+      rotate: -14deg;
+    }
+  }
+
+  .rodape__whatsapp:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 4px;
+    border-radius: 4px;
   }
 
   .rodape__atendimento {
@@ -106,6 +242,7 @@ const ano = new Date().getFullYear();
     display: flex;
     align-items: center;
     gap: 10px;
+    animation: mov-sobe 800ms var(--saida) calc(650ms + var(--i) * 120ms) backwards;
   }
 
   /* quadradinhos azuis, como os marcadores do rodapé da ref-04 */
@@ -115,16 +252,98 @@ const ano = new Date().getFullYear();
     height: 7px;
     border-radius: 1px;
     background: var(--azul);
+    box-shadow: 0 0 8px color-mix(in oklab, var(--azul) 70%, transparent);
+    animation: rodape-ponto 700ms var(--mola) calc(750ms + var(--i) * 120ms) backwards;
+  }
+
+  @keyframes rodape-ponto {
+    from {
+      scale: 0;
+      rotate: 90deg;
+    }
   }
 
   .rodape__base {
+    position: relative;
     display: grid;
     gap: 12px;
     margin-top: 48px;
     padding-top: 24px;
-    border-top: 1px solid color-mix(in oklab, var(--offwhite) 8%, transparent);
     font-size: 0.8125rem;
     color: var(--texto-apagado);
+  }
+
+  /* linha da base: se desenha da esquerda para a direita */
+  .rodape__base::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: color-mix(in oklab, var(--offwhite) 8%, transparent);
+    transform-origin: left center;
+    animation: rodape-linha 1100ms var(--saida) backwards;
+  }
+
+  @keyframes rodape-linha {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  .rodape__aviso,
+  .rodape__fim {
+    animation: mov-aparece 1000ms ease 300ms backwards;
+  }
+
+  .rodape__fim {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    animation-delay: 450ms;
+  }
+
+  /* voltar ao topo: a seta sobe no hover */
+  .rodape__subir {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--texto-suave);
+    transition: color var(--transicao);
+  }
+
+  .rodape__subir svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: translate 500ms var(--mola);
+  }
+
+  @media (hover: hover) {
+    .rodape__subir:hover {
+      color: var(--azul-luz);
+    }
+
+    .rodape__subir:hover svg {
+      translate: 0 -4px;
+    }
+  }
+
+  .rodape__subir:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 4px;
+    border-radius: 4px;
   }
 
   .rodape__aviso {
@@ -147,7 +366,7 @@ const ano = new Date().getFullYear();
       align-items: center;
     }
 
-    .rodape__logo {
+    .rodape__marca {
       width: 300px;
     }
 
@@ -155,6 +374,12 @@ const ano = new Date().getFullYear();
       grid-template-columns: 1fr auto;
       align-items: end;
       gap: 32px;
+    }
+
+    .rodape__fim {
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
     }
   }
 </style>

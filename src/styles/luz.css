@@ -92,6 +92,62 @@
     0 0 44px -10px color-mix(in oklab, var(--azul) 75%, transparent);
 }
 
+/* ---------- Holofote: a luz da placa segue o mouse (scripts/holofote.ts) ----------
+   A borda acende só perto do ponteiro e o vidro ganha um brilho interno no mesmo ponto.
+   Usa ::before e ::after da placa; o conteúdo fica por cima (isolation + z-index -1). */
+.holofote {
+  --mx: 50%;
+  --my: 50%;
+  isolation: isolate;
+}
+
+.holofote::before,
+.holofote::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+/* borda: o mesmo gradiente, recortado para sobrar só o anel de 1 px */
+.holofote::before {
+  inset: -1px;
+  padding: 1px;
+  background: radial-gradient(
+    240px circle at var(--mx) var(--my),
+    var(--azul-fio),
+    color-mix(in oklab, var(--azul) 40%, transparent) 40%,
+    transparent 75%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+/* vidro: luz interna atrás do conteúdo */
+.holofote::after {
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    360px circle at var(--mx) var(--my),
+    color-mix(in oklab, var(--azul) 18%, transparent),
+    transparent 70%
+  );
+}
+
+@media (hover: hover) {
+  .holofote:hover::before,
+  .holofote:hover::after {
+    opacity: 1;
+  }
+}
+
 /* ---------- Botão de luz: o foco laranja (CTA de WhatsApp) ----------
    Mesmo material das placas de vidro (borda fina, reflexo no topo, luz interna), com uma luz
    laranja que nasce do fundo e balança devagar. A luz bate só na borda de baixo, como luz real.

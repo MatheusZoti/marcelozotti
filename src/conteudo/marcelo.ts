@@ -27,6 +27,7 @@ export const bento = {
     rotulo: 'Operação própria',
     titulo: 'Brazotti Distribuidora',
     texto: 'Fundada e administrada pelo Marcelo.',
+    selo: 'Em operação',
   },
   // brand book, "Provas de autoridade": experiência própria, mercado e ensino
   atuacao: {

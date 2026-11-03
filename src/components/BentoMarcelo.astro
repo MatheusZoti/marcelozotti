@@ -1,21 +1,82 @@
 ---
 // Bento da seção 5 (referência: bento escuro com luz azul e mini-widgets).
 // Cada bloco mostra um dado real dos pitches/brand book desenhado como um pequeno gráfico.
-// Uma placa acesa (a experiência), o resto apagado; a foto é do estoque real da Brazotti.
+// Uma placa acesa (a experiência), o resto apagado; as fotos são reais (estoque e rosto do Marcelo).
+// Movimento: no desktop o bento entra inteiro, montando em cascata pela ordem de importância;
+// no celular cada bloco entra quando aparece. Depois, cada mini-gráfico ganha vida: a trajetória
+// sobe ano a ano até "hoje", você e o Marcelo se conectam, as semanas enchem e são percorridas,
+// as frentes correm em trilhos, os marketplaces giram para a frente. Hover: luz que segue o mouse
+// e o gráfico de cada bloco reage.
 import { Image } from 'astro:assets';
+import { siShopee } from 'simple-icons';
 import fotoEstoque from '../assets/fotos/estoque-brazotti.jpg';
+import fotoRosto from '../assets/fotos/marcelo-rosto.jpg';
 import { bento, faturamento } from '../conteudo/marcelo';
 import { frentes } from '../conteudo/frentes';
+import MarcaMercadoLivre from './ui/MarcaMercadoLivre.astro';
 
 const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrentes, foco } = bento;
+
+// trajetória: 6 marcos (um por ano) subindo em degraus de 45°, a diagonal da fita
+const marcos = [20, 92, 164, 236, 308, 380].map((x, i) => ({ x, y: 150 - i * 26 }));
+const trajeto = marcos
+  .map((m, i) => (i === 0 ? `M${m.x},${m.y}` : `H${m.x - 26} L${m.x},${m.y}`))
+  .join(' ');
+const ultimo = marcos[marcos.length - 1];
+
+// ícones da atuação (traço de 1,75 em grade de 24)
+const iconesAtuacao = [
+  '<path d="M3 9.5 4.6 4h14.8L21 9.5"/><path d="M3 9.5h18v.5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0Z"/><path d="M4.5 13v7h15v-7"/><path d="M10 20v-4.5h4V20"/>',
+  '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><path d="M16 4.8a3.2 3.2 0 0 1 0 6.2"/><path d="M17.6 14a5.5 5.5 0 0 1 2.9 5.5"/>',
+  '<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8.5 20h7"/><path d="m7 12.5 3-3 2.5 2.5L17 7.5"/>',
+];
+
+// frentes em dois trilhos que correm em sentidos opostos (cada um repetido para o laço)
+const trilhos = [frentes.slice(0, 4), frentes.slice(4)];
 ---
 
-<ul class="bento" role="list">
-  <!-- A · experiência: o número protagonista, a única placa acesa -->
-  <li class="placa placa--acesa bloco bloco--experiencia">
+<ul class="bento" role="list" data-revelar-grupo="(min-width: 1024px)">
+  <!-- A · experiência: trajetória de 6 anos até hoje, a única placa acesa -->
+  <li class="placa placa--acesa holofote bloco bloco--experiencia" data-revelar>
+    <span class="bloco__feixe" aria-hidden="true"></span>
     <span class="rotulo bloco__rotulo">{experiencia.rotulo}</span>
+
+    <svg class="trajetoria" viewBox="0 0 400 172" aria-hidden="true">
+      <defs>
+        <linearGradient id="trajetoria-area" x1="0" y1="0" x2="0" y2="1">
+          <stop class="trajetoria__stop-forte" offset="0"></stop>
+          <stop class="trajetoria__stop-fraco" offset="1"></stop>
+        </linearGradient>
+        <linearGradient id="trajetoria-linha" x1="0" y1="0" x2="1" y2="0">
+          <stop class="trajetoria__stop-inicio" offset="0"></stop>
+          <stop class="trajetoria__stop-fim" offset="1"></stop>
+        </linearGradient>
+      </defs>
+      {[20, 59, 98, 137].map((y) => <line class="trajetoria__grade" x1="0" x2="400" y1={y} y2={y} />)}
+      <path class="trajetoria__area" d={`${trajeto} V160 H20 Z`}></path>
+      <path class="trajetoria__linha" d={trajeto} pathLength="1"></path>
+      {
+        marcos.map((m, i) => (
+          <circle
+            class={`trajetoria__marco${i === marcos.length - 1 ? ' trajetoria__marco--hoje' : ''}`}
+            cx={m.x}
+            cy={m.y}
+            r={i === marcos.length - 1 ? 6 : 4}
+            style={`--i:${i}`}
+          />
+        ))
+      }
+      <circle class="trajetoria__halo" cx={ultimo.x} cy={ultimo.y} r="6"></circle>
+      <text class="trajetoria__legenda" x="20" y="171">ANO 1</text>
+      <text class="trajetoria__legenda trajetoria__legenda--hoje" x="380" y="171" text-anchor="end">
+        HOJE
+      </text>
+    </svg>
+
     <div class="bloco__base">
-      <span class="numero bloco__gigante">{experiencia.numero}</span>
+      <span class="numero bloco__gigante" data-contar data-contar-atraso="380">
+        {experiencia.numero}
+      </span>
       <p class="bloco__texto">{experiencia.texto}</p>
       {
         faturamento.exibir && (
@@ -29,7 +90,7 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
   </li>
 
   <!-- B · operação própria: foto real do estoque com degradê navy (regra do brand book) -->
-  <li class="placa bloco bloco--operacao">
+  <li class="placa bloco bloco--operacao" data-revelar>
     <Image
       class="bloco__foto"
       src={fotoEstoque}
@@ -38,28 +99,45 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
       sizes="(min-width: 1024px) 590px, 92vw"
       loading="lazy"
     />
-    <span class="rotulo bloco__rotulo">{operacao.rotulo}</span>
+    <div class="bloco__topo">
+      <span class="rotulo bloco__rotulo">{operacao.rotulo}</span>
+      <span class="ao-vivo"><i aria-hidden="true"></i>{operacao.selo}</span>
+    </div>
     <div class="bloco__base">
       <h3 class="bloco__titulo">{operacao.titulo}</h3>
       <p class="bloco__texto">{operacao.texto}</p>
     </div>
   </li>
 
-  <!-- C · atuação: mini-lista no estilo de tabela -->
-  <li class="placa bloco bloco--atuacao">
+  <!-- C · atuação: lista com ícones, no estilo de tabela -->
+  <li class="placa holofote bloco bloco--atuacao" data-revelar>
     <span class="rotulo bloco__rotulo">{atuacao.rotulo}</span>
     <ul class="atuacao" role="list">
-      {atuacao.itens.map((item) => <li>{item}</li>)}
+      {
+        atuacao.itens.map((item, i) => (
+          <li style={`--i:${i}`}>
+            <span class="atuacao__icone" aria-hidden="true">
+              <svg viewBox="0 0 24 24" set:html={iconesAtuacao[i]} />
+            </span>
+            {item}
+          </li>
+        ))
+      }
     </ul>
     <h3 class="bloco__titulo bloco__titulo--menor">{atuacao.titulo}</h3>
   </li>
 
-  <!-- D · 1:1: dois círculos, você e ele -->
-  <li class="placa bloco bloco--individual">
+  <!-- D · 1:1: você e o Marcelo, ligados direto -->
+  <li class="placa holofote bloco bloco--individual" data-revelar>
     <span class="rotulo bloco__rotulo">{individual.rotulo}</span>
     <div class="dupla" aria-hidden="true">
-      <span class="dupla__circulo dupla__circulo--voce"></span>
-      <span class="dupla__circulo dupla__circulo--ele"></span>
+      <span class="dupla__avatar dupla__avatar--voce">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg>
+      </span>
+      <span class="dupla__elo"><i></i></span>
+      <span class="dupla__avatar dupla__avatar--ele">
+        <Image src={fotoRosto} alt="" widths={[96, 144]} sizes="48px" loading="lazy" />
+      </span>
     </div>
     <div class="bloco__base">
       <span class="numero bloco__numero">{individual.numero}</span>
@@ -67,21 +145,26 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     </div>
   </li>
 
-  <!-- E · 8h: linha do tempo com os 4 encontros de 2h -->
-  <li class="placa bloco bloco--aovivo">
-    <span class="rotulo bloco__rotulo">{aoVivo.rotulo}</span>
+  <!-- E · 8h: as 4 semanas de 2h, percorridas por uma luz -->
+  <li class="placa holofote bloco bloco--aovivo" data-revelar>
+    <span class="rotulo bloco__rotulo bloco__rotulo--vivo">{aoVivo.rotulo}</span>
     <div class="aovivo">
       <div class="bloco__base">
-        <span class="numero bloco__numero">{aoVivo.numero}</span>
+        <span class="numero bloco__numero" data-contar data-contar-atraso="380">
+          {aoVivo.numero}
+        </span>
         <p class="bloco__texto">{aoVivo.texto}</p>
       </div>
-      <ol class="encontros" aria-label="4 encontros de 2 horas">
+      <ol class="encontros" aria-label="4 encontros de 2 horas, um por semana">
         {
           Array.from({ length: aoVivo.encontros }, (_, i) => (
-            <li class="encontro">
+            <li class="encontro" style={`--i:${i}`}>
               <span class="encontro__barra" />
               <span class="encontro__legenda">
-                {i + 1}º · 2h
+                <span>
+                  S<span class="encontro__extenso">em. </span>{i + 1}
+                </span>
+                <span>2h</span>
               </span>
             </li>
           ))
@@ -90,27 +173,54 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     </div>
   </li>
 
-  <!-- F · 7 frentes: etiquetas que somem nas bordas -->
-  <li class="placa bloco bloco--frentes">
+  <!-- F · 7 frentes: dois trilhos de etiquetas correndo em sentidos opostos -->
+  <li class="placa holofote bloco bloco--frentes" data-revelar>
     <span class="rotulo bloco__rotulo">{blocoFrentes.rotulo}</span>
-    <ul class="etiquetas" role="list" aria-label="As 7 frentes">
+    <ul class="visualmente-oculto">
       {frentes.map((frente) => <li>{frente.titulo}</li>)}
     </ul>
+    <div class="trilhos" aria-hidden="true">
+      {
+        trilhos.map((trilho, t) => (
+          <div class={`trilho${t === 1 ? ' trilho--volta' : ''}`}>
+            <div class="trilho__faixa">
+              {[...trilho, ...trilho].map((frente, i) => (
+                <span class={`etiqueta${i % trilho.length === 0 ? ' etiqueta--acesa' : ''}`}>
+                  {frente.titulo}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
     <div class="bloco__base">
-      <span class="numero bloco__numero">{blocoFrentes.numero}</span>
+      <span class="numero bloco__numero" data-contar data-contar-atraso="380">
+        {blocoFrentes.numero}
+      </span>
       <p class="bloco__texto">{blocoFrentes.texto}</p>
     </div>
   </li>
 
-  <!-- G · 2 marketplaces -->
-  <li class="placa bloco bloco--foco">
+  <!-- G · 2 marketplaces: as marcas, em branco (paleta da página) -->
+  <li class="placa holofote bloco bloco--foco" data-revelar>
     <span class="rotulo bloco__rotulo">{foco.rotulo}</span>
-    <ul class="canais" role="list">
-      {foco.canais.map((canal) => <li>{canal}</li>)}
-    </ul>
+    <div class="apps">
+      <span class="app" style="--i:0">
+        <MarcaMercadoLivre class="app__ml" />
+      </span>
+      <span class="apps__elo" aria-hidden="true"></span>
+      <span class="app" style="--i:1">
+        <svg class="app__shopee" viewBox="0 0 24 24" role="img" aria-label="Shopee">
+          <path d={siShopee.path}></path>
+        </svg>
+      </span>
+    </div>
     <div class="bloco__base">
-      <span class="numero bloco__numero">{foco.numero}</span>
-      <p class="bloco__texto">{foco.texto}</p>
+      <span class="numero bloco__numero" data-contar data-contar-atraso="380">
+        {foco.numero}
+      </span>
+      <p class="bloco__texto">{foco.texto}: {foco.canais.join(' e ')}</p>
     </div>
   </li>
 </ul>
@@ -126,6 +236,8 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
   }
 
   .bloco {
+    /* início das microanimações internas: logo depois que o bloco assenta */
+    --d: calc(var(--lote, 0ms) + 380ms);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -136,7 +248,24 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     padding: 18px;
     transition:
       border-color var(--transicao),
-      transform var(--transicao);
+      box-shadow 500ms ease,
+      transform 600ms var(--saida);
+    /* entrada: os blocos montam em cascata (ordem de importância) */
+    animation: bento-entra 1000ms var(--saida) var(--lote, 0ms) backwards;
+  }
+
+  @keyframes bento-entra {
+    from {
+      opacity: 0;
+      translate: 0 34px;
+      scale: 0.94;
+      filter: blur(10px);
+    }
+  }
+
+  /* com overflow escondido, o anel do holofote fica por dentro da borda */
+  .bloco.holofote::before {
+    inset: 0;
   }
 
   .bloco--experiencia,
@@ -147,8 +276,21 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
 
   @media (hover: hover) {
     .bloco:hover {
+      transform: translateY(-4px);
       border-color: color-mix(in oklab, var(--azul-fio) 45%, transparent);
+      box-shadow:
+        inset 0 1px 0 color-mix(in oklab, var(--offwhite) 12%, transparent),
+        0 24px 48px -20px color-mix(in oklab, var(--azul) 60%, transparent);
     }
+  }
+
+  .bloco__topo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
   }
 
   .bloco__rotulo {
@@ -189,7 +331,7 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
 
   /* ---------- A · experiência (acesa) ---------- */
   .bloco--experiencia {
-    min-height: 280px;
+    min-height: 340px;
     /* luz azul subindo do canto, cortada por um feixe a 67,5° (como o "88%" da referência) */
     background:
       linear-gradient(
@@ -207,13 +349,169 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
       var(--navy);
   }
 
+  /* feixe a 67,5° que atravessa a placa acesa quando ela aparece */
+  .bloco__feixe {
+    position: absolute;
+    inset: -10% -30%;
+    pointer-events: none;
+    background: linear-gradient(
+      calc(var(--desvio-luz) + 90deg),
+      transparent 40%,
+      color-mix(in oklab, var(--azul-luz) 30%, transparent) 50%,
+      transparent 60%
+    );
+    translate: -100% 0;
+    animation: bento-feixe 1800ms var(--saida) var(--d) both;
+  }
+
+  @keyframes bento-feixe {
+    to {
+      translate: 100% 0;
+    }
+  }
+
+  /* trajetória: a linha sobe em degraus de 45°, um marco por ano, até "hoje" */
+  .trajetoria {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    margin: auto 0;
+    overflow: visible;
+  }
+
+  .trajetoria__stop-forte {
+    stop-color: var(--azul-luz);
+    stop-opacity: 0.4;
+  }
+
+  .trajetoria__stop-fraco {
+    stop-color: var(--azul);
+    stop-opacity: 0;
+  }
+
+  .trajetoria__stop-inicio {
+    stop-color: var(--azul);
+  }
+
+  .trajetoria__stop-fim {
+    stop-color: var(--offwhite);
+  }
+
+  .trajetoria__grade {
+    stroke: color-mix(in oklab, var(--offwhite) 9%, transparent);
+    stroke-width: 1;
+    stroke-dasharray: 2 6;
+  }
+
+  .trajetoria__area {
+    fill: url(#trajetoria-area);
+    animation: mov-aparece 1200ms ease calc(var(--d) + 900ms) backwards;
+  }
+
+  .trajetoria__linha {
+    fill: none;
+    stroke: url(#trajetoria-linha);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    filter: drop-shadow(0 0 6px color-mix(in oklab, var(--azul-luz) 70%, transparent));
+    transition: stroke-width 400ms ease;
+    animation: bento-traco 1500ms cubic-bezier(0.6, 0, 0.3, 1) var(--d) backwards;
+  }
+
+  @keyframes bento-traco {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  .trajetoria__marco {
+    fill: var(--navy);
+    stroke: var(--azul-luz);
+    stroke-width: 2;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: scale 400ms var(--mola);
+    /* cada marco acende quando a linha passa por ele (acompanha a contagem 1, 2, 3…) */
+    animation: bento-marco 600ms var(--mola) calc(var(--d) + var(--i) * 270ms) backwards;
+  }
+
+  .trajetoria__marco--hoje {
+    fill: var(--offwhite);
+    stroke: var(--offwhite);
+  }
+
+  @keyframes bento-marco {
+    from {
+      scale: 0;
+    }
+  }
+
+  /* "hoje" pulsa: a operação segue ativa */
+  .trajetoria__halo {
+    fill: none;
+    stroke: var(--azul-luz);
+    stroke-width: 1.5;
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    animation: bento-halo 2.4s ease-out calc(var(--d) + 1500ms) infinite;
+  }
+
+  @keyframes bento-halo {
+    0% {
+      opacity: 0.9;
+      scale: 1;
+    }
+    100% {
+      opacity: 0;
+      scale: 3.2;
+    }
+  }
+
+  .trajetoria__legenda {
+    font-family: var(--fonte-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    fill: var(--texto-suave);
+  }
+
+  .trajetoria__legenda--hoje {
+    fill: var(--offwhite);
+  }
+
+  @media (hover: hover) {
+    .bloco--experiencia:hover .trajetoria__linha {
+      stroke-width: 3.5;
+    }
+
+    .bloco--experiencia:hover .trajetoria__marco {
+      scale: 1.35;
+      transition-delay: calc(var(--i) * 60ms);
+    }
+  }
+
   .bloco__gigante {
     display: block;
-    font-size: clamp(5rem, 3rem + 9vw, 9rem);
+    font-size: clamp(4.5rem, 3rem + 6vw, 7.5rem);
     line-height: 0.9;
     letter-spacing: -0.06em;
     color: var(--offwhite);
     text-shadow: 0 0 40px color-mix(in oklab, var(--azul) 70%, transparent);
+    /* o número respira devagar, como uma luz acesa */
+    animation: bento-respira 4.5s ease-in-out var(--d) infinite alternate;
+  }
+
+  @keyframes bento-respira {
+    to {
+      text-shadow:
+        0 0 64px color-mix(in oklab, var(--azul) 90%, transparent),
+        0 0 18px color-mix(in oklab, var(--azul-luz) 50%, transparent);
+    }
   }
 
   .bloco--experiencia .bloco__texto {
@@ -250,6 +548,26 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     height: 100%;
     object-fit: cover;
     opacity: 0.85;
+    transition:
+      scale 1600ms var(--saida),
+      translate 1600ms var(--saida),
+      opacity 600ms ease;
+    animation: bento-foto 2400ms var(--saida) var(--lote, 0ms) backwards;
+  }
+
+  @keyframes bento-foto {
+    from {
+      scale: 1.2;
+      opacity: 0;
+    }
+  }
+
+  @media (hover: hover) {
+    .bloco--operacao:hover :global(.bloco__foto) {
+      scale: 1.08;
+      translate: -2% 0;
+      opacity: 1;
+    }
   }
 
   /* degradê navy sobre a foto para o texto ler (brand book: "sobre foto, com faixa") */
@@ -260,6 +578,44 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     background:
       linear-gradient(180deg, color-mix(in oklab, var(--navy-noite) 85%, transparent), transparent 38%),
       linear-gradient(0deg, var(--navy-noite) 5%, color-mix(in oklab, var(--navy-noite) 70%, transparent) 40%, transparent 75%);
+  }
+
+  /* selo "em operação": ponto que pulsa como status online */
+  .ao-vivo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px 5px 9px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 22%, transparent);
+    background: color-mix(in oklab, var(--navy-noite) 65%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--offwhite);
+    animation: mov-sobe 800ms var(--saida) var(--d) backwards;
+  }
+
+  .ao-vivo i,
+  .bloco__rotulo--vivo::before {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--azul-luz);
+    animation: bento-ao-vivo 2.4s ease-out var(--d) infinite;
+  }
+
+  @keyframes bento-ao-vivo {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--azul-luz) 70%, transparent);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 7px transparent;
+    }
   }
 
   /* ---------- C · atuação ---------- */
@@ -275,46 +631,201 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 0;
+    padding: 7px 0;
     border-bottom: 1px solid color-mix(in oklab, var(--offwhite) 9%, transparent);
+    transition: color 400ms ease;
+    animation: bento-item 800ms var(--saida) calc(var(--d) + var(--i) * 120ms) backwards;
   }
 
-  .atuacao li::before {
-    content: '';
+  @keyframes bento-item {
+    from {
+      opacity: 0;
+      translate: -16px 0;
+    }
+  }
+
+  .atuacao__icone {
+    display: grid;
+    place-items: center;
     flex: none;
-    width: 7px;
-    height: 7px;
-    rotate: var(--ang-fita);
-    background: var(--azul);
-    box-shadow: 0 0 8px var(--azul);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: color-mix(in oklab, var(--azul) 16%, transparent);
+    color: var(--azul-fio);
+    transition:
+      background-color 400ms ease,
+      color 400ms ease,
+      scale 400ms var(--mola);
+    animation: bento-icone 700ms var(--mola) calc(var(--d) + 80ms + var(--i) * 120ms) backwards;
   }
 
-  /* ---------- D · 1:1 ---------- */
+  .atuacao__icone svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @keyframes bento-icone {
+    from {
+      scale: 0;
+      rotate: -45deg;
+    }
+  }
+
+  @media (hover: hover) {
+    .bloco--atuacao:hover .atuacao li {
+      color: var(--texto);
+      transition-delay: calc(var(--i) * 70ms);
+    }
+
+    .bloco--atuacao:hover .atuacao__icone {
+      background: var(--azul);
+      color: var(--offwhite);
+      scale: 1.08;
+      transition-delay: calc(var(--i) * 70ms);
+    }
+  }
+
+  /* ---------- D · 1:1: você e o Marcelo ligados direto ---------- */
   .dupla {
     display: flex;
+    align-items: center;
     align-self: flex-start;
   }
 
-  .dupla__circulo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-  }
-
-  .dupla__circulo--voce {
-    border: 1.5px solid color-mix(in oklab, var(--offwhite) 55%, transparent);
-  }
-
-  .dupla__circulo--ele {
-    margin-left: -12px;
-    background: radial-gradient(circle at 35% 30%, var(--offwhite), color-mix(in oklab, var(--azul-luz) 70%, var(--navy)));
-    box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 60%, transparent);
-  }
-
-  /* ---------- E · 8h: linha do tempo ---------- */
-  .aovivo {
+  .dupla__avatar {
     display: grid;
-    gap: 18px;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    overflow: hidden;
+    transition: translate 700ms var(--mola);
+  }
+
+  .dupla__avatar--voce {
+    border: 1.5px dashed color-mix(in oklab, var(--offwhite) 45%, transparent);
+    color: color-mix(in oklab, var(--offwhite) 70%, transparent);
+    animation: bento-voce 1000ms var(--saida) var(--d) backwards;
+  }
+
+  .dupla__avatar--voce svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+  }
+
+  .dupla__avatar--ele {
+    border: 2px solid var(--azul-luz);
+    box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 70%, transparent);
+    animation:
+      bento-ele 1000ms var(--saida) var(--d) backwards,
+      bento-pulsa 2.8s ease-in-out calc(var(--d) + 1200ms) infinite;
+  }
+
+  .dupla__avatar--ele :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @keyframes bento-voce {
+    from {
+      opacity: 0;
+      translate: -26px 0;
+    }
+  }
+
+  @keyframes bento-ele {
+    from {
+      opacity: 0;
+      translate: 26px 0;
+    }
+  }
+
+  @keyframes bento-pulsa {
+    50% {
+      box-shadow:
+        0 0 0 5px color-mix(in oklab, var(--azul) 22%, transparent),
+        0 0 26px color-mix(in oklab, var(--azul) 85%, transparent);
+    }
+  }
+
+  /* o elo: uma linha que se desenha entre os dois e um sinal que vai e volta */
+  .dupla__elo {
+    position: relative;
+    width: 34px;
+    height: 2px;
+    margin: 0 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, color-mix(in oklab, var(--offwhite) 40%, transparent), var(--azul-luz));
+    transform-origin: left center;
+    transition: width 600ms var(--mola);
+    animation: bento-elo 600ms var(--saida) calc(var(--d) + 700ms) backwards;
+  }
+
+  @keyframes bento-elo {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  .dupla__elo i {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 50%;
+    background: var(--offwhite);
+    box-shadow: 0 0 8px var(--azul-luz);
+    animation: bento-sinal 1.8s ease-in-out calc(var(--d) + 1300ms) infinite alternate backwards;
+  }
+
+  @keyframes bento-sinal {
+    from {
+      left: 0;
+      opacity: 0.4;
+    }
+    to {
+      left: calc(100% - 6px);
+      opacity: 1;
+    }
+  }
+
+  @media (hover: hover) {
+    .bloco--individual:hover .dupla__elo {
+      width: 18px;
+    }
+  }
+
+  /* ---------- E · 8h: as semanas enchem e uma luz as percorre ---------- */
+  .bloco__rotulo--vivo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bloco__rotulo--vivo::before {
+    content: '';
+  }
+
+  /* as semanas ficam em cima, ocupando a largura; o "8h" fecha embaixo */
+  .aovivo {
+    display: flex;
+    flex: 1;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    gap: 22px;
   }
 
   .encontros {
@@ -331,35 +842,121 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
   }
 
   .encontro__barra {
-    height: 10px;
-    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    height: 12px;
+    border-radius: 4px;
     background: linear-gradient(90deg, var(--azul), var(--azul-luz));
     box-shadow: 0 0 12px color-mix(in oklab, var(--azul) 55%, transparent);
+    transform-origin: left center;
+    transition:
+      filter 400ms ease,
+      box-shadow 400ms ease;
+    /* a linha do tempo enche encontro a encontro, como semanas passando */
+    animation: bento-encontro 560ms cubic-bezier(0.5, 0, 0.3, 1) calc(var(--d) + var(--i) * 260ms)
+      backwards;
+  }
+
+  @keyframes bento-encontro {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  /* depois de cheia, uma luz percorre as 4 semanas sem parar (o mês acontecendo) */
+  .encontro__barra::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--offwhite) 85%, transparent), transparent);
+    translate: -110% 0;
+    animation: bento-percorre 4s linear calc(var(--d) + 1600ms + var(--i) * 0.5s) infinite;
+  }
+
+  @keyframes bento-percorre {
+    0% {
+      translate: -110% 0;
+    }
+    12.5%,
+    100% {
+      translate: 230% 0;
+    }
   }
 
   .encontro__legenda {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
     font-family: var(--fonte-mono);
     font-size: 0.75rem;
     color: var(--texto-suave);
+    animation: mov-aparece 600ms ease calc(var(--d) + 200ms + var(--i) * 260ms) backwards;
   }
 
-  /* ---------- F · 7 frentes: etiquetas que somem nas bordas ---------- */
-  .etiquetas {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: 88px;
+  .encontro__legenda > span:last-child {
+    color: var(--texto);
+  }
+
+  /* no celular, "S1 · 2h" cabe melhor que "Sem. 1 · 2h" */
+  .encontro__extenso {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .encontro__extenso {
+      display: inline;
+    }
+  }
+
+  @media (hover: hover) {
+    .bloco--aovivo:hover .encontro__barra {
+      filter: brightness(1.35);
+      box-shadow: 0 0 20px color-mix(in oklab, var(--azul-luz) 70%, transparent);
+      transition-delay: calc(var(--i) * 90ms);
+    }
+  }
+
+  /* ---------- F · 7 frentes: trilhos correndo em sentidos opostos ---------- */
+  .trilhos {
+    display: grid;
+    gap: 8px;
+    margin-inline: -18px;
+    /* as etiquetas nascem e somem nas bordas */
+    mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+    animation: mov-aparece 900ms ease var(--d) backwards;
+  }
+
+  .trilho {
     overflow: hidden;
-    padding: 0;
-    list-style: none;
-    /* somem embaixo e à direita, como as trilhas da referência */
-    mask-image:
-      linear-gradient(180deg, #000 45%, transparent),
-      linear-gradient(90deg, #000 72%, transparent);
-    mask-composite: intersect;
   }
 
-  .etiquetas li {
+  .trilho__faixa {
+    display: flex;
+    gap: 6px;
+    width: max-content;
+    animation: bento-trilho 22s linear var(--d) infinite;
+  }
+
+  .trilho--volta .trilho__faixa {
+    animation-direction: reverse;
+    animation-duration: 18s;
+  }
+
+  /* metade da faixa = uma volta completa (a lista está repetida) */
+  @keyframes bento-trilho {
+    to {
+      translate: calc(-50% - 3px) 0;
+    }
+  }
+
+  @media (hover: hover) {
+    .bloco--frentes:hover .trilho__faixa {
+      animation-play-state: paused;
+    }
+  }
+
+  .etiqueta {
     padding: 5px 10px;
     border-radius: 999px;
     border: 1px solid color-mix(in oklab, var(--offwhite) 14%, transparent);
@@ -369,37 +966,83 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     color: var(--texto-suave);
   }
 
-  .etiquetas li:first-child {
+  .etiqueta--acesa {
     border-color: color-mix(in oklab, var(--azul-fio) 55%, transparent);
+    background: color-mix(in oklab, var(--azul) 18%, transparent);
     color: var(--texto);
   }
 
-  /* ---------- G · 2 marketplaces ---------- */
-  .canais {
+  /* ---------- G · 2 marketplaces: marcas em placas de vidro ---------- */
+  .apps {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 0;
-    list-style: none;
-  }
-
-  .canais li {
-    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: 1px solid color-mix(in oklab, var(--offwhite) 16%, transparent);
-    font-size: 0.8125rem;
-    font-weight: 600;
+    perspective: 600px;
   }
 
-  .canais li::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--azul-luz);
+  .app {
+    display: grid;
+    place-items: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 18%, transparent);
+    background:
+      linear-gradient(160deg, color-mix(in oklab, var(--azul) 30%, transparent), transparent 70%),
+      color-mix(in oklab, var(--navy) 80%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--offwhite) 16%, transparent),
+      0 10px 24px -10px color-mix(in oklab, var(--azul) 70%, transparent);
+    color: var(--offwhite);
+    transition:
+      translate 600ms var(--mola),
+      rotate 600ms var(--mola),
+      box-shadow 400ms ease;
+    /* as marcas giram para a frente, como cartas virando */
+    animation: bento-app 900ms var(--saida) calc(var(--d) + var(--i) * 180ms) backwards;
+  }
+
+  @keyframes bento-app {
+    from {
+      opacity: 0;
+      transform: rotateY(90deg);
+    }
+  }
+
+  .app__ml {
+    width: 44px;
+    height: auto;
+  }
+
+  .app__shopee {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+  }
+
+  .apps__elo {
+    width: 16px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--azul-luz), color-mix(in oklab, var(--offwhite) 40%, transparent));
+    animation: bento-elo 500ms var(--saida) calc(var(--d) + 500ms) backwards;
+    transform-origin: left center;
+  }
+
+  @media (hover: hover) {
+    .bloco--foco:hover .app {
+      translate: 0 -4px;
+      box-shadow:
+        inset 0 1px 0 color-mix(in oklab, var(--offwhite) 22%, transparent),
+        0 16px 30px -10px color-mix(in oklab, var(--azul) 90%, transparent);
+    }
+
+    .bloco--foco:hover .app:first-child {
+      rotate: -6deg;
+    }
+
+    .bloco--foco:hover .app:last-child {
+      rotate: 6deg;
+      transition-delay: 60ms;
+    }
   }
 
   /* ---------- Tablet ---------- */
@@ -412,10 +1055,12 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
       padding: 22px;
     }
 
-    .aovivo {
-      grid-template-columns: auto 1fr;
-      align-items: end;
-      gap: 28px;
+    .trilhos {
+      margin-inline: -22px;
+    }
+
+    .encontros {
+      gap: 8px;
     }
   }
 
@@ -430,6 +1075,10 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     .bloco {
       min-height: 0;
       padding: 26px;
+    }
+
+    .trilhos {
+      margin-inline: -26px;
     }
 
     .bloco--experiencia {
@@ -465,6 +1114,12 @@ const { experiencia, operacao, atuacao, individual, aoVivo, frentes: blocoFrente
     .bloco--foco {
       grid-column: 4;
       grid-row: 3;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trilho__faixa {
+      animation: none;
     }
   }
 </style>

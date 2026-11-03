@@ -1,11 +1,15 @@
 ---
 // Seção 5 · Quem é o Marcelo (ref-02): foto no escritório da Brazotti com corte a 45°,
 // bio e um bento com o que ele é e o que a pessoa tem com ele na mentoria. Luz alta.
+// Movimento: a foto abre a partir do canto num corte a 45° e uma linha de luz desenha a dobra;
+// o título entra palavra a palavra; na rolagem a foto anda um pouco mais devagar (profundidade).
 import { Image } from 'astro:assets';
 import fotoEscritorio from '../../assets/fotos/marcelo-escritorio-brazotti.jpg';
 import { bio } from '../../conteudo/marcelo';
 import BentoMarcelo from '../BentoMarcelo.astro';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+
+const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' ');
 ---
 
 <section class="marcelo" aria-labelledby="marcelo-titulo">
@@ -13,7 +17,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
   <div class="container">
     <div class="marcelo__grade">
-      <div class="marcelo__foto">
+      <div class="marcelo__foto" data-revelar>
         <Image
           src={fotoEscritorio}
           alt="Marcelo Zotti sorrindo à mesa de trabalho, com o logo da Brazotti na parede ao fundo"
@@ -23,12 +27,20 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
         />
       </div>
 
-      <div class="marcelo__texto">
-        <p class="rotulo">Quem é o Marcelo</p>
+      <div class="marcelo__texto" data-revelar>
+        <p class="rotulo rotulo-digita" style="--letras: 16">Quem é o Marcelo</p>
         <h2 id="marcelo-titulo" class="marcelo__titulo">
-          Um empresário que ensina o que aplica todos os dias.
+          {
+            titulo.map((palavra, i) => (
+              <>
+                <span class="marcelo__palavra" style={`--i:${i}`}>
+                  {palavra}
+                </span>{' '}
+              </>
+            ))
+          }
         </h2>
-        {bio.map((paragrafo) => <p class="marcelo__bio">{paragrafo}</p>)}
+        {bio.map((paragrafo, i) => <p class="marcelo__bio" style={`--i:${i}`}>{paragrafo}</p>)}
       </div>
     </div>
 
@@ -36,7 +48,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
       <BentoMarcelo />
     </div>
 
-    <div class="marcelo__acao">
+    <div class="marcelo__acao" data-revelar>
       <BotaoWhatsApp origem="marcelo">Conversar com o Marcelo</BotaoWhatsApp>
     </div>
   </div>
@@ -79,7 +91,32 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   }
 
   .marcelo__foto {
+    --corte: 72px;
+    position: relative;
     filter: drop-shadow(0 24px 60px color-mix(in oklab, var(--azul) 35%, transparent));
+  }
+
+  /* a linha de luz que desenha a dobra (o corte a 45° do canto) depois que a foto abre */
+  .marcelo__foto::after {
+    content: '';
+    position: absolute;
+    left: calc(100% - var(--corte));
+    top: 0;
+    width: calc(var(--corte) * 1.4142);
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--azul-luz), var(--offwhite), var(--azul-luz));
+    box-shadow: 0 0 14px var(--azul-luz);
+    transform-origin: 0 50%;
+    rotate: 45deg;
+    animation: marcelo-dobra 900ms var(--saida) 1100ms backwards;
+  }
+
+  @keyframes marcelo-dobra {
+    from {
+      scale: 0 1;
+      opacity: 0;
+    }
   }
 
   /* corte a 45° no canto: a diagonal da fita como moldura (brand book) */
@@ -88,7 +125,54 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     aspect-ratio: 5 / 4;
     object-fit: cover;
     border-radius: var(--raio);
-    clip-path: polygon(0 0, calc(100% - 72px) 0, 100% 72px, 100% 100%, 0 100%);
+    clip-path: polygon(0 0, calc(100% - var(--corte)) 0, 100% var(--corte), 100% 100%, 0 100%);
+    /* abre a partir do canto de baixo, na diagonal da fita */
+    animation: marcelo-foto-abre 1400ms var(--saida) backwards;
+  }
+
+  @keyframes marcelo-foto-abre {
+    from {
+      clip-path: polygon(0 100%, 0 100%, 0 100%, 0 100%, 0 100%);
+      scale: 1.08;
+      filter: brightness(1.6) saturate(0.6);
+    }
+    60% {
+      filter: none;
+    }
+  }
+
+  /* ---------- Entrada do texto ---------- */
+  .marcelo__palavra {
+    display: inline-block;
+    animation: mov-sobe 900ms var(--saida) calc(300ms + var(--i) * 55ms) backwards;
+  }
+
+  .marcelo__bio {
+    animation: mov-sobe 1000ms var(--saida) calc(800ms + var(--i) * 140ms) backwards;
+  }
+
+  .marcelo__acao {
+    animation: mov-sobe 900ms var(--saida) 200ms backwards;
+  }
+
+  /* ---------- Rolagem: a foto anda mais devagar que o texto ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .marcelo__foto {
+        animation: marcelo-profundidade linear both;
+        animation-timeline: view();
+        animation-range: cover;
+      }
+
+      @keyframes marcelo-profundidade {
+        from {
+          translate: 0 36px;
+        }
+        to {
+          translate: 0 -36px;
+        }
+      }
+    }
   }
 
   .marcelo__titulo {
@@ -142,8 +226,8 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
       gap: 72px;
     }
 
-    .marcelo__foto :global(img) {
-      clip-path: polygon(0 0, calc(100% - 104px) 0, 100% 104px, 100% 100%, 0 100%);
+    .marcelo__foto {
+      --corte: 104px;
     }
 
     .marcelo__bento {

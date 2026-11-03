@@ -1,0 +1,100 @@
+/* Movimento compartilhado entre as seções.
+   Regras: entradas curtas (≤ 1,2 s), saída suave (--saida), luz e cortes a 67,5°;
+   o conteúdo nunca depende da animação para aparecer (sem JS, tudo fica visível). */
+
+:root {
+  --saida: cubic-bezier(0.16, 1, 0.3, 1);
+  --mola: cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* ---------- Revelação na rolagem (scripts/revelar.ts) ----------
+   Enquanto o bloco não entrou na tela, tudo dentro dele espera no primeiro quadro. */
+.revelar [data-revelar]:not([data-revelado]),
+.revelar [data-revelar]:not([data-revelado])::before,
+.revelar [data-revelar]:not([data-revelado])::after,
+.revelar [data-revelar]:not([data-revelado]) *,
+.revelar [data-revelar]:not([data-revelado]) *::before,
+.revelar [data-revelar]:not([data-revelado]) *::after {
+  animation-play-state: paused !important;
+}
+
+/* --lote: atraso de cascata para blocos revelados no mesmo instante (revelar.ts) */
+
+/* ---------- Entradas reutilizáveis ---------- */
+@keyframes mov-sobe {
+  from {
+    opacity: 0;
+    translate: 0 22px;
+    filter: blur(8px);
+  }
+}
+
+@keyframes mov-aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+/* frase de destaque revelada por uma varredura de luz a 67,5° */
+@keyframes mov-varredura {
+  from {
+    mask-image: linear-gradient(calc(var(--desvio-luz) + 90deg), #000 40%, transparent 56%);
+    mask-size: 300% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 100% 0;
+    translate: 0 0.15em;
+    filter: blur(6px);
+  }
+  to {
+    mask-image: linear-gradient(calc(var(--desvio-luz) + 90deg), #000 40%, transparent 56%);
+    mask-size: 300% 100%;
+    mask-repeat: no-repeat;
+    mask-position: 0 0;
+  }
+}
+
+/* rótulo em mono "digitado", letra a letra (o número de passos vem em --letras) */
+@keyframes mov-digita {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes mov-cursor {
+  0% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Rótulo de seção "digitado" como num painel de dados, com cursor que pisca e some.
+   A seção informa a quantidade de caracteres em --letras (um passo por letra). */
+.rotulo-digita {
+  position: relative;
+  display: inline-block;
+  /* só a largura das letras, mesmo quando vira item de grade (o cursor fica colado no texto) */
+  width: fit-content;
+  justify-self: start;
+  padding-right: 0.9em;
+  animation: mov-digita calc(var(--letras, 16) * 42ms) steps(var(--letras, 16), end) 100ms backwards;
+}
+
+.rotulo-digita::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 0.55em;
+  height: 1.1em;
+  translate: 0 -50%;
+  background: var(--azul-luz);
+  box-shadow: 0 0 10px var(--azul-luz);
+  opacity: 0;
+  animation: mov-cursor 520ms steps(1, end) calc(var(--letras, 16) * 42ms + 160ms) 4 forwards;
+}

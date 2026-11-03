@@ -2,6 +2,10 @@
 // Seção 12 · FAQ de objeções. Luz mínima, só tipografia.
 // <details>/<summary> nativo: abre e fecha sem JavaScript. Onde o navegador permite,
 // a abertura é animada (::details-content); nos outros, abre direto.
+// Movimento: as linhas da lista se desenham da esquerda para a direita em cascata e cada
+// pergunta sobe com o seu número. Ao abrir: o losango gira e acende, a linha de baixo vira
+// luz, um brilho nasce à esquerda e a resposta desliza para o lugar. Hover: a linha acende
+// pela metade e a pergunta anda um pouco.
 import { perguntas } from '../../conteudo/faq';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
@@ -19,21 +23,35 @@ const dadosFaq = {
 
 <section class="faq" aria-labelledby="faq-titulo">
   <div class="container faq__grade">
-    <div class="faq__topo">
-      <p class="rotulo">Perguntas frequentes</p>
-      <h2 id="faq-titulo" class="faq__titulo">Antes de chamar no WhatsApp.</h2>
+    <div class="faq__topo" data-revelar>
+      <p class="rotulo rotulo-digita" style="--letras: 20">Perguntas frequentes</p>
+      <h2 id="faq-titulo" class="faq__titulo">
+        {
+          'Antes de chamar no WhatsApp.'.split(' ').map((palavra, i) => (
+            <>
+              <span class="faq__palavra" style={`--i:${i}`}>
+                {palavra}
+              </span>{' '}
+            </>
+          ))
+        }
+      </h2>
       <div class="faq__ajuda">
         <p>Ficou alguma dúvida que não está aqui?</p>
         <BotaoWhatsApp origem="faq" variante="contorno">Perguntar ao Marcelo</BotaoWhatsApp>
       </div>
     </div>
 
-    <div class="faq__lista">
+    <div class="faq__lista" data-revelar-grupo="(min-width: 1024px)">
       {
-        perguntas.map(({ pergunta, resposta }) => (
-          <details class="pergunta">
+        perguntas.map(({ pergunta, resposta }, i) => (
+          <details class="pergunta" style={`--i:${i}`} data-revelar>
             <summary class="pergunta__titulo">
-              <span>{pergunta}</span>
+              <span class="pergunta__linha" aria-hidden="true" />
+              <span class="numero pergunta__numero" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span class="pergunta__texto">{pergunta}</span>
               <span class="pergunta__marca" aria-hidden="true" />
             </summary>
             <p class="pergunta__resposta">{resposta}</p>
@@ -63,24 +81,99 @@ const dadosFaq = {
     max-width: 14ch;
   }
 
+  .faq__palavra {
+    display: inline-block;
+    animation: mov-sobe 900ms var(--saida) calc(400ms + var(--i) * 70ms) backwards;
+  }
+
   .faq__ajuda {
     display: none; /* no celular, o CTA final logo abaixo já cumpre esse papel */
   }
 
   /* ---------- Lista ---------- */
   .faq__lista {
-    border-top: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
+    position: relative;
+  }
+
+  /* linha de cima da lista: se desenha antes das perguntas */
+  .faq__lista::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: color-mix(in oklab, var(--offwhite) 12%, transparent);
+    transform-origin: left center;
+    animation: faq-linha 900ms var(--saida) backwards;
   }
 
   .pergunta {
-    border-bottom: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
+    position: relative;
+    /* brilho que nasce à esquerda quando a pergunta está aberta */
+    background: linear-gradient(90deg, color-mix(in oklab, var(--azul) 12%, transparent), transparent 60%)
+      no-repeat 0 0 / 0% 100%;
+    transition: background-size 600ms var(--saida);
+  }
+
+  .pergunta[open] {
+    background-size: 100% 100%;
+  }
+
+  /* linha de baixo: cinza que se desenha na entrada; vira luz no hover (metade) e ao abrir */
+  .pergunta__linha {
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: color-mix(in oklab, var(--offwhite) 12%, transparent);
+    transform-origin: left center;
+    animation: faq-linha 900ms var(--saida) calc(var(--lote, 0ms) + var(--i) * 40ms) backwards;
+  }
+
+  .pergunta__linha::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, var(--azul-luz), color-mix(in oklab, var(--azul) 40%, transparent));
+    box-shadow: 0 0 10px color-mix(in oklab, var(--azul-luz) 60%, transparent);
+    transform-origin: left center;
+    scale: 0 1;
+    transition: scale 600ms var(--saida);
+  }
+
+  .pergunta[open] .pergunta__linha::after {
+    scale: 1 1;
+  }
+
+  @keyframes faq-linha {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  .pergunta__numero {
+    flex: none;
+    min-width: 1.6em;
+    font-size: 0.75rem;
+    color: var(--texto-apagado);
+    transition: color var(--transicao);
+  }
+
+  .pergunta__texto {
+    flex: 1;
+    transition: translate 500ms var(--saida);
+  }
+
+  .pergunta[open] .pergunta__numero {
+    color: var(--azul-luz);
+  }
+
+  .pergunta[open] .pergunta__texto {
+    color: var(--offwhite);
   }
 
   .pergunta__titulo {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    gap: 16px;
     padding: 22px 0;
     font-size: 1.0625rem;
     font-weight: 700;
@@ -94,8 +187,41 @@ const dadosFaq = {
     display: none;
   }
 
-  .pergunta__titulo:hover {
-    color: var(--azul-luz);
+  /* a pergunta sobe com o número, em cascata */
+  .pergunta__numero,
+  .pergunta__texto,
+  .pergunta__marca {
+    animation: mov-sobe 800ms var(--saida) calc(var(--lote, 0ms) + 150ms + var(--i) * 40ms)
+      backwards;
+  }
+
+  @media (hover: hover) {
+    .pergunta__titulo:hover {
+      color: var(--azul-luz);
+    }
+
+    .pergunta__titulo:hover .pergunta__texto {
+      translate: 6px 0;
+    }
+
+    .pergunta__titulo:hover .pergunta__numero {
+      color: var(--azul-luz);
+    }
+
+    .pergunta:not([open]) .pergunta__titulo:hover .pergunta__linha::after {
+      scale: 0.5 1;
+    }
+
+    .pergunta:not([open]) .pergunta__titulo:hover .pergunta__marca {
+      rotate: calc(var(--ang-fita) + 90deg);
+      border-color: var(--azul-luz);
+    }
+  }
+
+  .pergunta__titulo:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 4px;
+    border-radius: 4px;
   }
 
   /* marcador: losango vazado que se preenche ao abrir */
@@ -110,10 +236,13 @@ const dadosFaq = {
     transition:
       background-color var(--transicao),
       border-color var(--transicao),
-      box-shadow var(--transicao);
+      box-shadow var(--transicao),
+      rotate 500ms var(--mola);
   }
 
+  /* ao abrir, o losango dá meia volta e acende */
   .pergunta[open] .pergunta__marca {
+    rotate: calc(var(--ang-fita) + 180deg);
     background: var(--azul-luz);
     border-color: var(--azul-luz);
     box-shadow: 0 0 12px var(--azul);
@@ -121,8 +250,21 @@ const dadosFaq = {
 
   .pergunta__resposta {
     max-width: 40rem;
-    padding: 0 32px 24px 0;
+    padding: 0 32px 24px calc(1.6em * 0.75 + 16px);
     color: var(--texto-suave);
+  }
+
+  /* a resposta desliza para o lugar a cada abertura */
+  .pergunta[open] .pergunta__resposta {
+    animation: faq-resposta 600ms var(--saida) 60ms backwards;
+  }
+
+  @keyframes faq-resposta {
+    from {
+      opacity: 0;
+      translate: -10px 0;
+      filter: blur(4px);
+    }
   }
 
   /* abertura animada onde houver suporte */
@@ -167,6 +309,7 @@ const dadosFaq = {
       margin-top: 32px;
       color: var(--texto-suave);
       font-size: var(--fs-pequeno);
+      animation: mov-sobe 900ms var(--saida) 900ms backwards;
     }
 
     .pergunta__titulo {

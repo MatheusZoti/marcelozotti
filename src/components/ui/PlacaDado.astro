@@ -4,14 +4,23 @@ interface Props {
   numero: string;
   rotulo: string;
   acesa?: boolean;
+  /** conta de 0 até o número quando o bloco [data-revelar] em volta aparece (scripts/contar.ts) */
+  contar?: boolean;
+  /** atraso da contagem, em ms (para acompanhar a entrada da placa) */
+  atrasoContagem?: number;
   class?: string;
 }
 
-const { numero, rotulo, acesa = false, class: classe } = Astro.props;
+const { numero, rotulo, acesa = false, contar = false, atrasoContagem = 0, class: classe } =
+  Astro.props;
 ---
 
 <div class:list={['placa', 'placa-dado', { 'placa--acesa': acesa }, classe]}>
-  <span class="numero placa-dado__numero">{numero}</span>
+  <span
+    class="numero placa-dado__numero"
+    data-contar={contar ? '' : undefined}
+    data-contar-atraso={contar ? atrasoContagem : undefined}>{numero}</span
+  >
   <span class="placa-dado__rotulo">{rotulo}</span>
 </div>
 

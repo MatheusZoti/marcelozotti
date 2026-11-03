@@ -2,6 +2,10 @@
 // Seção 6 · O método (ref-05): três placas de vidro que acendem em sequência ao rolar,
 // ligadas por elos em losango. Luz média.
 // Sem JavaScript (ou com movimento reduzido), as três já aparecem acesas.
+// Movimento: "achismo" é riscado por uma linha de luz e "pela conta" é varrida pela luz.
+// As placas entram e acendem uma depois da outra como um circuito: uma luz contorna a borda,
+// o verbo é "pintado" da esquerda para a direita e a corrente corre pelo elo até a próxima.
+// Depois, a luz segue dando a volta nas três (Entender → Decidir → Aplicar), sem parar.
 import { objetivo, passos } from '../../conteudo/metodo';
 ---
 
@@ -11,18 +15,33 @@ import { objetivo, passos } from '../../conteudo/metodo';
   </div>
 
   <div class="container">
-    <header class="metodo__topo">
-      <p class="rotulo">O método</p>
+    <header class="metodo__topo" data-revelar>
+      <p class="rotulo rotulo-digita" style="--letras: 9">O método</p>
       <h2 id="metodo-titulo" class="metodo__titulo">
-        Pare de decidir no achismo. <span>Comece a decidir pela conta.</span>
+        <span class="metodo__titulo-base">
+          Pare de decidir no <span class="metodo__riscado">achismo</span>.
+        </span>
+        <span class="metodo__titulo-luz">Comece a decidir pela conta.</span>
       </h2>
       <p class="metodo__objetivo">{objetivo}</p>
     </header>
 
-    <ol class="metodo__passos" role="list">
+    <ol class="metodo__passos" role="list" data-revelar-grupo="(min-width: 900px)">
       {
         passos.map((passo, i) => (
-          <li class="placa placa--acesa passo" data-passo>
+          <li
+            class="placa placa--acesa passo"
+            style={`--i:${i}`}
+            data-passo
+            data-revelar
+            data-holofote
+          >
+            <span class="passo__brilho" aria-hidden="true" />
+            {i < passos.length - 1 && (
+              <span class="passo__elo" aria-hidden="true">
+                <span class="passo__corrente" />
+              </span>
+            )}
             <span class="passo__etapa" aria-hidden="true">
               Etapa
             </span>
@@ -40,34 +59,33 @@ import { objetivo, passos } from '../../conteudo/metodo';
 </section>
 
 <script>
+  // Acende as placas em sequência quando elas aparecem (depois da entrada de cada uma).
+  // Só com a revelação ligada; sem ela, as placas já vêm acesas no HTML.
   const secao = document.querySelector<HTMLElement>('[data-metodo]');
-  const movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (secao && !movimentoReduzido && 'IntersectionObserver' in window) {
+  if (secao && document.documentElement.classList.contains('revelar')) {
     const placas = [...secao.querySelectorAll<HTMLElement>('[data-passo]')];
     // a seção fica abaixo da dobra, então apagar aqui não pisca na tela
     placas.forEach((placa) => placa.classList.remove('placa--acesa'));
 
     let ultimoAceso = 0;
-    const observador = new IntersectionObserver(
-      (entradas) => {
-        entradas
-          .filter((entrada) => entrada.isIntersecting)
-          .map((entrada) => entrada.target as HTMLElement)
-          .sort((a, b) => placas.indexOf(a) - placas.indexOf(b))
-          .forEach((placa) => {
-            observador.unobserve(placa);
-            // quando várias entram juntas (desktop), acendem uma depois da outra
-            const agora = performance.now();
-            const quando = Math.max(agora, ultimoAceso + 450);
-            ultimoAceso = quando;
-            window.setTimeout(() => placa.classList.add('placa--acesa'), quando - agora);
-          });
-      },
-      { threshold: 0.6, rootMargin: '0px 0px -12% 0px' },
-    );
+    const acender = (placa: HTMLElement) => {
+      // espera a placa assentar; se várias entram juntas, acendem uma depois da outra
+      const agora = performance.now();
+      const quando = Math.max(agora + 650, ultimoAceso + 750);
+      ultimoAceso = quando;
+      window.setTimeout(() => placa.classList.add('placa--acesa'), quando - agora);
+    };
 
-    placas.forEach((placa) => observador.observe(placa));
+    placas.forEach((placa) => {
+      if (placa.hasAttribute('data-revelado')) return acender(placa);
+      const observador = new MutationObserver(() => {
+        if (!placa.hasAttribute('data-revelado')) return;
+        observador.disconnect();
+        acender(placa);
+      });
+      observador.observe(placa, { attributes: true, attributeFilter: ['data-revelado'] });
+    });
   }
 </script>
 
@@ -102,8 +120,51 @@ import { objetivo, passos } from '../../conteudo/metodo';
     max-width: 18ch;
   }
 
-  .metodo__titulo span {
+  .metodo__titulo-base,
+  .metodo__titulo-luz {
+    display: block;
+  }
+
+  .metodo__titulo-luz {
     color: var(--azul-luz);
+  }
+
+  /* ---------- Entrada do topo ---------- */
+  .metodo__titulo-base {
+    animation: mov-sobe 1000ms var(--saida) 360ms backwards;
+  }
+
+  /* "achismo" é riscado por uma linha de luz antes da resposta aparecer */
+  .metodo__riscado {
+    position: relative;
+    white-space: nowrap;
+    color: var(--texto-suave);
+    transition: color 600ms ease;
+  }
+
+  .metodo__riscado::after {
+    content: '';
+    position: absolute;
+    left: -0.06em;
+    right: -0.06em;
+    top: 54%;
+    height: 0.09em;
+    border-radius: 0.05em;
+    background: linear-gradient(90deg, var(--azul-luz), var(--offwhite));
+    box-shadow: 0 0 12px var(--azul-luz);
+    transform-origin: left center;
+    rotate: -4deg;
+    animation: metodo-risca 700ms cubic-bezier(0.7, 0, 0.3, 1) 1050ms backwards;
+  }
+
+  @keyframes metodo-risca {
+    from {
+      scale: 0 1;
+    }
+  }
+
+  .metodo__titulo-luz {
+    animation: mov-varredura 1500ms var(--saida) 1500ms backwards;
   }
 
   .metodo__objetivo {
@@ -111,6 +172,7 @@ import { objetivo, passos } from '../../conteudo/metodo';
     max-width: 36rem;
     font-size: var(--fs-lead);
     color: var(--texto-suave);
+    animation: mov-sobe 1000ms var(--saida) 900ms backwards;
   }
 
   /* ---------- Passos ---------- */
@@ -122,8 +184,17 @@ import { objetivo, passos } from '../../conteudo/metodo';
     list-style: none;
   }
 
+  /* ângulo da luz que contorna a borda da placa (registrado para poder animar) */
+  @property --giro {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+
   .passo {
+    --passo-atraso: 0ms;
     position: relative;
+    isolation: isolate;
     display: grid;
     grid-template-columns: 1fr auto;
     grid-template-areas:
@@ -135,7 +206,122 @@ import { objetivo, passos } from '../../conteudo/metodo';
     transition:
       background 700ms ease,
       border-color 700ms ease,
-      box-shadow 700ms ease;
+      box-shadow 700ms ease,
+      transform 600ms var(--saida);
+    /* entrada: a placa sobe do escuro (apagada); o JS acende depois */
+    animation: metodo-placa 1000ms var(--saida) calc(var(--lote, 0ms) + var(--passo-atraso)) backwards;
+  }
+
+  @keyframes metodo-placa {
+    from {
+      opacity: 0;
+      translate: 0 36px;
+      scale: 0.95;
+      filter: blur(10px);
+    }
+  }
+
+  /* luz que contorna a borda: uma volta quando a placa acende, depois uma volta a cada 6 s
+     em revezamento (01 → 02 → 03), como uma corrente passando pelo método */
+  .passo::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: 2;
+    padding: 1.5px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--giro),
+      transparent 0 62%,
+      color-mix(in oklab, var(--azul-luz) 60%, transparent) 80%,
+      var(--offwhite) 88%,
+      transparent 94%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    opacity: 0;
+  }
+
+  .passo.placa--acesa::before {
+    animation:
+      metodo-contorno 1300ms cubic-bezier(0.4, 0, 0.2, 1),
+      metodo-ronda 6s linear calc(1800ms + var(--i) * 2s) infinite;
+  }
+
+  @keyframes metodo-contorno {
+    0% {
+      --giro: 0deg;
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      --giro: 360deg;
+      opacity: 0;
+    }
+  }
+
+  @keyframes metodo-ronda {
+    0% {
+      --giro: 0deg;
+      opacity: 0;
+    }
+    4%,
+    26% {
+      opacity: 0.85;
+    }
+    33%,
+    100% {
+      --giro: 360deg;
+      opacity: 0;
+    }
+  }
+
+  /* brilho interno que segue o mouse (scripts/holofote.ts) */
+  .passo__brilho {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      320px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, var(--azul) 22%, transparent),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 450ms ease;
+  }
+
+  @media (hover: hover) {
+    .passo:hover {
+      transform: translateY(-5px);
+    }
+
+    .passo:hover .passo__brilho {
+      opacity: 1;
+    }
+
+    .passo:hover .passo__verbo {
+      translate: 4px 0;
+    }
+
+    .passo:hover .passo__pratica {
+      color: var(--texto);
+    }
+
+    .passo.placa--acesa:hover .passo__numero {
+      text-shadow:
+        0 0 36px var(--azul),
+        0 0 12px var(--azul-luz);
+    }
   }
 
   /* rótulo vertical em mono na borda, como na ref-05 */
@@ -166,7 +352,31 @@ import { objetivo, passos } from '../../conteudo/metodo';
   .passo__verbo {
     font-size: clamp(1.75rem, 1.4rem + 1.4vw, 2.25rem);
     color: var(--texto-suave);
-    transition: color 700ms ease;
+    transition:
+      color 700ms ease,
+      translate 500ms var(--saida);
+  }
+
+  /* ao acender, o verbo é "pintado" de luz da esquerda para a direita */
+  .passo.placa--acesa .passo__verbo {
+    background: linear-gradient(
+        90deg,
+        var(--texto) 0 40%,
+        var(--azul-luz) 48%,
+        var(--offwhite) 50%,
+        var(--texto-suave) 60% 100%
+      )
+      0 0 / 260% 100% no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: metodo-pinta 1100ms var(--saida) 200ms backwards;
+  }
+
+  @keyframes metodo-pinta {
+    from {
+      background-position: 100% 0;
+    }
   }
 
   .passo__frase {
@@ -184,6 +394,7 @@ import { objetivo, passos } from '../../conteudo/metodo';
     border-top: 1px solid color-mix(in oklab, var(--offwhite) 10%, transparent);
     font-size: var(--fs-pequeno);
     color: var(--texto-suave);
+    transition: color 500ms ease;
   }
 
   .passo.placa--acesa .passo__numero {
@@ -199,28 +410,93 @@ import { objetivo, passos } from '../../conteudo/metodo';
     color: var(--texto-suave);
   }
 
-  /* elo entre placas: losango a 45° que acende junto com a placa seguinte */
-  .passo:not(:last-child)::after {
+  /* elo entre placas: um fio com um losango a 45° no meio; quando a placa seguinte acende,
+     a corrente enche o fio e o losango acende. Depois, um pulso de luz corre pelo fio. */
+  .passo__elo {
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 2px;
+    height: 40px;
+    translate: -50% 0;
+    background: color-mix(in oklab, var(--offwhite) 12%, transparent);
+  }
+
+  .passo__corrente {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, var(--azul-luz), var(--offwhite));
+    box-shadow: 0 0 10px var(--azul-luz);
+    transform-origin: top center;
+    scale: 1 0;
+    transition: scale 450ms cubic-bezier(0.6, 0, 0.3, 1);
+  }
+
+  /* losango no meio do fio */
+  .passo__elo::after {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -27px;
+    top: 50%;
     width: 14px;
     height: 14px;
-    translate: -50% 0;
+    translate: -50% -50%;
     rotate: var(--ang-fita);
     border: 1.5px solid color-mix(in oklab, var(--offwhite) 25%, transparent);
     border-radius: 2px;
+    background: var(--navy-profundo);
     transition:
-      background-color 700ms ease,
-      border-color 700ms ease,
-      box-shadow 700ms ease;
+      background-color 500ms ease 250ms,
+      border-color 500ms ease 250ms,
+      box-shadow 500ms ease 250ms;
   }
 
-  .passo:has(+ .placa--acesa)::after {
+  /* pulso que corre pelo fio sem parar, depois que tudo acendeu */
+  .passo__elo::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    border-radius: 50%;
+    background: var(--offwhite);
+    box-shadow: 0 0 10px var(--azul-luz);
+    opacity: 0;
+  }
+
+  .passo:has(+ .placa--acesa) .passo__corrente {
+    scale: 1 1;
+  }
+
+  .passo:has(+ .placa--acesa) .passo__elo::after {
     background: var(--azul-luz);
     border-color: var(--azul-luz);
     box-shadow: 0 0 14px var(--azul);
+  }
+
+  .passo:has(+ .placa--acesa) .passo__elo::before {
+    animation: metodo-pulso-v 6s ease-in-out calc(3000ms + var(--i) * 2s) infinite;
+  }
+
+  @keyframes metodo-pulso-v {
+    0% {
+      top: 0;
+      opacity: 0;
+    }
+    3% {
+      opacity: 1;
+    }
+    12% {
+      top: calc(100% - 6px);
+      opacity: 1;
+    }
+    15%,
+    100% {
+      top: calc(100% - 6px);
+      opacity: 0;
+    }
   }
 
   @media (min-width: 900px) {
@@ -276,12 +552,56 @@ import { objetivo, passos } from '../../conteudo/metodo';
       margin-top: 0;
     }
 
-    .passo:not(:last-child)::after {
-      left: auto;
-      right: -27px;
+    /* no desktop as placas entram juntas e acendem em cascata */
+    .passo {
+      --passo-atraso: calc(var(--i) * 140ms);
+    }
+
+    .passo__elo {
+      left: 100%;
       top: 50%;
-      bottom: auto;
+      width: 40px;
+      height: 2px;
       translate: 0 -50%;
+    }
+
+    .passo__corrente {
+      background: linear-gradient(90deg, var(--azul-luz), var(--offwhite));
+      transform-origin: left center;
+      scale: 0 1;
+    }
+
+    .passo:has(+ .placa--acesa) .passo__corrente {
+      scale: 1 1;
+    }
+
+    .passo__elo::before {
+      top: 50%;
+      left: 0;
+      margin: -3px 0 0;
+    }
+
+    .passo:has(+ .placa--acesa) .passo__elo::before {
+      animation-name: metodo-pulso-h;
+    }
+
+    @keyframes metodo-pulso-h {
+      0% {
+        left: 0;
+        opacity: 0;
+      }
+      3% {
+        opacity: 1;
+      }
+      12% {
+        left: calc(100% - 6px);
+        opacity: 1;
+      }
+      15%,
+      100% {
+        left: calc(100% - 6px);
+        opacity: 0;
+      }
     }
   }
 </style>

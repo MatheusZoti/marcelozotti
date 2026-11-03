@@ -1,52 +1,142 @@
 ---
 // Seção 13 · CTA final com qualificador (ref-04): colunas de luz a 67,5° atrás do conteúdo.
-// Luz máxima, segundo pico da página. As escolhas montam a mensagem do WhatsApp;
-// sem JavaScript, o botão envia a mensagem padrão. Nada é obrigatório.
-import { apoio, perguntas, titulo } from '../../conteudo/cta-final';
+// Luz máxima, segundo pico da página. O qualificador tem 3 etapas, cada uma com um estilo:
+// cartões (2 caminhos), círculos (3 formatos) e segmentos (3 marketplaces).
+// As escolhas montam a mensagem do WhatsApp. Nada é obrigatório: dá para pular cada etapa.
+// Sem JavaScript, as 3 perguntas aparecem empilhadas e o botão envia a mensagem padrão.
+// Movimento (clímax da página): as colunas de luz se abrem do centro, o título entra palavra a
+// palavra e o painel sobe com uma luz dando a volta na borda. Depois, a borda do painel recebe
+// a luz de novo a cada ~7 s, e com mouse um brilho segue o ponteiro dentro do vidro.
+import { apoio, perguntas, titulo, type Icone } from '../../conteudo/cta-final';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
+
+// traço de 1,75 em grade de 24, no mesmo peso das letras da Manrope
+const icones: Record<Icone, string> = {
+  loja: '<path d="M3 9.5 4.6 4h14.8L21 9.5"/><path d="M3 9.5h18v.5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0Z"/><path d="M4.5 13v7h15v-7"/><path d="M10 20v-4.5h4V20"/>',
+  crescimento: '<path d="M3 17 9.5 10.5l4 4L21 7"/><path d="M15 7h6v6"/>',
+  tela: '<rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/><path d="m10.5 8.2 4 2.3-4 2.3Z"/>',
+  local: '<path d="M19.5 10c0 5-5.6 10.2-7 11.4a.8.8 0 0 1-1 0C10.1 20.2 4.5 15 4.5 10a7.5 7.5 0 0 1 15 0Z"/><circle cx="12" cy="10" r="2.6"/>',
+  duvida: '<circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.5-2.7 2.5"/><path d="M12 16.8h.01"/>',
+};
+
+const ultima = perguntas.length - 1;
+const palavras = titulo.split(' ');
+const doisDigitos = (n: number) => String(n).padStart(2, '0');
 ---
 
 <section class="final" aria-labelledby="final-titulo" id="conversar" data-final>
-  <div class="final__luz" aria-hidden="true">
+  <div class="final__luz" aria-hidden="true" data-revelar>
     <div class="final__colunas"></div>
   </div>
 
   <div class="container final__grade">
-    <div class="final__texto">
-      <p class="rotulo">O próximo passo</p>
-      <h2 id="final-titulo" class="final__titulo">{titulo}</h2>
+    <div class="final__texto" data-revelar>
+      <p class="rotulo rotulo-digita" style="--letras: 15">O próximo passo</p>
+      <h2 id="final-titulo" class="final__titulo">
+        {
+          palavras.map((palavra, i) => (
+            <>
+              <span class="final__palavra" style={`--i:${i}`}>
+                {palavra}
+              </span>{' '}
+            </>
+          ))
+        }
+      </h2>
       <p class="final__apoio">{apoio}</p>
     </div>
 
-    <form class="placa final__painel" action="#" onsubmit="return false">
-      <p class="final__instrucao">
-        Responda se quiser. As respostas vão junto na mensagem e ajudam o Marcelo a entender o seu
-        momento.
-      </p>
+    <form
+      class="placa placa--acesa holofote final__painel"
+      action="#"
+      onsubmit="return false"
+      data-painel
+      data-revelar
+    >
+      <span class="final__contorno" aria-hidden="true"></span>
+      <div class="final__progresso" data-progresso hidden>
+        <p class="rotulo final__passo" aria-live="polite">
+          Etapa <span class="numero" data-passo>01</span> de {doisDigitos(perguntas.length)}
+        </p>
+        <div class="final__barras" aria-hidden="true">
+          {perguntas.map(() => <span class="final__barra" />)}
+        </div>
+      </div>
 
-      {
-        perguntas.map((p) => (
-          <fieldset class="final__pergunta">
-            <legend class="final__legenda">{p.pergunta}</legend>
-            <div class="final__opcoes">
-              {p.opcoes.map((o) => (
-                <label class="opcao">
-                  <input
-                    class="visualmente-oculto"
-                    type="radio"
-                    name={p.id}
-                    value={o.valor}
-                    data-linha={`${p.naMensagem}: ${o.naMensagem}`}
-                  />
-                  <span>{o.rotulo}</span>
-                </label>
-              ))}
+      <div class="final__etapas">
+        {
+          perguntas.map((p, i) => (
+            <div class={`etapa etapa--${p.estilo}`} data-etapa>
+              <fieldset class="etapa__pergunta">
+                <legend class="etapa__legenda">{p.pergunta}</legend>
+                <div class={`opcoes opcoes--${p.estilo}`}>
+                  {p.opcoes.map((o) => (
+                    <label class={`opcao opcao--${p.estilo}`}>
+                      <input
+                        class="visualmente-oculto"
+                        type="radio"
+                        name={p.id}
+                        value={o.valor}
+                        data-linha={`${p.naMensagem}: ${o.naMensagem}`}
+                        data-curto={o.curto ?? o.rotulo}
+                      />
+                      {o.icone && (
+                        <span class="opcao__icone" aria-hidden="true">
+                          <svg viewBox="0 0 24 24" set:html={icones[o.icone]} />
+                          <span class="opcao__check">
+                            <svg viewBox="0 0 24 24">
+                              <path d="M5 12.5 10 17.5 19 7" />
+                            </svg>
+                          </span>
+                        </span>
+                      )}
+                      <span class="opcao__texto">
+                        <span class="opcao__rotulo">{o.rotulo}</span>
+                        {o.detalhe && <span class="opcao__detalhe">{o.detalhe}</span>}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              {i === ultima && (
+                <div class="final__resumo" data-resumo hidden>
+                  <p class="rotulo final__resumo-rotulo">Vai na mensagem</p>
+                  <p class="final__resumo-vazio" data-resumo-vazio>
+                    Nenhuma resposta marcada. Tudo bem: o Marcelo pergunta na conversa.
+                  </p>
+                  <ul class="final__resumo-lista" data-resumo-lista />
+                </div>
+              )}
+
+              {i === ultima && (
+                <BotaoWhatsApp origem="final" class="final__botao">
+                  Enviar para o Marcelo
+                </BotaoWhatsApp>
+              )}
+
+              <div class="etapa__nav">
+                {i > 0 && (
+                  <button type="button" class="etapa__voltar" data-voltar>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M19 12H5m6-6-6 6 6 6" />
+                    </svg>
+                    Voltar
+                  </button>
+                )}
+                {i < ultima && (
+                  <button type="button" class="etapa__avancar" data-avancar>
+                    <span data-avancar-texto>Pular</span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M5 12h14m-6-6 6 6-6 6" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
-          </fieldset>
-        ))
-      }
-
-      <BotaoWhatsApp origem="final" class="final__botao">Enviar para o Marcelo</BotaoWhatsApp>
+          ))
+        }
+      </div>
     </form>
   </div>
 </section>
@@ -55,21 +145,98 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   import { linkWhatsApp, MENSAGENS_WHATSAPP } from '../../config/site';
 
   const secao = document.querySelector<HTMLElement>('[data-final]');
+  const painel = secao?.querySelector<HTMLFormElement>('[data-painel]');
   const botao = secao?.querySelector<HTMLAnchorElement>('a[data-cta="final"]');
 
-  if (secao && botao) {
-    const atualizar = () => {
-      const linhas = [...secao.querySelectorAll<HTMLInputElement>('input[type="radio"]:checked')].map(
-        (escolha) => `• ${escolha.dataset.linha}`,
-      );
+  if (secao && painel && botao) {
+    const etapas = [...painel.querySelectorAll<HTMLElement>('[data-etapa]')];
+    const barras = [...painel.querySelectorAll<HTMLElement>('.final__barra')];
+    const passo = painel.querySelector<HTMLElement>('[data-passo]');
+    const progresso = painel.querySelector<HTMLElement>('[data-progresso]');
+    const resumo = painel.querySelector<HTMLElement>('[data-resumo]');
+    const resumoLista = painel.querySelector<HTMLElement>('[data-resumo-lista]');
+    const resumoVazio = painel.querySelector<HTMLElement>('[data-resumo-vazio]');
+    let atual = 0;
+    let porPonteiro = false;
+    let espera = 0;
+
+    const atualizarMensagem = () => {
+      const escolhas = [...painel.querySelectorAll<HTMLInputElement>('input[type="radio"]:checked')];
+      const linhas = escolhas.map((escolha) => `• ${escolha.dataset.linha}`);
+
+      // resumo na última etapa: a pessoa vê o que vai junto antes de enviar
+      if (resumoLista && resumoVazio) {
+        resumoLista.replaceChildren(
+          ...escolhas.map((escolha) => {
+            const item = document.createElement('li');
+            item.textContent = escolha.dataset.curto ?? '';
+            return item;
+          }),
+        );
+        resumoVazio.hidden = escolhas.length > 0;
+      }
+
       const mensagem = linhas.length
         ? [MENSAGENS_WHATSAPP.final, ...linhas].join('\n')
         : MENSAGENS_WHATSAPP.final;
       botao.href = linkWhatsApp(mensagem);
     };
 
-    secao.addEventListener('change', atualizar);
-    atualizar(); // o navegador pode restaurar escolhas ao voltar para a página
+    // "Pular" vira "Próximo" quando a etapa já tem resposta
+    const atualizarAvancar = () => {
+      etapas.forEach((etapa) => {
+        const respondida = !!etapa.querySelector('input:checked');
+        const avancar = etapa.querySelector<HTMLElement>('[data-avancar]');
+        const texto = etapa.querySelector<HTMLElement>('[data-avancar-texto]');
+        avancar?.classList.toggle('etapa__avancar--pronto', respondida);
+        if (texto) texto.textContent = respondida ? 'Próximo' : 'Pular';
+      });
+    };
+
+    const mostrar = (indice: number, focar: boolean) => {
+      atual = indice;
+      etapas.forEach((etapa, n) => {
+        etapa.inert = n !== indice;
+        etapa.dataset.lado = n < indice ? 'antes' : n > indice ? 'depois' : 'atual';
+      });
+      barras.forEach((barra, n) => barra.classList.toggle('final__barra--acesa', n <= indice));
+      if (passo) passo.textContent = String(indice + 1).padStart(2, '0');
+      if (focar) {
+        const alvo =
+          etapas[indice].querySelector<HTMLInputElement>('input:checked') ??
+          etapas[indice].querySelector<HTMLInputElement>('input');
+        alvo?.focus({ preventScroll: true });
+      }
+    };
+
+    painel.classList.add('em-etapas');
+    if (progresso) progresso.hidden = false;
+    if (resumo) resumo.hidden = false;
+    mostrar(0, false);
+
+    painel.addEventListener('pointerdown', () => (porPonteiro = true));
+    painel.addEventListener('keydown', () => (porPonteiro = false));
+
+    painel.addEventListener('change', () => {
+      atualizarMensagem();
+      atualizarAvancar();
+      // no toque/clique avança sozinho; no teclado as setas mudam a escolha,
+      // então quem usa teclado avança pelo botão
+      window.clearTimeout(espera);
+      if (porPonteiro && atual < etapas.length - 1) {
+        espera = window.setTimeout(() => mostrar(atual + 1, true), 420);
+      }
+    });
+
+    painel.addEventListener('click', (evento) => {
+      const alvo = evento.target as HTMLElement;
+      if (alvo.closest('[data-avancar]')) mostrar(Math.min(atual + 1, etapas.length - 1), true);
+      if (alvo.closest('[data-voltar]')) mostrar(Math.max(atual - 1, 0), true);
+    });
+
+    // o navegador pode restaurar escolhas ao voltar para a página
+    atualizarMensagem();
+    atualizarAvancar();
   }
 </script>
 
@@ -136,6 +303,30 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     gap: 40px;
   }
 
+  /* ---------- Entrada: a luz se abre do centro ---------- */
+  .final__luz {
+    animation: final-luz-abre 1800ms var(--saida) backwards;
+  }
+
+  @keyframes final-luz-abre {
+    from {
+      opacity: 0;
+      clip-path: inset(50% 0 50% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  .final__palavra {
+    display: inline-block;
+    animation: mov-sobe 900ms var(--saida) calc(350ms + var(--i) * 55ms) backwards;
+  }
+
+  .final__apoio {
+    animation: mov-sobe 1000ms var(--saida) 1100ms backwards;
+  }
+
   .final__titulo {
     margin-top: 12px;
     font-size: clamp(2rem, 1.3rem + 3vw, 3.5rem);
@@ -151,74 +342,644 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
   /* ---------- Painel do qualificador ---------- */
   .final__painel {
+    container-type: inline-size;
     display: grid;
     gap: 22px;
-    padding: 22px 18px 24px;
+    padding: 22px 18px 20px;
     --placa-opacidade: 80%;
+    /* sobe do escuro e assenta; o conteúdo vem logo atrás */
+    animation: final-painel 1200ms var(--saida) calc(var(--lote, 0ms) + 200ms) backwards;
   }
 
-  .final__instrucao {
-    font-size: var(--fs-pequeno);
-    color: var(--texto-suave);
+  @keyframes final-painel {
+    from {
+      opacity: 0;
+      translate: 0 40px;
+      scale: 0.96;
+      filter: blur(10px);
+    }
   }
 
-  .final__pergunta {
+  .final__progresso,
+  .final__etapas {
+    animation: mov-sobe 900ms var(--saida) calc(var(--lote, 0ms) + 700ms) backwards;
+  }
+
+  /* as opções da primeira etapa aparecem uma a uma depois do painel (só na entrada:
+     a regra vale sempre para a 1ª etapa, então não repete ao voltar para ela) */
+  .etapa:first-child .opcao {
+    animation: mov-sobe 700ms var(--saida) calc(var(--lote, 0ms) + 850ms) backwards;
+  }
+
+  .etapa:first-child .opcao:nth-child(2) {
+    animation-delay: calc(var(--lote, 0ms) + 980ms);
+  }
+
+  /* luz que dá a volta na borda do painel: na entrada e depois a cada ~7 s */
+  @property --final-giro {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+
+  .final__contorno {
+    position: absolute;
+    inset: -1px;
+    z-index: 2;
+    padding: 1.5px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--final-giro),
+      transparent 0 60%,
+      color-mix(in oklab, var(--azul-luz) 60%, transparent) 80%,
+      var(--offwhite) 88%,
+      transparent 94%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    opacity: 0;
+    animation: final-contorno 7s linear calc(var(--lote, 0ms) + 900ms) infinite;
+  }
+
+  @keyframes final-contorno {
+    0% {
+      --final-giro: 0deg;
+      opacity: 0;
+    }
+    3%,
+    22% {
+      opacity: 1;
+    }
+    28%,
+    100% {
+      --final-giro: 360deg;
+      opacity: 0;
+    }
+  }
+
+  /* progresso: só com JavaScript */
+  .final__progresso {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .final__progresso[hidden] {
+    display: none;
+  }
+
+  .final__passo {
+    font-size: 0.75rem;
+  }
+
+  .final__passo .numero {
+    color: var(--offwhite);
+  }
+
+  .final__barras {
+    display: flex;
+    gap: 6px;
+  }
+
+  .final__barra {
+    width: 28px;
+    height: 4px;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--offwhite) 14%, transparent);
+    transition:
+      background-color 400ms ease,
+      box-shadow 400ms ease;
+  }
+
+  .final__barra--acesa {
+    background: var(--azul-luz);
+    box-shadow: 0 0 10px color-mix(in oklab, var(--azul-luz) 70%, transparent);
+  }
+
+  /* sem JavaScript: etapas empilhadas */
+  .final__etapas {
+    display: grid;
+    gap: 32px;
+  }
+
+  .etapa {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+
+  .etapa__pergunta {
     margin: 0;
     padding: 0;
     border: 0;
     min-width: 0;
   }
 
-  .final__legenda {
+  .etapa__legenda {
     padding: 0;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
+    font-size: 1.1875rem;
     font-weight: 700;
-  }
-
-  .final__opcoes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .opcao {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    padding: 8px 16px;
-    border-radius: 999px;
-    border: 1px solid color-mix(in oklab, var(--offwhite) 20%, transparent);
-    background: color-mix(in oklab, var(--offwhite) 4%, transparent);
-    font-size: var(--fs-pequeno);
-    font-weight: 600;
+    letter-spacing: -0.015em;
     line-height: 1.3;
-    color: var(--texto-suave);
-    cursor: pointer;
+  }
+
+  /* com JavaScript: uma etapa por vez, todas na mesma célula (a altura não pula) */
+  .em-etapas .final__etapas {
+    gap: 0;
+  }
+
+  .em-etapas .etapa {
+    grid-area: 1 / 1;
     transition:
-      background-color var(--transicao),
-      border-color var(--transicao),
-      color var(--transicao);
+      opacity 280ms ease,
+      translate 420ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      visibility 0s linear 0s;
+  }
+
+  .em-etapas .etapa:is([data-lado='antes'], [data-lado='depois']) {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 200ms ease,
+      translate 420ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      visibility 0s linear 200ms;
+  }
+
+  .em-etapas .etapa[data-lado='antes'] {
+    translate: -24px 0;
+  }
+
+  .em-etapas .etapa[data-lado='depois'] {
+    translate: 24px 0;
+  }
+
+  /* ---------- Opções: base ---------- */
+  .opcao {
+    position: relative;
+    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
 
-  .opcao:hover {
-    border-color: color-mix(in oklab, var(--azul-fio) 60%, transparent);
+  .opcao__icone {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    color: var(--azul-fio);
+    transition:
+      color var(--transicao),
+      background-color var(--transicao),
+      border-color var(--transicao),
+      box-shadow var(--transicao);
   }
 
-  .opcao:has(input:checked) {
+  .opcao__icone > svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .opcao__texto {
+    display: grid;
+    gap: 2px;
+  }
+
+  .opcao__rotulo {
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--texto);
+  }
+
+  .opcao__detalhe {
+    font-size: var(--fs-pequeno);
+    line-height: 1.4;
+    color: var(--texto-suave);
+  }
+
+  /* selo de marcado: círculo azul com o check */
+  .opcao__check {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
     background: var(--azul);
-    border-color: var(--azul);
-    color: var(--offwhite);
+    box-shadow:
+      0 0 0 2px var(--navy-profundo),
+      0 0 12px color-mix(in oklab, var(--azul-luz) 70%, transparent);
+    scale: 0;
+    transition: scale 260ms cubic-bezier(0.3, 1.6, 0.5, 1);
+  }
+
+  .opcao__check svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--offwhite);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .opcao:has(input:checked) .opcao__check {
+    scale: 1;
   }
 
   .opcao:has(input:focus-visible) {
     outline: 2px solid var(--azul-fio);
-    outline-offset: 2px;
+    outline-offset: 3px;
   }
 
+  /* ---------- Etapa 1 · Cartões (2 caminhos) ---------- */
+  .opcoes--cartoes {
+    display: grid;
+    gap: 10px;
+  }
+
+  .opcao--cartoes {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 44px 14px 14px;
+    border-radius: var(--raio-pequeno);
+    border: 1px solid color-mix(in oklab, var(--offwhite) 14%, transparent);
+    background: color-mix(in oklab, var(--offwhite) 4%, transparent);
+    transition:
+      background-color var(--transicao),
+      border-color var(--transicao),
+      box-shadow var(--transicao),
+      transform var(--transicao);
+  }
+
+  .opcao--cartoes .opcao__icone {
+    position: static; /* o selo se posiciona pelo cartão, não pelo ícone */
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: color-mix(in oklab, var(--azul) 14%, transparent);
+  }
+
+  .opcao--cartoes .opcao__check {
+    top: 50%;
+    right: 14px;
+    translate: 0 -50%;
+  }
+
+  .opcao--cartoes:has(input:checked) {
+    border-color: var(--azul-fio);
+    background: color-mix(in oklab, var(--azul) 18%, transparent);
+    box-shadow:
+      inset 0 0 0 1px var(--azul-fio),
+      0 0 24px color-mix(in oklab, var(--azul) 35%, transparent);
+  }
+
+  .opcao--cartoes:has(input:checked) .opcao__icone {
+    color: var(--offwhite);
+    background: var(--azul);
+  }
+
+  /* painel largo: cartões lado a lado, ícone em cima (como na referência) */
+  @container (min-width: 400px) {
+    .opcoes--cartoes {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .opcao--cartoes {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .opcao--cartoes .opcao__check {
+      top: 14px;
+      translate: none;
+    }
+
+    .opcao--segmentos .opcao__rotulo {
+      font-size: 0.9375rem;
+    }
+  }
+
+  /* ---------- Etapa 2 · Círculos (3 formatos) ---------- */
+  .opcoes--circulos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .opcao--circulos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 2px 6px;
+    border-radius: var(--raio-pequeno);
+    text-align: center;
+  }
+
+  .opcao--circulos .opcao__icone {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 16%, transparent);
+    background:
+      radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--azul) 22%, transparent), transparent 70%),
+      color-mix(in oklab, var(--offwhite) 4%, transparent);
+  }
+
+  .opcao--circulos .opcao__icone > svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .opcao--circulos .opcao__check {
+    top: 0;
+    right: 0;
+  }
+
+  .opcao--circulos .opcao__rotulo {
+    font-size: 0.9375rem;
+  }
+
+  .opcao--circulos .opcao__detalhe {
+    font-size: 0.75rem;
+  }
+
+  .opcao--circulos:has(input:checked) .opcao__icone {
+    color: var(--offwhite);
+    border-color: var(--azul-fio);
+    background:
+      radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--azul-luz) 55%, transparent), transparent 75%),
+      color-mix(in oklab, var(--azul) 40%, transparent);
+    box-shadow:
+      0 0 0 3px color-mix(in oklab, var(--azul) 35%, transparent),
+      0 0 28px color-mix(in oklab, var(--azul) 55%, transparent);
+  }
+
+  /* ---------- Etapa 3 · Segmentos (3 marketplaces) ---------- */
+  /* "Mercado Livre" é o rótulo mais longo: a primeira coluna é mais larga para não quebrar */
+  .opcoes--segmentos {
+    --col-1: calc((100% - 8px) * 1.45 / 3.45);
+    --col: calc((100% - 8px) / 3.45);
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.45fr 1fr 1fr;
+    padding: 4px;
+    border-radius: 14px;
+    background: color-mix(in oklab, var(--navy-noite) 60%, transparent);
+    border: 1px solid color-mix(in oklab, var(--offwhite) 10%, transparent);
+    box-shadow: inset 0 2px 6px color-mix(in oklab, var(--navy-noite) 70%, transparent);
+  }
+
+  /* peça que desliza até a opção marcada */
+  .opcoes--segmentos::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: var(--col-1);
+    border-radius: 10px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--azul) 70%, var(--offwhite) 8%),
+      var(--azul)
+    );
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--offwhite) 35%, transparent),
+      0 4px 16px color-mix(in oklab, var(--azul) 45%, transparent);
+    opacity: 0;
+    scale: 0.92;
+    transition:
+      left 380ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      width 380ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      opacity 200ms ease,
+      scale 260ms ease;
+  }
+
+  .opcoes--segmentos:has(input:checked)::before {
+    opacity: 1;
+    scale: 1;
+  }
+
+  .opcoes--segmentos:has(.opcao:nth-child(2) input:checked)::before {
+    left: calc(4px + var(--col-1));
+    width: var(--col);
+  }
+
+  .opcoes--segmentos:has(.opcao:nth-child(3) input:checked)::before {
+    left: calc(4px + var(--col-1) + var(--col));
+    width: var(--col);
+  }
+
+  .opcao--segmentos {
+    position: relative; /* acima da peça que desliza */
+    display: grid;
+    place-items: center;
+    min-height: 50px;
+    padding: 8px 4px;
+    border-radius: 10px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .opcao--segmentos .opcao__rotulo {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--texto-suave);
+    transition: color var(--transicao);
+  }
+
+  .opcao--segmentos:has(input:checked) .opcao__rotulo {
+    font-weight: 700;
+    color: var(--offwhite);
+  }
+
+  @media (hover: hover) {
+    .opcao--cartoes:hover:not(:has(input:checked)) {
+      border-color: color-mix(in oklab, var(--azul-fio) 45%, transparent);
+      background: color-mix(in oklab, var(--offwhite) 7%, transparent);
+    }
+
+    .opcao--circulos:hover:not(:has(input:checked)) .opcao__icone {
+      border-color: color-mix(in oklab, var(--azul-fio) 55%, transparent);
+      color: var(--offwhite);
+    }
+
+    .opcao--segmentos:hover:not(:has(input:checked)) .opcao__rotulo {
+      color: var(--offwhite);
+    }
+  }
+
+  .opcao--cartoes:active {
+    transform: scale(0.985);
+  }
+
+  /* ---------- Botão e navegação ---------- */
   .final__painel :global(.final__botao) {
     width: 100%;
+  }
+
+  /* resumo do que vai na mensagem (só com JavaScript) */
+  .final__resumo {
+    display: grid;
+    gap: 10px;
     margin-top: 4px;
+  }
+
+  .final__resumo[hidden],
+  .final__resumo-vazio[hidden] {
+    display: none;
+  }
+
+  .final__resumo-rotulo {
+    font-size: 0.75rem;
+  }
+
+  .final__resumo-vazio {
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  .final__resumo-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .final__resumo-lista :global(li) {
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--azul-fio) 35%, transparent);
+    background: color-mix(in oklab, var(--azul) 14%, transparent);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--offwhite);
+    animation: resumo-entra 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  @keyframes resumo-entra {
+    from {
+      opacity: 0;
+      translate: 0 4px;
+    }
+  }
+
+  /* o botão fica no mesmo lugar do "Próximo" das outras etapas */
+  .em-etapas .etapa :global(.final__botao) {
+    margin-top: auto;
+  }
+
+  .em-etapas .etapa:has(:global(.final__botao)) .etapa__nav {
+    margin-top: -6px;
+  }
+
+  .etapa__nav {
+    display: none;
+  }
+
+  .em-etapas .etapa__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+  }
+
+  .etapa__voltar,
+  .etapa__avancar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font: inherit;
+    font-size: var(--fs-pequeno);
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      color var(--transicao),
+      background-color var(--transicao),
+      border-color var(--transicao);
+  }
+
+  .etapa__voltar svg,
+  .etapa__avancar svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: translate var(--transicao);
+  }
+
+  .etapa__voltar {
+    padding: 0 4px;
+    border: 0;
+    background: none;
+    color: var(--texto-suave);
+  }
+
+  .etapa__avancar {
+    margin-left: auto;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 18%, transparent);
+    background: transparent;
+    color: var(--texto-suave);
+  }
+
+  /* com resposta, o "Próximo" ganha o azul (o laranja fica só para o WhatsApp) */
+  .etapa__avancar--pronto {
+    border-color: var(--azul);
+    background: var(--azul);
+    color: var(--offwhite);
+  }
+
+  .etapa__voltar:focus-visible,
+  .etapa__avancar:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 3px;
+  }
+
+  @media (hover: hover) {
+    .etapa__voltar:hover {
+      color: var(--offwhite);
+    }
+
+    .etapa__voltar:hover svg {
+      translate: -3px 0;
+    }
+
+    .etapa__avancar:hover {
+      color: var(--offwhite);
+      border-color: color-mix(in oklab, var(--azul-fio) 60%, transparent);
+    }
+
+    .etapa__avancar:hover svg {
+      translate: 3px 0;
+    }
   }
 
   @media (min-width: 1024px) {
@@ -233,7 +994,8 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     }
 
     .final__painel {
-      padding: 32px 30px 32px;
+      gap: 26px;
+      padding: 28px 30px 26px;
       --placa-opacidade: 60%;
     }
   }

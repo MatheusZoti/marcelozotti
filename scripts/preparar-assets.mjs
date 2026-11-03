@@ -35,6 +35,12 @@ const fotos = [
     qualidade: 78,
   },
   {
+    origem: 'Foto principal pois mostra a ambientacao.jpg',
+    destino: 'marcelo-rosto.jpg', // avatar do bloco "1:1" do bento (seção 5)
+    recorte: { left: 1411, top: 1267, width: 1008, height: 1008 }, // 1:1, rosto inteiro
+    largura: 240,
+  },
+  {
     origem: 'Foto da operacao.jpg',
     destino: 'operacao-pb.jpg', // textura de fundo da seção 4 (já é P&B), aparece a 16% de opacidade
     largura: 1280,

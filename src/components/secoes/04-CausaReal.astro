@@ -2,6 +2,9 @@
 // Seção 4 · A causa real (ref-03): título grande, gráfico em cascata e conclusão com barra lateral.
 // A troca entre "preço cheio" e "com desconto" é feita só com CSS (funciona sem JavaScript).
 // Luz baixa: a foto P&B da operação aparece como textura escura no topo.
+// Movimento: o gráfico se monta como uma cascata de verdade (o preço sobe, cada saída cai do
+// alto e quica no lugar, a sobra cresce e acende). Na troca de cenário as barras escorregam em
+// onda, os valores viram e um selo mostra quanto da sobra some. Hover destaca uma barra.
 import { Image } from 'astro:assets';
 import fotoOperacao from '../../assets/fotos/operacao-pb.jpg';
 import { cenarios, formatarReais, quedaDaSobra } from '../../conteudo/causa';
@@ -16,7 +19,7 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
 ---
 
 <section class="causa" aria-labelledby="causa-titulo">
-  <div class="causa__fundo" aria-hidden="true">
+  <div class="causa__fundo" aria-hidden="true" data-revelar>
     <Image
       src={fotoOperacao}
       alt=""
@@ -28,10 +31,11 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
   </div>
 
   <div class="container">
-    <header class="causa__topo">
-      <p class="rotulo">A causa real</p>
+    <header class="causa__topo" data-revelar>
+      <p class="rotulo rotulo-digita" style="--letras: 12">A causa real</p>
       <h2 id="causa-titulo" class="causa__titulo">
-        Não é falta de esforço. <span>É falta de método.</span>
+        <span class="causa__titulo-base">Não é falta de esforço.</span>
+        <span class="causa__titulo-luz">É falta de método.</span>
       </h2>
       <p class="causa__texto">
         Quem vende em marketplace costuma trabalhar muito: responde cliente, ajusta anúncio, acompanha
@@ -41,7 +45,7 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
     </header>
 
     <div class="causa__painel">
-      <div class="causa__painel-topo">
+      <div class="causa__painel-topo" data-revelar>
         <h3 class="causa__painel-titulo">
           Não baixe o seu preço antes de fazer esta conta.
         </h3>
@@ -66,15 +70,20 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
         </fieldset>
       </div>
 
-      <ol class="cascata" aria-label="De onde sai cada real de uma venda (exemplo ilustrativo)">
+      <ol class="cascata" data-revelar aria-label="De onde sai cada real de uma venda (exemplo ilustrativo)">
         {
-          parcelas.map((p) => (
+          parcelas.map((p, i) => (
             <li
               class={`barra barra--${p.tipo}`}
-              style={`--ini-a:${p.ini};--fim-a:${p.fim};--ini-b:${p.b.ini};--fim-b:${p.b.fim}`}
+              style={`--i:${i};--ini-a:${p.ini};--fim-a:${p.fim};--ini-b:${p.b.ini};--fim-b:${p.b.fim}`}
             >
               <span class="barra__nome">{p.nome}</span>
               <span class="barra__valor numero">
+                {p.tipo === 'sobra' && (
+                  <span class="barra__queda" aria-hidden="true">
+                    −{quedaDaSobra}%
+                  </span>
+                )}
                 <span class="so-a">{formatarReais(p.valor)}</span>
                 <span class="so-b">{formatarReais(p.b.valor)}</span>
               </span>
@@ -86,7 +95,7 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
         }
       </ol>
 
-      <div class="causa__conclusao">
+      <div class="causa__conclusao" data-revelar>
         <p class="causa__sobra">
           <span class="so-a">
             De cada venda de R$ {cheio.preco}, sobram
@@ -103,7 +112,7 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
         </p>
       </div>
 
-      <p class="causa__aviso">
+      <p class="causa__aviso" data-revelar>
         Exemplo ilustrativo com números redondos. Comissões, frete e impostos variam por marketplace,
         categoria e regime tributário. Na mentoria, a conta é feita com os números da sua operação.
       </p>
@@ -134,6 +143,16 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* a foto "revela" do escuro, como uma lembrança da operação */
+    animation: causa-foto 2400ms var(--saida) backwards;
+  }
+
+  @keyframes causa-foto {
+    from {
+      opacity: 0;
+      scale: 1.1;
+      filter: blur(6px);
+    }
   }
 
   /* ---------- Topo (ref-03: título gigante + texto ao lado) ---------- */
@@ -144,9 +163,22 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
     line-height: 1;
   }
 
-  .causa__titulo span {
+  .causa__titulo-base,
+  .causa__titulo-luz {
     display: block;
+  }
+
+  .causa__titulo-luz {
     color: var(--azul-luz);
+  }
+
+  /* ---------- Entrada do topo ---------- */
+  .causa__titulo-base {
+    animation: mov-sobe 1000ms var(--saida) 360ms backwards;
+  }
+
+  .causa__titulo-luz {
+    animation: mov-varredura 1500ms var(--saida) 620ms backwards;
   }
 
   .causa__texto {
@@ -154,6 +186,15 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
     max-width: 34rem;
     font-size: var(--fs-lead);
     color: var(--texto-suave);
+    animation: mov-sobe 1000ms var(--saida) 860ms backwards;
+  }
+
+  .causa__painel-titulo {
+    animation: mov-sobe 900ms var(--saida) backwards;
+  }
+
+  .causa__cenarios {
+    animation: mov-sobe 900ms var(--saida) 150ms backwards;
   }
 
   /* ---------- Painel do gráfico ---------- */
@@ -176,6 +217,7 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
 
   /* seletor de cenário */
   .causa__cenarios {
+    position: relative;
     display: inline-grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px;
@@ -187,7 +229,32 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
     min-width: 0;
   }
 
+  /* peça azul que desliza até o cenário escolhido */
+  .causa__cenarios::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc((100% - 12px) / 2);
+    border-radius: 12px;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--azul) 70%, var(--offwhite) 8%),
+      var(--azul)
+    );
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--offwhite) 35%, transparent),
+      0 6px 20px color-mix(in oklab, var(--azul) 45%, transparent);
+    transition: translate 600ms var(--saida);
+  }
+
+  .causa__cenarios:has(input[value='desconto']:checked)::before {
+    translate: calc(100% + 4px) 0;
+  }
+
   .causa__cenario {
+    position: relative; /* acima da peça */
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -209,8 +276,13 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
   }
 
   .causa__cenario:has(input:checked) {
-    background: var(--azul);
     color: var(--offwhite);
+  }
+
+  @media (hover: hover) {
+    .causa__cenario:not(:has(input:checked)):hover {
+      color: var(--offwhite);
+    }
   }
 
   .causa__cenario:has(input:focus-visible) {
@@ -231,6 +303,32 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
     display: inline;
   }
 
+  /* o valor novo "vira" no lugar (a regra volta a valer a cada troca, então a animação repete) */
+  .causa:has(input[value='cheio']:checked) .so-a,
+  .causa:has(input[value='desconto']:checked) .so-b {
+    display: inline-block;
+    animation: causa-vira 520ms var(--saida) calc(var(--i, 0) * 60ms) backwards;
+  }
+
+  /* na frase da conclusão o texto continua em linha (inline-block quebraria a frase) */
+  .causa:has(input[value='cheio']:checked) .causa__sobra .so-a,
+  .causa:has(input[value='desconto']:checked) .causa__sobra .so-b {
+    display: inline;
+  }
+
+  .causa:has(input[value='desconto']:checked) .causa__sobra .so-a,
+  .causa:has(input[value='cheio']:checked) .causa__sobra .so-b {
+    display: none;
+  }
+
+  @keyframes causa-vira {
+    from {
+      opacity: 0;
+      translate: 0 -0.5em;
+      filter: blur(4px);
+    }
+  }
+
   .barra {
     --ini: var(--ini-a);
     --fim: var(--fim-a);
@@ -243,6 +341,10 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
 
   /* ---------- Cascata: barras horizontais no celular ---------- */
   .cascata {
+    /* direção da montagem: no celular as saídas chegam da direita e as barras crescem da esquerda */
+    --barra-de: 40px 0;
+    --cresce-de: 0 1;
+    --origem: left center;
     display: grid;
     gap: 18px;
     padding: 0;
@@ -290,11 +392,86 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
     left: calc(var(--ini) * 1%);
     width: calc((var(--fim) - var(--ini)) * 1%);
     border-radius: 4px;
+    transform-origin: var(--origem);
+    /* troca de cenário: as barras escorregam em onda, da primeira à última */
     transition:
-      left 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
-      width 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
-      bottom 500ms cubic-bezier(0.2, 0.7, 0.2, 1),
-      height 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+      left 800ms var(--saida),
+      width 800ms var(--saida),
+      bottom 800ms var(--saida),
+      height 800ms var(--saida),
+      filter 300ms ease;
+    transition-delay: calc(var(--i) * 70ms);
+    /* entrada: cada saída cai do alto e quica no lugar, uma depois da outra */
+    animation: causa-cai 900ms var(--mola) calc(250ms + var(--i) * 170ms) backwards;
+  }
+
+  @keyframes causa-cai {
+    from {
+      opacity: 0;
+      translate: var(--barra-de);
+    }
+  }
+
+  /* preço e sobra crescem a partir da base */
+  .barra--total .barra__preenchimento {
+    animation-name: causa-cresce;
+    animation-timing-function: var(--saida);
+  }
+
+  /* a sobra cresce por último e acende, para o olho parar nela */
+  .barra--sobra .barra__preenchimento {
+    animation:
+      causa-cresce 1000ms var(--saida) calc(250ms + var(--i) * 170ms) backwards,
+      causa-acende 1600ms ease calc(1000ms + var(--i) * 170ms);
+  }
+
+  @keyframes causa-cresce {
+    from {
+      scale: var(--cresce-de);
+    }
+  }
+
+  @keyframes causa-acende {
+    30% {
+      box-shadow:
+        0 0 46px 8px var(--azul-luz),
+        0 0 18px var(--azul-luz);
+      filter: brightness(1.35);
+    }
+  }
+
+  .barra__valor {
+    animation: mov-sobe 700ms var(--saida) calc(450ms + var(--i) * 170ms) backwards;
+  }
+
+  .barra__nome {
+    animation: mov-aparece 700ms ease calc(350ms + var(--i) * 170ms) backwards;
+  }
+
+  /* selo: quanto da sobra some com o desconto (só no cenário com desconto) */
+  .barra__queda {
+    display: none;
+    margin-right: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--azul-fio);
+    background: color-mix(in oklab, var(--azul) 28%, transparent);
+    font-size: 0.75rem;
+    color: var(--offwhite);
+    vertical-align: 0.1em;
+  }
+
+  .causa:has(input[value='desconto']:checked) .barra__queda {
+    display: inline-block;
+    animation: causa-selo 700ms var(--mola) 450ms backwards;
+  }
+
+  @keyframes causa-selo {
+    from {
+      opacity: 0;
+      scale: 0.4;
+      translate: 0 8px;
+    }
   }
 
   /* total: azul que clareia (gradiente da ref-03, sem o rosa) */
@@ -327,11 +504,48 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
   }
 
   /* ---------- Conclusão (barra lateral, como a "Conclusión" da ref-03) ---------- */
+  .causa__conclusao,
+  .causa__aviso {
+    /* se entrar junto com o gráfico (mesmo lote), espera a cascata terminar de montar */
+    --depois: calc(var(--lote, 0ms) * 7);
+  }
+
   .causa__conclusao {
+    position: relative;
     margin-top: 40px;
     padding-left: 18px;
-    border-left: 3px solid;
-    border-image: linear-gradient(180deg, var(--azul-luz), transparent) 1;
+  }
+
+  /* barra lateral que se desenha de cima para baixo antes do texto */
+  .causa__conclusao::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--azul-luz), transparent);
+    box-shadow: 0 0 12px color-mix(in oklab, var(--azul-luz) 50%, transparent);
+    transform-origin: top;
+    animation: causa-linha 900ms var(--saida) var(--depois) backwards;
+  }
+
+  @keyframes causa-linha {
+    from {
+      scale: 1 0;
+    }
+  }
+
+  .causa__sobra {
+    animation: mov-sobe 900ms var(--saida) calc(var(--depois) + 200ms) backwards;
+  }
+
+  .causa__licao {
+    animation: mov-sobe 900ms var(--saida) calc(var(--depois) + 340ms) backwards;
+  }
+
+  .causa__aviso {
+    animation: mov-aparece 1200ms ease calc(var(--depois) + 200ms) backwards;
   }
 
   .causa__sobra {
@@ -429,6 +643,12 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
       border-radius: 6px 6px 0 0;
     }
 
+    .cascata {
+      --barra-de: 0 -56px;
+      --cresce-de: 1 0;
+      --origem: center bottom;
+    }
+
     .barra__preenchimento {
       left: 0;
       right: 0;
@@ -456,6 +676,35 @@ const parcelas = cheio.parcelas.map((parcela, i) => ({
 
     .barra--sobra .barra__valor {
       font-size: 1.375rem;
+    }
+
+    .barra__queda {
+      display: none;
+      width: max-content;
+      margin: 0 auto 8px;
+    }
+
+    .causa:has(input[value='desconto']:checked) .barra__queda {
+      display: block;
+    }
+
+    /* hover: a barra apontada acende e as outras recuam (foco no número que importa) */
+    .barra {
+      transition: opacity 350ms ease;
+    }
+
+    @media (hover: hover) {
+      .cascata:has(.barra:hover) .barra:not(:hover) {
+        opacity: 0.38;
+      }
+
+      .barra:hover .barra__preenchimento {
+        filter: brightness(1.3) saturate(1.1);
+      }
+
+      .barra:hover .barra__nome {
+        color: var(--offwhite);
+      }
     }
 
     .causa__conclusao {

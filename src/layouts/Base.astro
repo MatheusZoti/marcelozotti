@@ -5,6 +5,7 @@ import manropeLatin from '@fontsource-variable/manrope/files/manrope-latin-wght-
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/luz.css';
+import '../styles/movimento.css';
 import { GTM_ID, SITE } from '../config/site';
 
 interface Props {
@@ -28,6 +29,17 @@ const canonica = new URL(Astro.url.pathname, Astro.site);
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href={manropeLatin} as="font" type="font/woff2" crossorigin />
+
+    <!-- revelação na rolagem: liga antes da primeira pintura (sem piscar); se o script de
+         revelação não carregar em 3,5 s, desliga e todo o conteúdo aparece -->
+    <script is:inline>
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add('revelar');
+        setTimeout(function () {
+          if (!window.revelarPronto) document.documentElement.classList.remove('revelar');
+        }, 3500);
+      }
+    </script>
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={SITE.locale} />
@@ -57,6 +69,9 @@ const canonica = new URL(Astro.url.pathname, Astro.site);
     <script>
       import '../scripts/whatsapp';
       import '../scripts/botao-luz';
+      import '../scripts/holofote';
+      import '../scripts/revelar';
+      import '../scripts/contar';
     </script>
   </body>
 </html>

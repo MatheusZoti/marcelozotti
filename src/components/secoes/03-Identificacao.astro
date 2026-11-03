@@ -2,6 +2,9 @@
 // Seção 3 · "Você se reconhece?" (ref-05): placas apagadas que acendem quando marcadas.
 // Luz baixa: a única luz da seção vem do que a pessoa marca.
 // Sem JavaScript: as placas continuam marcáveis (CSS) e o botão usa a mensagem padrão.
+// Movimento: o rótulo é "digitado" como num painel, o título sobe e a frase azul é varrida pela
+// luz; as placas entram em onda diagonal (45°) com uma linha de varredura de diagnóstico.
+// Marcar uma placa solta uma onda de luz do ponto do toque, o losango estoura e o medidor sobe.
 import { situacoes } from '../../conteudo/identificacao';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 ---
@@ -10,10 +13,11 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   <div class="identificacao__brilho" aria-hidden="true"></div>
 
   <div class="container identificacao__grade">
-    <div class="identificacao__topo">
-      <p class="rotulo">Diagnóstico rápido</p>
+    <div class="identificacao__topo" data-revelar>
+      <p class="rotulo rotulo-digita" style="--letras: 18">Diagnóstico rápido</p>
       <h2 id="identificacao-titulo" class="identificacao__titulo">
-        6 travas comuns em marketplace. <span>Quais estão na sua operação?</span>
+        <span class="identificacao__titulo-base">6 travas comuns em marketplace.</span>
+        <span class="identificacao__titulo-luz">Quais estão na sua operação?</span>
       </h2>
       <p class="identificacao__sub">Marque o que acontece hoje na sua empresa.</p>
     </div>
@@ -22,7 +26,11 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
       <legend class="visualmente-oculto">Situações que acontecem hoje na sua empresa</legend>
       {
         situacoes.map((situacao, i) => (
-          <label class="placa dor">
+          <label
+            class="placa holofote dor"
+            style={`--linha:${Math.floor(i / 2)};--coluna:${i % 2}`}
+            data-revelar
+          >
             <input
               class="visualmente-oculto"
               type="checkbox"
@@ -30,6 +38,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
               value={situacao.id}
               data-resumo={situacao.resumo}
             />
+            <span class="dor__varredura" aria-hidden="true" />
             <span class="dor__topo" aria-hidden="true">
               <span class="rotulo dor__area">
                 {String(i + 1).padStart(2, '0')} · {situacao.area}
@@ -42,12 +51,19 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
       }
     </fieldset>
 
-    <div class="identificacao__acao">
-      <p class="identificacao__contagem numero" aria-live="polite" data-contagem hidden></p>
+    <div class="identificacao__acao" data-revelar>
+      <div class="identificacao__painel" data-painel hidden>
+        <div class="identificacao__medidor" aria-hidden="true">
+          {situacoes.map(() => <span class="identificacao__segmento" />)}
+        </div>
+        <p class="identificacao__contagem numero" aria-live="polite" data-contagem></p>
+      </div>
       <p class="identificacao__fecho">
         Se você se viu em pelo menos uma dessas situações, vale uma conversa.
       </p>
-      <BotaoWhatsApp origem="identificacao">Conversar com o Marcelo</BotaoWhatsApp>
+      <div class="identificacao__botao">
+        <BotaoWhatsApp origem="identificacao">Conversar com o Marcelo</BotaoWhatsApp>
+      </div>
       <p class="identificacao__nota" data-nota hidden>O que você marcou já vai na mensagem.</p>
     </div>
   </div>
@@ -63,6 +79,20 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     const botao = secao.querySelector<HTMLAnchorElement>('a[data-cta="identificacao"]');
     const contagem = secao.querySelector<HTMLElement>('[data-contagem]');
     const nota = secao.querySelector<HTMLElement>('[data-nota]');
+    const painel = secao.querySelector<HTMLElement>('[data-painel]');
+    const segmentos = [...secao.querySelectorAll<HTMLElement>('.identificacao__segmento')];
+    let anterior = -1;
+
+    if (painel) painel.hidden = false;
+
+    // a onda de luz nasce do ponto do toque (no teclado, do centro da placa)
+    secao.addEventListener('pointerdown', (evento) => {
+      const placa = (evento.target as Element).closest<HTMLElement>('.dor');
+      if (!placa) return;
+      const caixa = placa.getBoundingClientRect();
+      placa.style.setProperty('--onda-x', `${evento.clientX - caixa.left}px`);
+      placa.style.setProperty('--onda-y', `${evento.clientY - caixa.top}px`);
+    });
 
     const atualizar = () => {
       const marcadas = caixas.filter((caixa) => caixa.checked);
@@ -72,10 +102,19 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
       secao.style.setProperty('--intensidade', String(total / caixas.length));
 
       if (contagem) {
-        contagem.hidden = total === 0;
         contagem.textContent = `${total} de ${caixas.length} marcadas`;
+        // o número "vira" a cada mudança (reinicia a animação)
+        if (anterior !== -1 && anterior !== total) {
+          contagem.classList.remove('identificacao__contagem--vira');
+          void contagem.offsetWidth;
+          contagem.classList.add('identificacao__contagem--vira');
+        }
       }
+      segmentos.forEach((segmento, i) =>
+        segmento.classList.toggle('identificacao__segmento--aceso', i < total),
+      );
       if (nota) nota.hidden = total === 0;
+      anterior = total;
 
       if (botao) {
         const mensagem =
@@ -132,9 +171,26 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     font-size: var(--fs-h2);
   }
 
-  .identificacao__titulo span {
+  .identificacao__titulo-base,
+  .identificacao__titulo-luz {
     display: block;
+  }
+
+  .identificacao__titulo-luz {
     color: var(--azul-luz);
+  }
+
+  /* ---------- Entrada do topo ---------- */
+  .identificacao__titulo-base {
+    animation: mov-sobe 1000ms var(--saida) 380ms backwards;
+  }
+
+  .identificacao__titulo-luz {
+    animation: mov-varredura 1400ms var(--saida) 620ms backwards;
+  }
+
+  .identificacao__sub {
+    animation: mov-sobe 900ms var(--saida) 820ms backwards;
   }
 
   .identificacao__sub {
@@ -153,6 +209,8 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   }
 
   .dor {
+    /* celular: cascata entre as placas que aparecem juntas */
+    --atraso: var(--lote, 0ms);
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -162,16 +220,101 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
       background-color var(--transicao),
       border-color var(--transicao),
       box-shadow var(--transicao),
-      transform var(--transicao);
+      transform 500ms var(--saida);
     -webkit-tap-highlight-color: transparent;
+    /* entrada: a placa sai do escuro enquanto a linha de diagnóstico passa por ela */
+    animation: identificacao-placa 1000ms var(--saida) var(--atraso) backwards;
   }
 
-  .dor:hover {
-    border-color: color-mix(in oklab, var(--azul-fio) 35%, transparent);
+  @keyframes identificacao-placa {
+    from {
+      opacity: 0;
+      translate: 0 28px;
+      scale: 0.96;
+      filter: blur(8px);
+    }
+  }
+
+  @media (hover: hover) {
+    .dor:hover {
+      transform: translateY(-3px);
+    }
+
+    .dor:hover .dor__marca {
+      border-color: var(--azul-fio);
+      rotate: calc(var(--ang-fita) + 90deg);
+    }
   }
 
   .dor:active {
-    transform: scale(0.99);
+    transform: scale(0.985);
+  }
+
+  /* linha de varredura (diagnóstico) e onda do clique, numa camada no formato da placa */
+  .dor__varredura {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .dor__varredura::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 46%;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in oklab, var(--azul) 22%, transparent) 80%,
+      color-mix(in oklab, var(--azul-luz) 70%, transparent) 99%,
+      transparent
+    );
+    translate: 0 -100%;
+    animation: identificacao-varre 1300ms cubic-bezier(0.45, 0, 0.2, 1) calc(var(--atraso) + 150ms)
+      both;
+  }
+
+  @keyframes identificacao-varre {
+    to {
+      translate: 0 230%;
+    }
+  }
+
+  /* onda de luz que nasce do toque quando a placa é marcada */
+  .dor__varredura::after {
+    content: '';
+    position: absolute;
+    left: var(--onda-x, 50%);
+    top: var(--onda-y, 50%);
+    width: 24px;
+    height: 24px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--azul-luz) 70%, transparent),
+      color-mix(in oklab, var(--azul) 30%, transparent) 60%,
+      transparent
+    );
+    opacity: 0;
+  }
+
+  .dor:has(input:checked) .dor__varredura::after {
+    animation: identificacao-onda 900ms var(--saida);
+  }
+
+  @keyframes identificacao-onda {
+    from {
+      opacity: 1;
+      scale: 0;
+    }
+    to {
+      opacity: 0;
+      scale: 32;
+    }
   }
 
   .dor:has(input:focus-visible) {
@@ -192,6 +335,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
   /* marcador em losango (45°, a diagonal da fita) */
   .dor__marca {
+    position: relative;
     flex: none;
     width: 14px;
     height: 14px;
@@ -202,7 +346,43 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     transition:
       background-color var(--transicao),
       border-color var(--transicao),
-      box-shadow var(--transicao);
+      box-shadow var(--transicao),
+      rotate 600ms var(--saida);
+  }
+
+  /* anel que estoura quando a placa é marcada */
+  .dor__marca::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 1.5px solid var(--azul-luz);
+    border-radius: 3px;
+    opacity: 0;
+  }
+
+  .dor:has(input:checked) .dor__marca {
+    animation: identificacao-marca 600ms var(--mola);
+  }
+
+  .dor:has(input:checked) .dor__marca::after {
+    animation: identificacao-anel 700ms var(--saida);
+  }
+
+  @keyframes identificacao-marca {
+    from {
+      scale: 0.3;
+    }
+  }
+
+  @keyframes identificacao-anel {
+    from {
+      opacity: 1;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 2.6;
+    }
   }
 
   .dor__texto {
@@ -228,11 +408,73 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
   }
 
   /* ---------- Ação ---------- */
+  /* o botão vai num invólucro: a animação de entrada não substitui o pulso dele */
+  .identificacao__painel,
+  .identificacao__fecho,
+  .identificacao__botao {
+    animation: mov-sobe 900ms var(--saida) backwards;
+  }
+
+  .identificacao__fecho {
+    animation-delay: 100ms;
+  }
+
+  .identificacao__botao {
+    animation-delay: 200ms;
+  }
+
+  /* medidor: 6 segmentos cortados a 67,5° que acendem conforme as marcações */
+  .identificacao__painel {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .identificacao__painel[hidden] {
+    display: none;
+  }
+
+  .identificacao__medidor {
+    display: flex;
+    gap: 4px;
+  }
+
+  .identificacao__segmento {
+    width: 14px;
+    height: 16px;
+    transform: skewX(calc(var(--desvio-luz) * -1));
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--offwhite) 12%, transparent);
+    transition:
+      background-color 400ms ease,
+      box-shadow 400ms ease,
+      scale 400ms var(--mola);
+  }
+
+  .identificacao__segmento--aceso {
+    background: var(--azul-luz);
+    box-shadow: 0 0 12px color-mix(in oklab, var(--azul-luz) 80%, transparent);
+    scale: 1 1.15;
+  }
+
   .identificacao__contagem {
-    margin-bottom: 12px;
     font-size: var(--fs-pequeno);
     color: var(--azul-luz);
     letter-spacing: 0.02em;
+  }
+
+  /* o número vira como um contador mecânico */
+  .identificacao__contagem--vira {
+    animation: identificacao-vira 420ms var(--saida);
+  }
+
+  @keyframes identificacao-vira {
+    from {
+      opacity: 0;
+      translate: 0 -0.6em;
+      filter: blur(3px);
+    }
   }
 
   .identificacao__fecho {
@@ -252,6 +494,11 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     color: var(--texto-suave);
   }
 
+  /* aparece deslizando quando a primeira placa é marcada */
+  .identificacao__nota:not([hidden]) {
+    animation: mov-sobe 600ms var(--saida);
+  }
+
   @media (min-width: 560px) {
     .identificacao__acao :global(.botao) {
       width: auto;
@@ -264,6 +511,8 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
     }
 
     .dor {
+      /* onda diagonal (45°): cada passo para a direita ou para baixo atrasa um pouco */
+      --atraso: calc((var(--linha) + var(--coluna)) * 110ms);
       min-height: 168px;
       padding: 22px 22px 24px;
       justify-content: space-between;
@@ -292,6 +541,19 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
     .identificacao__placas {
       grid-area: placas;
+    }
+
+    /* lado a lado com o título: a ação só entra depois que o título assentou */
+    .identificacao__painel {
+      animation-delay: 700ms;
+    }
+
+    .identificacao__fecho {
+      animation-delay: 800ms;
+    }
+
+    .identificacao__botao {
+      animation-delay: 900ms;
     }
 
     .identificacao__acao {

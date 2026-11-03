@@ -39,6 +39,24 @@ import BotaoWhatsApp from './ui/BotaoWhatsApp.astro';
     height: auto;
   }
 
+  /* entra junto com o hero: desce do escuro logo depois do feixe acender */
+  .cabecalho__marca,
+  .cabecalho__linha > :global(.botao) {
+    animation: cabecalho-entra 900ms cubic-bezier(0.16, 1, 0.3, 1) 120ms backwards;
+  }
+
+  .cabecalho__linha > :global(.botao) {
+    animation-delay: 300ms;
+  }
+
+  @keyframes cabecalho-entra {
+    from {
+      opacity: 0;
+      translate: 0 -14px;
+      filter: blur(6px);
+    }
+  }
+
   @media (min-width: 1024px) {
     .cabecalho {
       padding-top: 20px;
