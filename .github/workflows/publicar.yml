@@ -1,0 +1,48 @@
+# Publicação automática na Hostinger.
+# A cada push na main, o GitHub gera o site (npm run build) e coloca só o resultado (dist/)
+# na branch "deploy". A Hostinger está ligada a essa branch (hPanel → Avançado → Git) e,
+# pelo webhook, atualiza o public_html sozinha. A main continua com o código-fonte.
+name: Publicar na Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # botão "Run workflow" para publicar de novo sem mudar nada
+
+permissions:
+  contents: write # para gravar a branch deploy
+
+# se dois pushes chegarem juntos, só o mais recente é publicado
+concurrency:
+  group: publicar
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar o Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Gerar o site
+        run: npm run build
+
+      - name: Publicar o site pronto na branch deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: deploy
+          force_orphan: true # a branch guarda só a versão atual (fica leve)
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: 'Site publicado'

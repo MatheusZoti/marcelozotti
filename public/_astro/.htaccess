@@ -1,0 +1,5 @@
+# Arquivos gerados pelo Astro: o nome muda a cada versão (hash), então podem ficar em cache
+# por 1 ano no navegador sem risco de mostrar versão velha.
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</IfModule>
