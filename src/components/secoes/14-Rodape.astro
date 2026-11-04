@@ -7,6 +7,7 @@
 import logo from '../../assets/logos/logo-transparente-p-fundo-escuro.svg?url';
 import { linkWhatsAppPorOrigem, telefoneFormatado } from '../../config/site';
 import IconeWhatsApp from '../ui/IconeWhatsApp.astro';
+import SimboloIlimita from '../ui/SimboloIlimita.astro';
 
 const ano = new Date().getFullYear();
 ---
@@ -47,15 +48,22 @@ const ano = new Date().getFullYear();
     </div>
 
     <div class="rodape__base" data-revelar>
-      <p class="rodape__aviso">
-        Conteúdo educativo. Não há promessa de resultado ou faturamento: os resultados dependem de
-        cada operação e das decisões de cada empresa.
-      </p>
-      <div class="rodape__fim">
-        <p class="rodape__direitos">© {ano} Marcelo Zotti. Todos os direitos reservados.</p>
+      <div class="rodape__linha">
+        <p class="rodape__aviso">
+          Conteúdo educativo. Não há promessa de resultado ou faturamento.
+        </p>
         <a class="rodape__subir" href="#conteudo">
           Voltar ao topo
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"></path></svg>
+        </a>
+      </div>
+      <div class="rodape__linha rodape__linha--fim">
+        <p class="rodape__direitos">© {ano} Marcelo Zotti</p>
+        <!-- crédito da agência, discreto no canto -->
+        <a class="rodape__credito" href="https://ilimita.com.br" target="_blank" rel="noopener">
+          Feito com amor
+          <SimboloIlimita class="rodape__ilimita" />
+          <span class="visualmente-oculto">pela Ilimita (abre em uma nova aba)</span>
         </a>
       </div>
     </div>
@@ -266,7 +274,7 @@ const ano = new Date().getFullYear();
   .rodape__base {
     position: relative;
     display: grid;
-    gap: 12px;
+    gap: 8px;
     margin-top: 48px;
     padding-top: 24px;
     font-size: 0.8125rem;
@@ -290,18 +298,57 @@ const ano = new Date().getFullYear();
     }
   }
 
-  .rodape__aviso,
-  .rodape__fim {
-    animation: mov-aparece 1000ms ease 300ms backwards;
-  }
-
-  .rodape__fim {
+  /* duas linhas: aviso + voltar ao topo; direitos + crédito no canto */
+  .rodape__linha {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 12px 24px;
+    gap: 4px 24px;
+    animation: mov-aparece 1000ms ease 300ms backwards;
+  }
+
+  .rodape__linha--fim {
     animation-delay: 450ms;
+  }
+
+  /* crédito da Ilimita: some no fundo até o mouse passar */
+  .rodape__credito {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    color: var(--texto-apagado);
+    transition: color var(--transicao);
+  }
+
+  .rodape__credito :global(.rodape__ilimita) {
+    width: auto;
+    height: 18px;
+    transition:
+      color var(--transicao),
+      rotate 600ms var(--mola);
+  }
+
+  @media (hover: hover) {
+    .rodape__credito:hover {
+      color: var(--texto-suave);
+    }
+
+    .rodape__credito:hover :global(.rodape__ilimita) {
+      color: var(--offwhite);
+      rotate: 12deg;
+    }
+  }
+
+  .rodape__credito:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 4px;
+    border-radius: 4px;
   }
 
   /* voltar ao topo: a seta sobe no hover */
@@ -348,6 +395,7 @@ const ano = new Date().getFullYear();
 
   .rodape__aviso {
     max-width: 44rem;
+    padding-block: 12px; /* alinha com a altura do link ao lado */
   }
 
   .rodape__direitos {
@@ -371,15 +419,7 @@ const ano = new Date().getFullYear();
     }
 
     .rodape__base {
-      grid-template-columns: 1fr auto;
-      align-items: end;
-      gap: 32px;
-    }
-
-    .rodape__fim {
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
+      gap: 0;
     }
   }
 </style>
