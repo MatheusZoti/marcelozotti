@@ -1,10 +1,10 @@
 ---
-// Seção 5 · Quem é o Marcelo (ref-02): foto no escritório da Brazotti com corte a 45°,
+// Seção 5 · Quem é o Marcelo (ref-02): retrato do Marcelo com corte a 45°,
 // bio e um bento com o que ele é e o que a pessoa tem com ele na mentoria. Luz alta.
 // Movimento: a foto abre a partir do canto num corte a 45° e uma linha de luz desenha a dobra;
 // o título entra palavra a palavra; na rolagem a foto anda um pouco mais devagar (profundidade).
 import { Image } from 'astro:assets';
-import fotoEscritorio from '../../assets/fotos/marcelo-escritorio-brazotti.jpg';
+import fotoRetrato from '../../assets/fotos/marcelo-retrato.jpg';
 import { bio } from '../../conteudo/marcelo';
 import BentoMarcelo from '../BentoMarcelo.astro';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
@@ -19,9 +19,9 @@ const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' '
     <div class="marcelo__grade">
       <div class="marcelo__foto" data-revelar>
         <Image
-          src={fotoEscritorio}
-          alt="Marcelo Zotti sorrindo à mesa de trabalho, com o logo da Brazotti na parede ao fundo"
-          widths={[400, 640, 900, 1200]}
+          src={fotoRetrato}
+          alt="Retrato de Marcelo Zotti sorrindo, de óculos, blazer cinza e camiseta preta"
+          widths={[400, 640]}
           sizes="(min-width: 1024px) 560px, 92vw"
           loading="lazy"
         />
@@ -128,7 +128,7 @@ const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' '
   /* corte a 45° no canto: a diagonal da fita como moldura (brand book) */
   .marcelo__foto :global(img) {
     width: 100%;
-    aspect-ratio: 5 / 4;
+    aspect-ratio: 1 / 1; /* retrato quadrado: o rosto fica inteiro, sem cortar o cabelo */
     object-fit: cover;
     border-radius: var(--raio);
     clip-path: polygon(0 0, calc(100% - var(--corte)) 0, 100% var(--corte), 100% 100%, 0 100%);
