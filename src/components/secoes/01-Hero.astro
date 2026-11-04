@@ -760,8 +760,12 @@ const dados = [
       gap: 48px;
     }
 
+    /* o palco alinha pelo bloco que se vê (selo → botão), e não pela coluna inteira de texto,
+       que inclui as provas lá embaixo; centralizado na coluna, a foto ficava baixa demais */
     .hero__palco {
       aspect-ratio: 1 / 1.08;
+      align-self: start;
+      margin-top: -12px;
     }
 
     .hero__foto {
