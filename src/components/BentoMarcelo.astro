@@ -282,6 +282,14 @@ const trilhos = [frentes.slice(0, 4), frentes.slice(4)];
         inset 0 1px 0 color-mix(in oklab, var(--offwhite) 12%, transparent),
         0 24px 48px -20px color-mix(in oklab, var(--azul) 60%, transparent);
     }
+
+    /* a placa acesa (experiência) não perde o brilho no hover: a elevação soma a ele */
+    .bloco.placa--acesa:hover {
+      border-color: color-mix(in oklab, var(--azul-fio) 70%, transparent);
+      box-shadow:
+        var(--sombra-acesa),
+        0 24px 48px -20px color-mix(in oklab, var(--azul) 60%, transparent);
+    }
   }
 
   .bloco__topo {

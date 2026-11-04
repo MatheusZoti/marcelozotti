@@ -705,6 +705,12 @@ const dados = [
         0 24px 48px -16px color-mix(in oklab, var(--azul) 70%, transparent);
     }
 
+    .hero__dados :global(.hero__dado.placa--acesa:hover) {
+      box-shadow:
+        var(--sombra-acesa),
+        0 24px 48px -16px color-mix(in oklab, var(--azul) 70%, transparent);
+    }
+
     .hero__dados :global(.hero__dado:hover)::after {
       translate: 100% 0;
       transition: translate 1000ms var(--saida);
