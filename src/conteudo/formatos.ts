@@ -1,40 +1,17 @@
 // Seção 10 · Formatos. Fonte: slides "Formato", "Diferencial" e "Investimento" dos dois pitches.
 // SEM PREÇO (regra do projeto): investimento e condições são passados pelo Marcelo no WhatsApp.
+// Enxuta de propósito: os números da mentoria já aparecem no hero e no bento, e o suporte entre
+// os encontros está no FAQ. Aqui a pessoa só escolhe o formato.
 
 export const titulo = 'Dois jeitos de ter o Marcelo ao seu lado.';
 
-export const numeros = [
-  { numero: '4', rotulo: 'encontros' },
-  { numero: '2h', rotulo: 'por encontro' },
-  { numero: '1x', rotulo: 'por semana' },
-  { numero: '8h', rotulo: 'de mentoria ao vivo', acesa: true },
-];
-
-export const duracao = 'Ao longo de aproximadamente 30 dias.';
-
-export const diferencial = {
-  titulo: 'O acompanhamento continua entre os encontros.',
-  itens: [
-    {
-      nome: 'WhatsApp direto',
-      texto: 'Contato com o Marcelo para esclarecer dúvidas da operação entre uma mentoria e outra.',
-    },
-    {
-      nome: 'Grupo de suporte',
-      texto: 'Acesso ao grupo durante o período da mentoria para apoio e troca de dúvidas.',
-    },
-    {
-      nome: 'Orientação personalizada',
-      texto: 'Trabalho com os seus produtos, anúncios, números e desafios reais.',
-    },
-  ],
-};
+// o que vale para os dois formatos, numa linha só
+export const incluso = ['4 encontros de 2h', '1 por semana', 'WhatsApp direto', 'Grupo de suporte'];
 
 export interface Formato {
   id: 'online' | 'presencial';
   nome: string;
   resumo: string;
-  detalhes: string[];
   alcance: string;
   restrito: boolean;
   cta: 'formato-online' | 'formato-presencial';
@@ -45,9 +22,8 @@ export const formatos: Formato[] = [
   {
     id: 'online',
     nome: 'Online',
-    resumo: '100% online e ao vivo.',
-    detalhes: ['Encontros por videoconferência', 'Foco nos produtos, desafios e objetivos da sua empresa'],
-    alcance: 'Para todo o Brasil',
+    resumo: 'Ao vivo por videoconferência, de onde você estiver.',
+    alcance: 'Todo o Brasil',
     restrito: false,
     cta: 'formato-online',
     textoBotao: 'Quero a mentoria online',
@@ -55,8 +31,7 @@ export const formatos: Formato[] = [
   {
     id: 'presencial',
     nome: 'Presencial',
-    resumo: 'No escritório do Marcelo, em Curitiba (PR).',
-    detalhes: ['Encontros presenciais, cara a cara', 'Foco nos produtos, desafios e objetivos da sua empresa'],
+    resumo: 'Cara a cara, no escritório do Marcelo em Curitiba (PR).',
     alcance: 'Somente Curitiba e região',
     restrito: true,
     cta: 'formato-presencial',

@@ -1,33 +1,15 @@
 ---
 // Seção 10 · Formatos: Online x Presencial. Sem preço. Luz alta.
-// Dados comuns em placas de número (ref-02); os dois formatos são placas grandes (ref-05)
-// que funcionam como escolha: a escolhida acende e o único botão laranja segue a escolha.
-// Tudo com CSS (:has), funciona sem JavaScript.
-// Movimento: os números entram em cascata e contam; os itens do acompanhamento ganham ícones;
-// as duas placas de formato chegam de lados opostos. Ao escolher, uma luz varre a placa
-// escolhida, o losango estoura, a outra recua e o botão laranja troca com um giro curto.
-import {
-  diferencial,
-  duracao,
-  formatos,
-  notaInvestimento,
-  numeros,
-  titulo,
-} from '../../conteudo/formatos';
+// Minimalista: dois cartões de escolha (ref-05), uma linha com o que vale para os dois e um só
+// botão laranja, que segue a escolha. Tudo com CSS (:has), funciona sem JavaScript.
+// Movimento: os cartões sobem juntos; ao escolher, o cartão acende e o outro recua, sem pressa.
+import { formatos, incluso, notaInvestimento, titulo } from '../../conteudo/formatos';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
-import IconeWhatsApp from '../ui/IconeWhatsApp.astro';
-import PlacaDado from '../ui/PlacaDado.astro';
 
 const palavras = titulo.split(' ');
 
-// ícones (traço de 1,75 em grade de 24); o WhatsApp usa a marca
-const iconesDiferencial = [
-  null,
-  '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19.5a5.5 5.5 0 0 1 11 0"/><path d="M16 4.8a3.2 3.2 0 0 1 0 6.2"/><path d="M17.6 14a5.5 5.5 0 0 1 2.9 5.5"/>',
-  '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2"/>',
-];
-
-const iconesFormato: Record<string, string> = {
+// ícones dos formatos (traço de 1,75 em grade de 24)
+const icones: Record<string, string> = {
   online:
     '<rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/><path d="m10.5 8.2 4 2.3-4 2.3Z"/>',
   presencial:
@@ -39,7 +21,7 @@ const iconesFormato: Record<string, string> = {
   <div class="formatos__luz" aria-hidden="true"></div>
 
   <div class="container">
-    <header data-revelar>
+    <header class="formatos__topo" data-revelar>
       <p class="rotulo rotulo-digita" style="--letras: 8">Formatos</p>
       <h2 id="formatos-titulo" class="formatos__titulo">
         {
@@ -54,61 +36,13 @@ const iconesFormato: Record<string, string> = {
       </h2>
     </header>
 
-    <!-- O que é igual nos dois formatos -->
-    <div class="formatos__comum">
-      <div class="formatos__numeros-bloco" data-revelar>
-        <p class="rotulo formatos__subrotulo">Nos dois formatos</p>
-        <div class="formatos__numeros">
-          {
-            numeros.map((n, i) => (
-              <PlacaDado
-                class="formatos__numero"
-                numero={n.numero}
-                rotulo={n.rotulo}
-                acesa={n.acesa}
-                contar
-                atrasoContagem={200 + i * 120}
-              />
-            ))
-          }
-        </div>
-        <p class="formatos__duracao">{duracao}</p>
-      </div>
-
-      <div class="formatos__diferencial" data-revelar>
-        <h3 class="formatos__diferencial-titulo">{diferencial.titulo}</h3>
-        <ul class="formatos__itens" role="list">
-          {
-            diferencial.itens.map((item, i) => (
-              <li style={`--i:${i}`}>
-                <span class="formatos__item-icone" aria-hidden="true">
-                  {iconesDiferencial[i] ? (
-                    <svg class="formatos__traco" viewBox="0 0 24 24" set:html={iconesDiferencial[i]} />
-                  ) : (
-                    <IconeWhatsApp tamanho={18} />
-                  )}
-                </span>
-                <span class="formatos__item-nome">{item.nome}</span>
-                <span class="formatos__item-texto">{item.texto}</span>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-    </div>
-
     <!-- Escolha do formato -->
     <fieldset class="formatos__escolha">
-      <legend class="rotulo formatos__subrotulo">Escolha o formato</legend>
+      <legend class="visualmente-oculto">Escolha o formato da mentoria</legend>
       <div class="formatos__placas" data-revelar-grupo="(min-width: 768px)">
         {
           formatos.map((formato, i) => (
-            <div
-              class={`placa holofote formato formato--${formato.id}`}
-              style={`--i:${i}`}
-              data-revelar
-            >
-              <span class="formato__varredura" aria-hidden="true" />
+            <div class="placa holofote formato" style={`--i:${i}`} data-revelar>
               <input
                 class="visualmente-oculto"
                 type="radio"
@@ -119,20 +53,16 @@ const iconesFormato: Record<string, string> = {
               />
               <div class="formato__topo">
                 <span class="formato__icone" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" set:html={iconesFormato[formato.id]} />
+                  <svg viewBox="0 0 24 24" set:html={icones[formato.id]} />
                 </span>
-                <span class="rotulo formato__rotulo">Mentoria individual</span>
                 <span class="formato__marca" aria-hidden="true" />
               </div>
               <label class="formato__nome" for={`formato-${formato.id}`}>
                 {formato.nome}
               </label>
               <p class="formato__resumo">{formato.resumo}</p>
-              <ul class="formato__detalhes" role="list">
-                {formato.detalhes.map((detalhe) => <li>{detalhe}</li>)}
-              </ul>
               <p class:list={['formato__alcance', { 'formato__alcance--restrito': formato.restrito }]}>
-                {formato.restrito && <span class="formato__alcance-ponto" aria-hidden="true" />}
+                <span class="formato__ponto" aria-hidden="true" />
                 {formato.alcance}
               </p>
             </div>
@@ -141,14 +71,27 @@ const iconesFormato: Record<string, string> = {
       </div>
     </fieldset>
 
+    <!-- O que vale para os dois, numa linha -->
+    <div class="formatos__incluso" data-revelar>
+      <p class="rotulo formatos__incluso-rotulo">Nos dois formatos</p>
+      <ul class="formatos__itens" role="list">
+        {incluso.map((item, i) => <li style={`--i:${i}`}>{item}</li>)}
+      </ul>
+    </div>
+
     <div class="formatos__acao" data-revelar>
-      {
-        formatos.map((formato) => (
-          <BotaoWhatsApp origem={formato.cta} class={`formatos__botao formatos__botao--${formato.id}`}>
-            {formato.textoBotao}
-          </BotaoWhatsApp>
-        ))
-      }
+      <div class="formatos__botoes">
+        {
+          formatos.map((formato) => (
+            <BotaoWhatsApp
+              origem={formato.cta}
+              class={`formatos__botao formatos__botao--${formato.id}`}
+            >
+              {formato.textoBotao}
+            </BotaoWhatsApp>
+          ))
+        }
+      </div>
       <p class="formatos__nota">{notaInvestimento}</p>
     </div>
   </div>
@@ -167,15 +110,22 @@ const iconesFormato: Record<string, string> = {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background:
-      radial-gradient(70% 40% at 50% 68%, color-mix(in oklab, var(--azul) 34%, transparent), transparent 70%),
-      radial-gradient(40% 30% at 0% 0%, color-mix(in oklab, var(--azul) 16%, transparent), transparent 70%);
-    /* some no topo: sem emenda com a seção anterior */
-    mask-image: linear-gradient(180deg, transparent, #000 14%);
+    /* uma luz só, atrás dos cartões; some no topo para não marcar a emenda */
+    background: radial-gradient(
+      70% 45% at 50% 55%,
+      color-mix(in oklab, var(--azul) 30%, transparent),
+      transparent 70%
+    );
+    mask-image: linear-gradient(180deg, transparent, #000 18%, #000 85%, transparent);
+  }
+
+  /* ---------- Topo ---------- */
+  .formatos__topo {
+    text-align: center;
   }
 
   .formatos__titulo {
-    margin-top: 12px;
+    margin: 12px auto 0;
     max-width: 18ch;
     font-size: var(--fs-h2);
   }
@@ -185,159 +135,9 @@ const iconesFormato: Record<string, string> = {
     animation: mov-sobe 900ms var(--saida) calc(300ms + var(--i) * 60ms) backwards;
   }
 
-  /* ---------- Entrada: números em cascata (e contando) ---------- */
-  .formatos__numeros-bloco > .formatos__subrotulo {
-    animation: mov-aparece 600ms ease backwards;
-  }
-
-  .formatos__numeros > :global(.formatos__numero) {
-    animation: formatos-numero 900ms var(--saida) backwards;
-  }
-
-  .formatos__numeros > :global(.formatos__numero:nth-child(2)) {
-    animation-delay: 120ms;
-  }
-  .formatos__numeros > :global(.formatos__numero:nth-child(3)) {
-    animation-delay: 240ms;
-  }
-  /* a placa acesa (8h, o total) chega por último e dá um clarão */
-  .formatos__numeros > :global(.formatos__numero:nth-child(4)) {
-    animation:
-      formatos-numero 900ms var(--saida) 360ms backwards,
-      formatos-clarao 1400ms ease 1300ms;
-  }
-
-  @keyframes formatos-numero {
-    from {
-      opacity: 0;
-      transform: perspective(700px) rotateX(-50deg) translateY(16px);
-      filter: blur(6px);
-    }
-  }
-
-  @keyframes formatos-clarao {
-    30% {
-      box-shadow:
-        inset 0 0 36px color-mix(in oklab, var(--azul) 70%, transparent),
-        0 0 48px color-mix(in oklab, var(--azul-luz) 70%, transparent);
-    }
-  }
-
-  .formatos__duracao {
-    animation: mov-aparece 800ms ease 700ms backwards;
-  }
-
-  .formatos__subrotulo {
-    display: block;
-    margin-bottom: 16px;
-    padding: 0;
-  }
-
-  /* ---------- Comum aos dois ---------- */
-  .formatos__comum {
-    margin-top: 48px;
-  }
-
-  .formatos__numeros {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  .formatos__duracao {
-    margin-top: 14px;
-    font-family: var(--fonte-mono);
-    font-size: 0.8125rem;
-    color: var(--texto-suave);
-  }
-
-  .formatos__diferencial {
-    margin-top: 40px;
-  }
-
-  .formatos__diferencial-titulo {
-    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
-    letter-spacing: -0.02em;
-  }
-
-  .formatos__itens {
-    display: grid;
-    gap: 18px;
-    margin-top: 20px;
-    padding: 0;
-    list-style: none;
-  }
-
-  .formatos__diferencial-titulo {
-    animation: mov-sobe 900ms var(--saida) backwards;
-  }
-
-  .formatos__itens li {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    column-gap: 14px;
-    row-gap: 4px;
-    animation: mov-sobe 900ms var(--saida) calc(200ms + var(--i) * 140ms) backwards;
-  }
-
-  /* ícone em vidro, o mesmo idioma das frentes */
-  .formatos__item-icone {
-    grid-row: span 2;
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 11px;
-    border: 1px solid color-mix(in oklab, var(--azul-fio) 40%, transparent);
-    background: color-mix(in oklab, var(--azul) 22%, transparent);
-    color: var(--azul-fio);
-    transition:
-      background-color 400ms ease,
-      color 400ms ease,
-      rotate 500ms var(--mola),
-      box-shadow 400ms ease;
-    animation: formatos-icone 700ms var(--mola) calc(350ms + var(--i) * 140ms) backwards;
-  }
-
-  .formatos__traco {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  @keyframes formatos-icone {
-    from {
-      scale: 0;
-      rotate: -30deg;
-    }
-  }
-
-  @media (hover: hover) {
-    .formatos__itens li:hover .formatos__item-icone {
-      background: var(--azul);
-      color: var(--offwhite);
-      rotate: -8deg;
-      box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 70%, transparent);
-    }
-  }
-
-  .formatos__item-nome {
-    font-weight: 700;
-  }
-
-  .formatos__item-texto {
-    font-size: var(--fs-pequeno);
-    color: var(--texto-suave);
-  }
-
-  /* ---------- Escolha ---------- */
+  /* ---------- Cartões ---------- */
   .formatos__escolha {
-    margin: 64px 0 0;
+    margin: 48px 0 0;
     padding: 0;
     border: 0;
     min-width: 0;
@@ -349,26 +149,29 @@ const iconesFormato: Record<string, string> = {
   }
 
   .formato {
-    --lado: -1;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    padding: 24px 22px 26px;
+    padding: 24px 22px 24px;
     cursor: pointer;
     transition:
-      background 400ms ease,
-      border-color 400ms ease,
-      box-shadow 400ms ease,
+      background 500ms ease,
+      border-color 500ms ease,
+      box-shadow 500ms ease,
       opacity 500ms ease,
       scale 600ms var(--saida),
       translate 600ms var(--saida);
-    /* entrada: online chega da esquerda, presencial da direita */
-    animation: formatos-chega 1100ms var(--saida) calc(var(--lote, 0ms) + var(--i) * 120ms) backwards;
+    /* entrada: os dois sobem juntos, um logo depois do outro */
+    animation: formatos-sobe 1000ms var(--saida) calc(var(--lote, 0ms) + var(--i) * 120ms) backwards;
   }
 
-  .formato--presencial {
-    --lado: 1;
+  @keyframes formatos-sobe {
+    from {
+      opacity: 0;
+      translate: 0 28px;
+      filter: blur(6px);
+    }
   }
 
   /* com overflow escondido, o anel do holofote fica por dentro da borda */
@@ -376,88 +179,17 @@ const iconesFormato: Record<string, string> = {
     inset: 0;
   }
 
-  @keyframes formatos-chega {
-    from {
-      opacity: 0;
-      translate: calc(var(--lado) * 44px) 0;
-      filter: blur(10px);
-    }
-  }
-
-  /* a que não foi escolhida recua um pouco (a escolha fica óbvia) */
+  /* o que não foi escolhido recua um pouco: a escolha fica óbvia sem precisar de mais texto */
   .formato:not(:has(input:checked)) {
-    opacity: 0.72;
+    opacity: 0.62;
     scale: 0.985;
   }
 
   @media (hover: hover) {
     .formato:hover {
       opacity: 1;
-      translate: 0 -4px;
+      translate: 0 -3px;
     }
-  }
-
-  /* luz que varre a placa no instante da escolha (a regra volta a valer a cada troca) */
-  .formato__varredura {
-    position: absolute;
-    inset: -10% -40%;
-    pointer-events: none;
-    background: linear-gradient(
-      calc(var(--desvio-luz) + 90deg),
-      transparent 40%,
-      color-mix(in oklab, var(--azul-luz) 30%, transparent) 50%,
-      transparent 60%
-    );
-    translate: -100% 0;
-  }
-
-  .formato:has(input:checked) .formato__varredura {
-    animation: formatos-varre 1100ms var(--saida) 120ms;
-  }
-
-  @keyframes formatos-varre {
-    to {
-      translate: 100% 0;
-    }
-  }
-
-  .formato__icone {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 11px;
-    border: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
-    background: color-mix(in oklab, var(--offwhite) 5%, transparent);
-    color: var(--texto-suave);
-    transition:
-      background-color 400ms ease,
-      color 400ms ease,
-      border-color 400ms ease,
-      box-shadow 400ms ease;
-  }
-
-  .formato__icone svg {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  .formato:has(input:checked) .formato__icone {
-    color: var(--offwhite);
-    border-color: color-mix(in oklab, var(--azul-fio) 70%, transparent);
-    background: color-mix(in oklab, var(--azul) 60%, transparent);
-    box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 70%, transparent);
-    animation: formatos-icone 600ms var(--mola);
-  }
-
-  .formato__rotulo {
-    margin-left: 12px;
-    margin-right: auto;
   }
 
   .formato:has(input:focus-visible) {
@@ -471,6 +203,39 @@ const iconesFormato: Record<string, string> = {
     justify-content: space-between;
   }
 
+  .formato__icone {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
+    background: color-mix(in oklab, var(--offwhite) 5%, transparent);
+    color: var(--texto-suave);
+    transition:
+      background-color 500ms ease,
+      color 500ms ease,
+      border-color 500ms ease,
+      box-shadow 500ms ease;
+  }
+
+  .formato__icone svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .formato:has(input:checked) .formato__icone {
+    color: var(--offwhite);
+    border-color: color-mix(in oklab, var(--azul-fio) 70%, transparent);
+    background: color-mix(in oklab, var(--azul) 60%, transparent);
+    box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 60%, transparent);
+  }
+
   /* marcador de escolha: losango que se preenche */
   .formato__marca {
     width: 16px;
@@ -480,31 +245,23 @@ const iconesFormato: Record<string, string> = {
     border: 1.5px solid color-mix(in oklab, var(--offwhite) 40%, transparent);
     border-radius: 2px;
     transition:
-      background-color 300ms ease,
-      box-shadow 300ms ease;
+      background-color 400ms ease,
+      border-color 400ms ease,
+      box-shadow 400ms ease,
+      scale 500ms var(--mola);
   }
 
   .formato:has(input:checked) .formato__marca {
     background: var(--offwhite);
     border-color: var(--offwhite);
     box-shadow: 0 0 12px var(--azul-luz);
-    animation: formatos-marca 600ms var(--mola);
+    scale: 1.1;
   }
 
-  @keyframes formatos-marca {
-    from {
-      scale: 0.3;
-      box-shadow: 0 0 0 10px color-mix(in oklab, var(--azul-luz) 0%, transparent);
-    }
-    40% {
-      box-shadow: 0 0 0 8px color-mix(in oklab, var(--azul-luz) 35%, transparent);
-    }
-  }
-
-  /* o rótulo do nome cobre a placa inteira: clicar em qualquer ponto escolhe o formato */
+  /* o rótulo do nome cobre o cartão inteiro: clicar em qualquer ponto escolhe o formato */
   .formato__nome {
-    margin-top: 18px;
-    font-size: clamp(2rem, 1.6rem + 2vw, 3rem);
+    margin-top: 22px;
+    font-size: clamp(2rem, 1.6rem + 2vw, 2.75rem);
     font-weight: 800;
     letter-spacing: -0.035em;
     line-height: 1;
@@ -520,23 +277,13 @@ const iconesFormato: Record<string, string> = {
 
   .formato__resumo {
     margin-top: 10px;
-    font-size: var(--fs-lead);
-    font-weight: 600;
-  }
-
-  .formato__detalhes {
-    display: grid;
-    gap: 6px;
-    margin-top: 14px;
-    padding: 0;
-    list-style: none;
-    font-size: var(--fs-pequeno);
+    max-width: 22rem;
     color: var(--texto-suave);
+    transition: color 500ms ease;
   }
 
-  .formato__detalhes li::before {
-    content: '— ';
-    color: var(--texto-apagado);
+  .formato:has(input:checked) .formato__resumo {
+    color: color-mix(in oklab, var(--offwhite) 88%, var(--azul));
   }
 
   .formato__alcance {
@@ -547,26 +294,28 @@ const iconesFormato: Record<string, string> = {
     margin-top: 22px;
     padding: 6px 12px;
     border-radius: 999px;
-    border: 1px solid color-mix(in oklab, var(--offwhite) 18%, transparent);
+    border: 1px solid color-mix(in oklab, var(--offwhite) 16%, transparent);
     font-family: var(--fonte-mono);
     font-size: 0.75rem;
     letter-spacing: 0.04em;
     color: var(--texto-suave);
   }
 
-  /* presencial: restrição sempre visível, em destaque */
+  .formato__ponto {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--azul-luz);
+  }
+
+  /* presencial: a restrição de região fica sempre visível e o ponto pulsa */
   .formato__alcance--restrito {
-    border-color: color-mix(in oklab, var(--azul-luz) 60%, transparent);
-    background: color-mix(in oklab, var(--azul) 22%, transparent);
+    border-color: color-mix(in oklab, var(--azul-luz) 55%, transparent);
+    background: color-mix(in oklab, var(--azul) 20%, transparent);
     color: var(--offwhite);
   }
 
-  /* ponto de localização que pulsa: a restrição de região chama atenção sozinha */
-  .formato__alcance-ponto {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--azul-luz);
+  .formato__alcance--restrito .formato__ponto {
     animation: formatos-local 2.4s ease-out 1s infinite;
   }
 
@@ -580,35 +329,51 @@ const iconesFormato: Record<string, string> = {
     }
   }
 
+  /* ---------- Incluso nos dois ---------- */
+  .formatos__incluso {
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    margin-top: 32px;
+    text-align: center;
+  }
+
+  .formatos__incluso-rotulo {
+    font-size: 0.75rem;
+    animation: mov-aparece 700ms ease backwards;
+  }
+
+  .formatos__itens {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .formatos__itens li {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 12%, transparent);
+    background: color-mix(in oklab, var(--offwhite) 4%, transparent);
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+    animation: mov-sobe 700ms var(--saida) calc(150ms + var(--i) * 70ms) backwards;
+  }
+
   /* ---------- Ação: um só botão laranja, conforme a escolha ---------- */
   .formatos__acao {
-    margin-top: 32px;
+    display: grid;
+    justify-items: center;
+    gap: 14px;
+    margin-top: 36px;
+    text-align: center;
     animation: mov-sobe 900ms var(--saida) 200ms backwards;
   }
 
-  /* troca de botão: dois nomes de animação iguais, um por escolha, para repetir a cada troca */
-  .formatos:has(input[value='online']:checked) .formatos__acao[data-revelado] {
-    animation: formatos-troca-a 520ms var(--saida);
-  }
-
-  .formatos:has(input[value='presencial']:checked) .formatos__acao[data-revelado] {
-    animation: formatos-troca-b 520ms var(--saida);
-  }
-
-  @keyframes formatos-troca-a {
-    from {
-      opacity: 0.2;
-      translate: 0 10px;
-      filter: blur(4px);
-    }
-  }
-
-  @keyframes formatos-troca-b {
-    from {
-      opacity: 0.2;
-      translate: 0 10px;
-      filter: blur(4px);
-    }
+  .formatos__botoes {
+    width: 100%;
   }
 
   .formatos__acao :global(.botao) {
@@ -627,18 +392,38 @@ const iconesFormato: Record<string, string> = {
     display: inline-flex;
   }
 
+  /* troca de botão: um nome de animação por escolha, para repetir a cada troca */
+  .formatos:has(input[value='online']:checked) [data-revelado] .formatos__botoes {
+    animation: formatos-troca-a 450ms var(--saida);
+  }
+
+  .formatos:has(input[value='presencial']:checked) [data-revelado] .formatos__botoes {
+    animation: formatos-troca-b 450ms var(--saida);
+  }
+
+  @keyframes formatos-troca-a {
+    from {
+      opacity: 0.3;
+      translate: 0 6px;
+    }
+  }
+
+  @keyframes formatos-troca-b {
+    from {
+      opacity: 0.3;
+      translate: 0 6px;
+    }
+  }
+
   .formatos__nota {
-    margin-top: 14px;
-    font-size: var(--fs-pequeno);
-    color: var(--texto-suave);
+    max-width: 34rem;
+    font-size: 0.8125rem;
+    color: var(--texto-apagado);
   }
 
   @media (min-width: 560px) {
-    .formatos__acao {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
+    .formatos__botoes {
+      width: auto;
     }
 
     .formatos__acao :global(.botao) {
@@ -647,22 +432,22 @@ const iconesFormato: Record<string, string> = {
   }
 
   @media (min-width: 768px) {
-    .formatos__numeros {
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    .formatos__itens {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
     .formatos__placas {
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
 
     .formato {
-      padding: 30px 30px 32px;
+      min-height: 300px;
+      padding: 30px 30px 30px;
+    }
+
+    .formato__alcance {
+      margin-top: auto;
+    }
+
+    .formato__resumo {
+      margin-bottom: 24px;
     }
   }
 
@@ -671,29 +456,18 @@ const iconesFormato: Record<string, string> = {
       padding: 128px 0;
     }
 
-    .formatos__titulo {
-      max-width: 24ch;
-    }
-
-    .formatos__comum {
-      margin-top: 64px;
-    }
-
     .formatos__escolha {
-      margin-top: 80px;
+      max-width: 880px;
+      margin: 64px auto 0;
     }
 
     .formato {
-      min-height: 340px;
-      padding: 36px 36px 38px;
+      min-height: 320px;
+      padding: 36px;
     }
 
-    .formato__alcance {
-      margin-top: auto;
-    }
-
-    .formato__detalhes {
-      margin-bottom: 24px;
+    .formatos__incluso {
+      margin-top: 40px;
     }
 
     .formatos__acao {
