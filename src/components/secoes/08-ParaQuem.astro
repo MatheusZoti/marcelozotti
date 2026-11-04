@@ -79,6 +79,9 @@ const palavras = titulo.split(' ');
 
 <style>
   .publico {
+    /* o "não é para" entra deslizando da direita: sem isso, ele empurrava a página para o lado */
+    position: relative;
+    overflow: clip;
     padding: 96px 0 104px;
     /* entra no tom da seção 7 e sai no da seção 10, sem emenda */
     background: linear-gradient(180deg, var(--navy-noite), var(--navy-profundo) 40%);

@@ -13,9 +13,13 @@ html {
   text-size-adjust: 100%;
   scroll-behavior: smooth;
   color-scheme: dark;
+  /* nada pode criar rolagem lateral (luzes, entradas animadas de lado);
+     clip, e não hidden, para não quebrar elementos sticky */
+  overflow-x: clip;
 }
 
 body {
+  overflow-x: clip;
   min-height: 100dvh;
   background: var(--navy-profundo);
   color: var(--texto);

@@ -30,8 +30,9 @@ import BotaoWhatsApp from './ui/BotaoWhatsApp.astro';
 
   .cabecalho__marca {
     display: block;
-    /* o SVG já inclui a área de proteção (X) em volta do desenho */
-    margin-left: -12px;
+    /* o SVG já inclui a área de proteção em volta do desenho (≈ 7,7% da largura);
+       a margem negativa compensa isso e alinha o desenho com o texto da página */
+    margin-left: -8px;
   }
 
   .cabecalho__simbolo {
@@ -60,6 +61,10 @@ import BotaoWhatsApp from './ui/BotaoWhatsApp.astro';
   @media (min-width: 1024px) {
     .cabecalho {
       padding-top: 20px;
+    }
+
+    .cabecalho__marca {
+      margin-left: -10px;
     }
 
     .cabecalho__simbolo {
