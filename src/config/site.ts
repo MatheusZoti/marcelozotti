@@ -36,6 +36,8 @@ export const MENSAGENS_WHATSAPP = {
   // Mensagem padrão; com JavaScript, o qualificador da seção 13 acrescenta as respostas.
   final: 'Olá, Marcelo! Vim pela sua página e quero conversar sobre a mentoria individual.',
   rodape: 'Olá, Marcelo! Vim pela sua página e quero saber mais sobre a mentoria individual.',
+  // página de links (/links), usada na bio do Instagram
+  links: 'Olá, Marcelo! Vim pelo link da sua bio no Instagram e quero conversar sobre a mentoria individual.',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;

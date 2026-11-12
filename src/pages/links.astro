@@ -1,0 +1,691 @@
+---
+// Página de links (/links) para a bio do Instagram do Marcelo.
+// Mesmo material do site: fundo navy com feixe a 67,5°, placas de vidro e um único foco laranja
+// (o WhatsApp). Três destinos: WhatsApp, o site da mentoria e o site da Brazotti.
+// Movimento: o feixe acende, o retrato chega com uma luz girando na borda, a assinatura é
+// varrida pela luz e os links viram para a frente em cascata. Tudo em CSS: sem JavaScript a
+// página funciona igual (o script só registra os cliques no dataLayer).
+import { Image } from 'astro:assets';
+import fotoEstoque from '../assets/fotos/estoque-brazotti.jpg';
+import fotoRetrato from '../assets/fotos/marcelo-retrato.jpg';
+import logo from '../assets/logos/logo-transparente-p-fundo-escuro.svg?url';
+import BotaoWhatsApp from '../components/ui/BotaoWhatsApp.astro';
+import SimboloIlimita from '../components/ui/SimboloIlimita.astro';
+import Base from '../layouts/Base.astro';
+
+const ano = new Date().getFullYear();
+
+// números da mentoria (fonte: pitches), no formato "número grande + rótulo pequeno"
+const dados = [
+  { numero: '4', rotulo: 'encontros' },
+  { numero: '8h', rotulo: 'ao vivo' },
+  { numero: '1:1', rotulo: 'individual' },
+];
+
+// poeira no feixe: posições fixas (sorteio com semente), iguais em todo build
+let semente = 23;
+const sortear = () => (semente = (semente * 9301 + 49297) % 233280) / 233280;
+const poeira = Array.from({ length: 10 }, () => ({
+  x: `${(sortear() * 100).toFixed(1)}%`,
+  atraso: `${(-sortear() * 18).toFixed(2)}s`,
+  duracao: `${(12 + sortear() * 10).toFixed(2)}s`,
+  tamanho: `${(1.5 + sortear() * 2).toFixed(1)}px`,
+  brilho: (0.3 + sortear() * 0.5).toFixed(2),
+  deriva: `${((sortear() - 0.5) * 50).toFixed(0)}px`,
+}));
+---
+
+<Base
+  titulo="Marcelo Zotti · Links"
+  descricao="Fale com o Marcelo Zotti no WhatsApp, conheça a mentoria individual de marketplaces e a Brazotti Distribuidora."
+>
+  <div class="links">
+    <div class="links__luz" aria-hidden="true">
+      <div class="feixe links__feixe"></div>
+      <div class="links__poeira">
+        {
+          poeira.map((p) => (
+            <i
+              style={`--x:${p.x};--atraso:${p.atraso};--duracao:${p.duracao};--tamanho:${p.tamanho};--brilho:${p.brilho};--deriva:${p.deriva}`}
+            />
+          ))
+        }
+      </div>
+      <div class="links__brilho"></div>
+    </div>
+
+    <div class="links__coluna">
+      <header class="links__topo">
+        <div class="links__avatar">
+          <span class="links__anel" aria-hidden="true"></span>
+          <Image
+            src={fotoRetrato}
+            alt="Retrato de Marcelo Zotti sorrindo, de óculos, blazer cinza e camiseta preta"
+            widths={[112, 224, 336]}
+            sizes="112px"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+
+        {/* o nome só aparece pela assinatura oficial (brand book), nunca redigitado */}
+        <h1 class="links__marca">
+          <img src={logo} alt="Marcelo Zotti, mentor de marketplaces" width="280" height="174" />
+        </h1>
+
+        <p class="links__bio">
+          Empresário que ensina o que aplica. Fundador da Brazotti Distribuidora, há mais de 6 anos
+          vendendo em marketplaces.
+        </p>
+      </header>
+
+      <nav aria-label="Links do Marcelo">
+        <ul class="links__lista" role="list">
+          <li class="links__item" style="--i:0">
+            <BotaoWhatsApp origem="links" class="links__whats">
+              Falar com o Marcelo
+            </BotaoWhatsApp>
+          </li>
+
+          <li class="links__item" style="--i:1">
+            <a class="placa placa--acesa holofote cartao cartao--mentoria" href="/" data-link="mentoria">
+              <span class="cartao__feixe" aria-hidden="true"></span>
+              <span class="cartao__topo">
+                <span class="rotulo cartao__rotulo">Mentoria individual</span>
+                <span class="cartao__seta" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg>
+                </span>
+              </span>
+              <span class="cartao__titulo">Transforme seus produtos em vendas nos marketplaces.</span>
+              <span class="cartao__dados">
+                {
+                  dados.map((d) => (
+                    <span class="cartao__dado">
+                      <span class="numero cartao__numero">{d.numero}</span>
+                      <span class="cartao__legenda">{d.rotulo}</span>
+                    </span>
+                  ))
+                }
+              </span>
+            </a>
+          </li>
+
+          <li class="links__item" style="--i:2">
+            <a
+              class="placa cartao cartao--brazotti"
+              href="https://brazotti.com.br/"
+              target="_blank"
+              rel="noopener"
+              data-link="brazotti"
+            >
+              <Image
+                class="cartao__foto"
+                src={fotoEstoque}
+                alt=""
+                widths={[440, 880]}
+                sizes="(min-width: 480px) 440px, 92vw"
+                loading="lazy"
+              />
+              <span class="cartao__topo">
+                <span class="rotulo cartao__rotulo">Operação própria</span>
+                <span class="cartao__seta" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"></path></svg>
+                </span>
+              </span>
+              <span class="cartao__titulo">Brazotti Distribuidora</span>
+              <span class="cartao__texto">
+                A distribuidora fundada pelo Marcelo.
+                <span class="visualmente-oculto">(abre em uma nova aba)</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <footer class="links__rodape">
+        <p>© {ano} Marcelo Zotti</p>
+        <a class="links__credito" href="https://ilimita.com.br" target="_blank" rel="noopener">
+          Feito com amor
+          <SimboloIlimita class="links__ilimita" />
+          <span class="visualmente-oculto">pela Ilimita (abre em uma nova aba)</span>
+        </a>
+      </footer>
+    </div>
+  </div>
+</Base>
+
+<script>
+  // Registra os cliques nos links (o do WhatsApp já é registrado por scripts/whatsapp.ts)
+  type JanelaComDataLayer = Window & { dataLayer?: Record<string, unknown>[] };
+
+  document.addEventListener('click', (evento) => {
+    const link = (evento.target as Element).closest<HTMLAnchorElement>('a[data-link]');
+    if (!link) return;
+    const janela = window as JanelaComDataLayer;
+    janela.dataLayer = janela.dataLayer ?? [];
+    janela.dataLayer.push({ event: 'link_click', destino: link.dataset.link });
+  });
+</script>
+
+<style>
+  .links {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    display: grid;
+    min-height: 100dvh;
+    padding: 40px 0 calc(24px + env(safe-area-inset-bottom));
+    background:
+      radial-gradient(120% 60% at 50% 0%, var(--navy) 0%, transparent 70%),
+      linear-gradient(180deg, var(--navy-profundo) 45%, var(--navy-noite) 100%);
+  }
+
+  /* ---------- Luz ---------- */
+  .links__luz {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .links__feixe,
+  .links__poeira {
+    --feixe-largura: 260px;
+    --feixe-x: 58%;
+    --feixe-y: -18%;
+    --feixe-altura: 120%;
+  }
+
+  /* o feixe acende de cima para baixo */
+  .links__feixe {
+    transform-origin: 50% 0;
+    animation: links-feixe 1600ms var(--saida) backwards;
+  }
+
+  @keyframes links-feixe {
+    from {
+      opacity: 0;
+      scale: 1 0.15;
+    }
+  }
+
+  /* poeira subindo devagar dentro do feixe, como no hero */
+  .links__poeira {
+    position: absolute;
+    pointer-events: none;
+    width: var(--feixe-largura);
+    height: var(--feixe-altura);
+    left: var(--feixe-x);
+    top: var(--feixe-y);
+    translate: -50% 0;
+    rotate: var(--desvio-luz);
+    mask-image: linear-gradient(180deg, transparent 12%, #000 34%, #000 62%, transparent 86%);
+    animation: mov-aparece 2400ms ease 900ms backwards;
+  }
+
+  .links__poeira i {
+    position: absolute;
+    left: var(--x);
+    bottom: 12%;
+    width: var(--tamanho);
+    height: var(--tamanho);
+    border-radius: 50%;
+    background: var(--offwhite);
+    box-shadow: 0 0 6px var(--azul-luz);
+    opacity: 0;
+    animation: links-poeira var(--duracao) linear var(--atraso) infinite;
+  }
+
+  @keyframes links-poeira {
+    0% {
+      opacity: 0;
+      translate: 0 0;
+    }
+    15%,
+    80% {
+      opacity: var(--brilho);
+    }
+    100% {
+      opacity: 0;
+      translate: var(--deriva) -70vh;
+    }
+  }
+
+  /* brilho atrás do retrato */
+  .links__brilho {
+    position: absolute;
+    left: 50%;
+    top: 150px;
+    width: 460px;
+    height: 460px;
+    translate: -50% -50%;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--azul) 38%, transparent),
+      transparent
+    );
+    animation: links-brilho 1800ms var(--saida) 200ms backwards;
+  }
+
+  @keyframes links-brilho {
+    from {
+      opacity: 0;
+      scale: 0.5;
+    }
+  }
+
+  /* ---------- Coluna ---------- */
+  .links__coluna {
+    display: flex;
+    flex-direction: column;
+    width: min(100% - 32px, 440px);
+    margin-inline: auto;
+  }
+
+  /* ---------- Topo: retrato, assinatura e bio ---------- */
+  .links__topo {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .links__avatar {
+    position: relative;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--azul-fio) 45%, transparent),
+      0 0 44px -6px color-mix(in oklab, var(--azul) 80%, transparent);
+    animation: links-avatar 1100ms var(--saida) 200ms backwards;
+  }
+
+  @keyframes links-avatar {
+    from {
+      opacity: 0;
+      scale: 0.7;
+      filter: blur(10px);
+    }
+  }
+
+  .links__avatar :global(img) {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  /* luz que gira devagar na borda do retrato */
+  @property --links-giro {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+  }
+
+  .links__anel {
+    position: absolute;
+    inset: -4px;
+    padding: 2px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from var(--links-giro),
+      transparent 0 55%,
+      color-mix(in oklab, var(--azul-luz) 70%, transparent) 78%,
+      var(--offwhite) 88%,
+      transparent 96%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    animation: links-gira 5s linear 600ms infinite backwards;
+  }
+
+  @keyframes links-gira {
+    to {
+      --links-giro: 360deg;
+    }
+  }
+
+  /* a assinatura já traz a área de proteção em volta do desenho; a margem negativa só
+     aproxima os vizinhos (o arquivo continua com 280 px, o mínimo do brand book) */
+  .links__marca {
+    margin: -6px 0 -8px;
+    animation: mov-varredura 1500ms var(--saida) 450ms backwards;
+  }
+
+  .links__marca img {
+    display: block;
+    width: 280px;
+    height: auto;
+  }
+
+  .links__bio {
+    max-width: 24rem;
+    color: var(--texto-suave);
+    animation: mov-sobe 1000ms var(--saida) 700ms backwards;
+  }
+
+  /* ---------- Lista de links ---------- */
+  .links__lista {
+    display: grid;
+    gap: 12px;
+    margin-top: 28px;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* os links viram para a frente em cascata, como as placas do site */
+  .links__item {
+    transform-origin: 50% 100%;
+    animation: links-vira 900ms var(--saida) calc(850ms + var(--i) * 130ms) backwards;
+  }
+
+  @keyframes links-vira {
+    from {
+      opacity: 0;
+      transform: perspective(900px) rotateX(-50deg) translateY(18px);
+      filter: blur(6px);
+    }
+  }
+
+  .links__item :global(.links__whats) {
+    width: 100%;
+  }
+
+  /* ---------- Cartões ---------- */
+  .cartao {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    gap: 10px;
+    padding: 18px 18px 20px;
+    text-decoration: none;
+    color: var(--texto);
+    transition:
+      border-color var(--transicao),
+      box-shadow 500ms ease,
+      translate 500ms var(--saida),
+      scale 300ms var(--saida);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* com overflow escondido, o anel do holofote fica por dentro da borda */
+  .cartao.holofote::before {
+    inset: 0;
+  }
+
+  .cartao:active {
+    scale: 0.985;
+  }
+
+  .cartao:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 3px;
+  }
+
+  .cartao__topo {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .cartao__rotulo {
+    color: color-mix(in oklab, var(--offwhite) 88%, var(--azul));
+  }
+
+  /* seta em vidro: anda no hover */
+  .cartao__seta {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid color-mix(in oklab, var(--offwhite) 18%, transparent);
+    background: color-mix(in oklab, var(--offwhite) 6%, transparent);
+    transition:
+      background-color var(--transicao),
+      border-color var(--transicao);
+  }
+
+  .cartao__seta svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: translate 500ms var(--mola);
+  }
+
+  .cartao__titulo {
+    position: relative;
+    z-index: 1;
+    font-size: 1.375rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+
+  .cartao__texto {
+    position: relative;
+    z-index: 1;
+    font-size: var(--fs-pequeno);
+    color: var(--texto-suave);
+  }
+
+  @media (hover: hover) {
+    .cartao:hover {
+      translate: 0 -3px;
+    }
+
+    .cartao:hover .cartao__seta {
+      border-color: var(--azul-fio);
+      background: var(--azul);
+    }
+
+    .cartao--mentoria:hover .cartao__seta svg {
+      translate: 3px 0;
+    }
+
+    .cartao--brazotti:hover .cartao__seta svg {
+      translate: 2px -2px;
+    }
+
+    /* a placa acesa mantém o brilho de fora no hover */
+    .cartao--mentoria:hover {
+      box-shadow:
+        var(--sombra-acesa),
+        0 24px 48px -20px color-mix(in oklab, var(--azul) 60%, transparent);
+    }
+
+    .cartao--brazotti:hover {
+      border-color: color-mix(in oklab, var(--azul-fio) 55%, transparent);
+      box-shadow: 0 24px 48px -20px color-mix(in oklab, var(--azul) 60%, transparent);
+    }
+
+    .cartao--brazotti:hover :global(.cartao__foto) {
+      scale: 1.07;
+      opacity: 0.95;
+    }
+  }
+
+  /* --- mentoria: a placa acesa, com os números da mentoria --- */
+  .cartao--mentoria {
+    padding-bottom: 18px;
+  }
+
+  /* feixe a 67,5° que atravessa a placa uma vez, depois que ela chega */
+  .cartao__feixe {
+    position: absolute;
+    inset: -10% -40%;
+    pointer-events: none;
+    background: linear-gradient(
+      calc(var(--desvio-luz) + 90deg),
+      transparent 40%,
+      color-mix(in oklab, var(--azul-luz) 28%, transparent) 50%,
+      transparent 60%
+    );
+    translate: -100% 0;
+    animation: links-reflexo 1800ms var(--saida) 1700ms both;
+  }
+
+  @keyframes links-reflexo {
+    to {
+      translate: 100% 0;
+    }
+  }
+
+  .cartao__dados {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid color-mix(in oklab, var(--offwhite) 16%, transparent);
+  }
+
+  .cartao__dado {
+    display: grid;
+    gap: 2px;
+  }
+
+  .cartao__numero {
+    font-size: 1.5rem;
+    line-height: 1.1;
+    color: var(--offwhite);
+    text-shadow: 0 0 22px color-mix(in oklab, var(--azul) 80%, transparent);
+  }
+
+  .cartao__legenda {
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: color-mix(in oklab, var(--offwhite) 80%, var(--azul));
+  }
+
+  /* --- Brazotti: foto real do estoque com degradê navy (brand book) --- */
+  .cartao--brazotti {
+    min-height: 156px;
+    align-content: space-between;
+  }
+
+  .cartao--brazotti :global(.cartao__foto) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition:
+      scale 1400ms var(--saida),
+      opacity 600ms ease;
+  }
+
+  .cartao--brazotti::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--navy-noite) 88%, transparent), transparent 45%),
+      linear-gradient(0deg, var(--navy-noite) 8%, color-mix(in oklab, var(--navy-noite) 72%, transparent) 45%, transparent 80%);
+  }
+
+  .cartao--brazotti .cartao__rotulo {
+    color: var(--offwhite);
+    text-shadow: 0 1px 10px var(--navy-noite);
+  }
+
+  .cartao--brazotti .cartao__titulo {
+    margin-top: 28px;
+  }
+
+  .cartao--brazotti .cartao__texto {
+    margin-top: -6px;
+  }
+
+  /* ---------- Rodapé ---------- */
+  .links__rodape {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 28px;
+    font-family: var(--fonte-mono);
+    font-size: 0.75rem;
+    color: var(--texto-apagado);
+    animation: mov-aparece 1200ms ease 1500ms backwards;
+  }
+
+  .links__credito {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    color: var(--texto-apagado);
+    transition: color var(--transicao);
+  }
+
+  .links__credito :global(.links__ilimita) {
+    width: auto;
+    height: 18px;
+    transition:
+      color var(--transicao),
+      rotate 600ms var(--mola);
+  }
+
+  @media (hover: hover) {
+    .links__credito:hover {
+      color: var(--texto-suave);
+    }
+
+    .links__credito:hover :global(.links__ilimita) {
+      color: var(--offwhite);
+      rotate: 12deg;
+    }
+  }
+
+  .links__credito:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+
+  /* ---------- Telas maiores: a coluna fica no centro da tela ---------- */
+  @media (min-width: 768px) {
+    .links {
+      padding-top: 64px;
+    }
+
+    .links__feixe,
+    .links__poeira {
+      --feixe-largura: 380px;
+      --feixe-x: 56%;
+    }
+
+    .links__brilho {
+      top: 190px;
+      width: 640px;
+      height: 640px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .links__poeira {
+      display: none;
+    }
+  }
+</style>
