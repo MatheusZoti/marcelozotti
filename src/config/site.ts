@@ -15,29 +15,29 @@ export const SITE = {
   locale: 'pt_BR',
 } as const;
 
-// Cada botão envia uma mensagem diferente para o Marcelo saber de onde o lead veio.
+// Cada botão envia uma mensagem diferente para a equipe saber de onde o lead veio.
 // A chave também é o valor de `cta` no evento `whatsapp_click` do dataLayer.
 export const MENSAGENS_WHATSAPP = {
-  cabecalho: 'Olá, Marcelo! Vim pela sua página e quero saber mais sobre a mentoria individual.',
-  hero: 'Olá, Marcelo! Vim pela sua página e quero conversar sobre a mentoria individual para a minha empresa.',
-  flutuante: 'Olá, Marcelo! Vim pela sua página e quero saber mais sobre a mentoria individual.',
+  cabecalho: 'Olá! Vim pela sua página e quero saber mais sobre a mentoria individual.',
+  hero: 'Olá! Vim pela sua página e quero conversar sobre a mentoria individual para a minha empresa.',
+  flutuante: 'Olá! Vim pela sua página e quero saber mais sobre a mentoria individual.',
   // Mensagem padrão; com JavaScript, a seção 3 troca pela lista do que a pessoa marcou.
   identificacao:
-    'Olá, Marcelo! Vim pela sua página, me reconheci em algumas situações e quero conversar sobre a mentoria.',
+    'Olá! Vim pela sua página, me reconheci em algumas situações e quero conversar sobre a mentoria.',
   marcelo:
-    'Olá, Marcelo! Conheci sua trajetória pela página e quero conversar sobre a mentoria individual.',
+    'Olá! Conheci sua trajetória pela página e quero conversar sobre a mentoria individual.',
   frentes:
-    'Olá, Marcelo! Vi as 7 frentes da mentoria na sua página e quero conversar sobre a minha operação.',
+    'Olá! Vi as 7 frentes da mentoria na sua página e quero conversar sobre a minha operação.',
   'formato-online':
-    'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual online. Pode me passar os detalhes?',
+    'Olá! Vim pela sua página e tenho interesse na mentoria individual online. Pode me passar os detalhes?',
   'formato-presencial':
-    'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual presencial, em Curitiba e região. Pode me passar os detalhes?',
-  faq: 'Olá, Marcelo! Li as perguntas frequentes na sua página e ainda tenho uma dúvida sobre a mentoria.',
+    'Olá! Vim pela sua página e tenho interesse na mentoria individual presencial, em Curitiba e região. Pode me passar os detalhes?',
+  faq: 'Olá! Li as perguntas frequentes na sua página e ainda tenho uma dúvida sobre a mentoria.',
   // Mensagem padrão; com JavaScript, o qualificador da seção 13 acrescenta as respostas.
-  final: 'Olá, Marcelo! Vim pela sua página e quero conversar sobre a mentoria individual.',
-  rodape: 'Olá, Marcelo! Vim pela sua página e quero saber mais sobre a mentoria individual.',
+  final: 'Olá! Vim pela sua página e quero conversar sobre a mentoria individual.',
+  rodape: 'Olá! Vim pela sua página e quero saber mais sobre a mentoria individual.',
   // página de links (/links), usada na bio do Instagram
-  links: 'Olá, Marcelo! Vim pelo link da sua bio no Instagram e quero conversar sobre a mentoria individual.',
+  links: 'Olá! Vim pelo link da sua bio no Instagram e quero conversar sobre a mentoria individual.',
 } as const;
 
 export type OrigemCta = keyof typeof MENSAGENS_WHATSAPP;

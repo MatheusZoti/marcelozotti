@@ -10,7 +10,7 @@ export const perguntas: Pergunta[] = [
   {
     pergunta: 'Quanto custa a mentoria?',
     resposta:
-      'O investimento e as condições são passados pelo Marcelo no WhatsApp, junto com as respostas às suas dúvidas. Parcelamento pode ser disponibilizado.',
+      'O investimento e as condições são passados pela equipe no WhatsApp, junto com as respostas às suas dúvidas. Parcelamento pode ser disponibilizado.',
   },
   {
     pergunta: 'A mentoria garante que eu vou vender mais?',
@@ -35,7 +35,7 @@ export const perguntas: Pergunta[] = [
   {
     pergunta: 'Moro fora de Curitiba. Posso participar?',
     resposta:
-      'Pode, no formato online, que atende todo o Brasil por videoconferência. O presencial é só para Curitiba e região, em um local combinado com o Marcelo.',
+      'Pode, no formato online, que atende todo o Brasil por videoconferência. O presencial é só para Curitiba e região, em um local combinado com a equipe.',
   },
   {
     pergunta: 'Quanto tempo dura e como são os encontros?',
@@ -45,6 +45,6 @@ export const perguntas: Pergunta[] = [
   {
     pergunta: 'E se eu tiver dúvidas entre um encontro e outro?',
     resposta:
-      'Você tem contato direto com o Marcelo pelo WhatsApp e acesso ao grupo de suporte durante o período da mentoria.',
+      'Você tem suporte direto pelo WhatsApp e acesso ao grupo de suporte durante o período da mentoria.',
   },
 ];

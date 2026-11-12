@@ -1,5 +1,5 @@
 // Seção 10 · Formatos. Fonte: slides "Formato", "Diferencial" e "Investimento" dos dois pitches.
-// SEM PREÇO (regra do projeto): investimento e condições são passados pelo Marcelo no WhatsApp.
+// SEM PREÇO (regra do projeto): investimento e condições são passados pela equipe no WhatsApp.
 // Enxuta de propósito: os números da mentoria já aparecem no hero e no bento, e o suporte entre
 // os encontros está no FAQ. Aqui a pessoa só escolhe o formato.
 
@@ -40,4 +40,4 @@ export const formatos: Formato[] = [
 ];
 
 export const notaInvestimento =
-  'Investimento e condições são passados pelo Marcelo no WhatsApp. Parcelamento pode ser disponibilizado.';
+  'Investimento e condições são passados pela equipe no WhatsApp. Parcelamento pode ser disponibilizado.';

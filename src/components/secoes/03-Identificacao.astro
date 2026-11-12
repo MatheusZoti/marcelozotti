@@ -63,7 +63,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
         Se você se viu em pelo menos uma dessas situações, vale uma conversa.
       </p>
       <div class="identificacao__botao">
-        <BotaoWhatsApp origem="identificacao">Conversar com o Marcelo</BotaoWhatsApp>
+        <BotaoWhatsApp origem="identificacao">Conversar com a equipe</BotaoWhatsApp>
       </div>
       <p class="identificacao__nota" data-nota hidden>O que você marcou já vai na mensagem.</p>
     </div>
@@ -122,7 +122,7 @@ import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
           total === 0
             ? MENSAGENS_WHATSAPP.identificacao
             : [
-                'Olá, Marcelo! Vim pela sua página e me reconheci nestas situações:',
+                'Olá! Vim pela sua página e me reconheci nestas situações:',
                 ...marcadas.map((caixa) => `• ${caixa.dataset.resumo}`),
                 'Quero conversar sobre a mentoria.',
               ].join('\n');

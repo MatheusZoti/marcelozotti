@@ -10,12 +10,12 @@ export const passos = [
     texto: 'Qualquer botão da página abre o WhatsApp com a mensagem pronta. É só enviar.',
   },
   {
-    titulo: 'Conversa direta com o Marcelo',
-    texto: 'Ele entende o momento da sua empresa, tira suas dúvidas e passa investimento e condições.',
+    titulo: 'Conversa com a equipe',
+    texto: 'A equipe entende o momento da sua empresa, tira suas dúvidas e passa investimento e condições.',
   },
   {
     titulo: 'Vocês definem o início',
-    texto: 'Se fizer sentido para os dois, vocês combinam o formato e a data do primeiro encontro.',
+    texto: 'Se fizer sentido para a sua empresa, vocês combinam o formato e a data do primeiro encontro.',
   },
 ];
 
