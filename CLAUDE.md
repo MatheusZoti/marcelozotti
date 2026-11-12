@@ -23,7 +23,7 @@ Landing page focada em conversão para as mentorias individuais de marketplaces 
 - "R$ 400 mil de faturamento mensal na operação própria" só pode aparecer como faturamento (nunca lucro) e com nota de que não é promessa. Confirmar com o cliente antes de publicar.
 
 ## As ofertas (fonte: pitches)
-- Mentoria Individual **Online** e Mentoria Individual **Presencial** (escritório do Marcelo em Curitiba-PR).
+- Mentoria Individual **Online** e Mentoria Individual **Presencial** (em qualquer lugar de Curitiba e região, combinado com o Marcelo).
 - 4 encontros · 2h por encontro · 1x por semana · 8h ao vivo · ~30 dias.
 - Inclui: suporte direto pelo WhatsApp, acesso ao grupo durante a mentoria, orientação personalizada.
 - Público: (1) loja física ou empresa que já tem produtos e quer começar a vender online; (2) operação digital que já vende e quer melhorar resultados. Pré-requisito: já possuir produtos.

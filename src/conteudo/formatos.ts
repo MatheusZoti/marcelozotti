@@ -31,7 +31,7 @@ export const formatos: Formato[] = [
   {
     id: 'presencial',
     nome: 'Presencial',
-    resumo: 'Cara a cara, no escritório do Marcelo em Curitiba (PR).',
+    resumo: 'Cara a cara, em Curitiba ou região, no local que vocês combinarem.',
     alcance: 'Somente Curitiba e região',
     restrito: true,
     cta: 'formato-presencial',

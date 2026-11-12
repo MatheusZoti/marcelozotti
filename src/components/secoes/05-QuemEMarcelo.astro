@@ -7,6 +7,7 @@ import { Image } from 'astro:assets';
 import fotoRetrato from '../../assets/fotos/marcelo-retrato.jpg';
 import { bio } from '../../conteudo/marcelo';
 import BentoMarcelo from '../BentoMarcelo.astro';
+import { siInstagram } from 'simple-icons';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 
 const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' ');
@@ -41,6 +42,18 @@ const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' '
           }
         </h2>
         {bio.map((paragrafo, i) => <p class="marcelo__bio" style={`--i:${i}`}>{paragrafo}</p>)}
+        <a
+          class="marcelo__instagram"
+          href="https://www.instagram.com/marcelozotti_/"
+          target="_blank"
+          rel="noopener"
+        >
+          <span class="marcelo__instagram-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d={siInstagram.path}></path></svg>
+          </span>
+          @marcelozotti_
+          <span class="visualmente-oculto">no Instagram (abre em uma nova aba)</span>
+        </a>
       </div>
     </div>
 
@@ -189,6 +202,63 @@ const titulo = 'Um empresário que ensina o que aplica todos os dias.'.split(' '
   .marcelo__bio {
     margin-top: 20px;
     color: var(--texto-suave);
+  }
+
+  /* Instagram do Marcelo: ícone em vidro + @, discreto; acende no hover */
+  .marcelo__instagram {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    margin-top: 20px;
+    font-family: var(--fonte-mono);
+    font-size: var(--fs-pequeno);
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: var(--texto-suave);
+    transition: color var(--transicao);
+    animation: mov-sobe 900ms var(--saida) 1100ms backwards;
+  }
+
+  .marcelo__instagram-icone {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in oklab, var(--azul-fio) 40%, transparent);
+    background: color-mix(in oklab, var(--azul) 22%, transparent);
+    color: var(--azul-fio);
+    transition:
+      background-color var(--transicao),
+      color var(--transicao),
+      box-shadow var(--transicao),
+      rotate 500ms var(--mola);
+  }
+
+  .marcelo__instagram-icone svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+  }
+
+  @media (hover: hover) {
+    .marcelo__instagram:hover {
+      color: var(--offwhite);
+    }
+
+    .marcelo__instagram:hover .marcelo__instagram-icone {
+      background: var(--azul);
+      color: var(--offwhite);
+      box-shadow: 0 0 18px color-mix(in oklab, var(--azul) 70%, transparent);
+      rotate: -8deg;
+    }
+  }
+
+  .marcelo__instagram:focus-visible {
+    outline: 2px solid var(--azul-fio);
+    outline-offset: 4px;
+    border-radius: 6px;
   }
 
   .marcelo__bio:first-of-type {

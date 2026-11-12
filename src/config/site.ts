@@ -31,7 +31,7 @@ export const MENSAGENS_WHATSAPP = {
   'formato-online':
     'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual online. Pode me passar os detalhes?',
   'formato-presencial':
-    'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual presencial, em Curitiba. Pode me passar os detalhes?',
+    'Olá, Marcelo! Vim pela sua página e tenho interesse na mentoria individual presencial, em Curitiba e região. Pode me passar os detalhes?',
   faq: 'Olá, Marcelo! Li as perguntas frequentes na sua página e ainda tenho uma dúvida sobre a mentoria.',
   // Mensagem padrão; com JavaScript, o qualificador da seção 13 acrescenta as respostas.
   final: 'Olá, Marcelo! Vim pela sua página e quero conversar sobre a mentoria individual.',

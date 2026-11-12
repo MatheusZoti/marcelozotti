@@ -35,7 +35,7 @@ export const perguntas: Pergunta[] = [
   {
     pergunta: 'Moro fora de Curitiba. Posso participar?',
     resposta:
-      'Pode, no formato online, que atende todo o Brasil por videoconferência. O presencial é só para Curitiba e região, no escritório do Marcelo.',
+      'Pode, no formato online, que atende todo o Brasil por videoconferência. O presencial é só para Curitiba e região, em um local combinado com o Marcelo.',
   },
   {
     pergunta: 'Quanto tempo dura e como são os encontros?',
