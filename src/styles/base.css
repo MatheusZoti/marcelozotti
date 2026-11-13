@@ -116,6 +116,24 @@ p {
   top: 12px;
 }
 
+/* nomes das plataformas no título, com as cores de cada uma (pedido do cliente; fora da paleta
+   de propósito, só nessas palavras). Contraste conferido sobre o navy. */
+.marca-ml,
+.marca-shopee {
+  white-space: nowrap;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.marca-ml {
+  background-image: linear-gradient(100deg, #fff159 0%, #ffe600 55%, #ffd000 100%);
+}
+
+.marca-shopee {
+  background-image: linear-gradient(100deg, #ff7337 0%, #ee4d2d 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

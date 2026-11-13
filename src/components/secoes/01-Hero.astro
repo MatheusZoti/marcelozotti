@@ -10,7 +10,13 @@ import fotoHero from '../../assets/fotos/hero-marcelo-retrato.jpg';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 import PlacaDado from '../ui/PlacaDado.astro';
 
-const tituloBase = 'Aprenda a vender no Mercado Livre e na Shopee'.split(' ');
+// cada plataforma ganha um degradê com as próprias cores (classes globais em base.css)
+const tituloBase: { texto: string; marca?: string }[] = [
+  ...'Aprenda a vender no'.split(' ').map((texto) => ({ texto })),
+  { texto: 'Mercado Livre', marca: 'marca-ml' },
+  { texto: 'e' },
+  { texto: 'Shopee', marca: 'marca-shopee' },
+];
 const tituloLuz = 'com quem vende lá todos os dias.';
 
 // poeira no feixe: posições fixas (sorteio com semente), iguais em todo build
@@ -57,8 +63,8 @@ const dados = [
           {
             tituloBase.map((palavra, i) => (
               <>
-                <span class="hero__palavra" style={`--i:${i}`}>
-                  {palavra}
+                <span class={`hero__palavra ${palavra.marca ?? ''}`} style={`--i:${i}`}>
+                  {palavra.texto}
                 </span>{' '}
               </>
             ))
