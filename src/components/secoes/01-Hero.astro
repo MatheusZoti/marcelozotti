@@ -6,7 +6,7 @@
 // Depois: poeira flutuando no feixe e, com mouse, a cena inteira reage ao ponteiro (profundidade).
 // Tudo em CSS (o conteúdo aparece mesmo sem JavaScript); o JS só soma contagem e paralaxe.
 import { Picture } from 'astro:assets';
-import fotoHero from '../../assets/fotos/hero-marcelo-galpao.jpg';
+import fotoHero from '../../assets/fotos/hero-marcelo-retrato.jpg';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 import PlacaDado from '../ui/PlacaDado.astro';
 
@@ -16,8 +16,8 @@ const provas = [
   'Presencial em Curitiba e região',
 ];
 
-const tituloBase = 'Transforme seus produtos'.split(' ');
-const tituloLuz = 'em vendas nos marketplaces.';
+const tituloBase = 'Aprenda a vender no Mercado Livre e na Shopee'.split(' ');
+const tituloLuz = 'com quem vende lá todos os dias.';
 
 // poeira no feixe: posições fixas (sorteio com semente), iguais em todo build
 let semente = 11;
@@ -56,7 +56,7 @@ const dados = [
 
   <div class="container hero__grade">
     <div class="hero__texto">
-      <p class="rotulo hero__selo">Mentoria individual · Mercado Livre e Shopee</p>
+      <p class="rotulo hero__selo">Mentoria · Mercado Livre e Shopee</p>
 
       <h1 id="hero-titulo" class="hero__titulo">
         <span class="hero__titulo-base">
@@ -74,8 +74,8 @@ const dados = [
       </h1>
 
       <p class="hero__lead">
-        Estratégia e acompanhamento de quem vive o marketplace todos os dias, mesmo que você ainda
-        não venda online.
+        Mentoria individual, com estratégia e acompanhamento para a sua empresa, mesmo que você
+        ainda não venda online.
       </p>
 
       <div class="hero__acao">
@@ -94,7 +94,7 @@ const dados = [
           formats={['avif', 'webp']}
           widths={[360, 540, 720, 960]}
           sizes="(min-width: 1024px) 400px, 86vw"
-          alt="Marcelo Zotti explicando, de camiseta azul, no galpão da operação da Brazotti Distribuidora"
+          alt="Marcelo Zotti sorrindo, sentado, de óculos, blazer cinza e camiseta preta"
           loading="eager"
           fetchpriority="high"
         />

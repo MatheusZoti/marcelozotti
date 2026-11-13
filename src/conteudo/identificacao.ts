@@ -25,8 +25,8 @@ export const situacoes: Situacao[] = [
   },
   {
     id: 'preco',
-    titulo: 'Guerra de preço',
-    texto: 'Baixa o preço para competir, e a margem vai junto.',
+    titulo: 'Sem preço para vender',
+    texto: 'A concorrência vende mais barato e você não consegue acompanhar sem perder margem.',
     resumo: 'baixo o preço para acompanhar a concorrência',
   },
   {

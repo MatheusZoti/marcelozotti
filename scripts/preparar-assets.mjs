@@ -14,10 +14,11 @@ const saidaLogos = path.join(raiz, 'src/assets/logos');
 // o Astro gera AVIF/WebP nos tamanhos de tela a partir dela.
 const fotos = [
   {
-    origem: 'Foto principal pois mostra a ambientacao.jpg',
-    destino: 'hero-marcelo-galpao.jpg',
-    recorte: { left: 691, top: 979, width: 2880, height: 3600 }, // 4:5, rosto no terço superior, mãos inteiras
-    largura: 1200,
+    origem: 'marcelo-retrato-sentado.jpg',
+    destino: 'hero-marcelo-retrato.jpg', // hero: sentado, blazer cinza, fundo de concreto
+    recorte: { left: 0, top: 180, width: 1066, height: 1332 }, // 4:5, rosto no terço superior
+    largura: 1066, // o original tem 1066 px: não ampliar
+    qualidade: 86,
   },
   {
     origem: 'marcelo-retrato-blazer.png',
