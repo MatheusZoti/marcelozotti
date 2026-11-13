@@ -10,12 +10,6 @@ import fotoHero from '../../assets/fotos/hero-marcelo-retrato.jpg';
 import BotaoWhatsApp from '../ui/BotaoWhatsApp.astro';
 import PlacaDado from '../ui/PlacaDado.astro';
 
-const provas = [
-  'Fundador da Brazotti Distribuidora',
-  'Online para todo o Brasil',
-  'Presencial em Curitiba e região',
-];
-
 const tituloBase = 'Aprenda a vender no Mercado Livre e na Shopee'.split(' ');
 const tituloLuz = 'com quem vende lá todos os dias.';
 
@@ -74,17 +68,12 @@ const dados = [
       </h1>
 
       <p class="hero__lead">
-        Mentoria individual, com estratégia e acompanhamento para a sua empresa, mesmo que você
-        ainda não venda online.
+        Mentoria individual para quem já tem produtos e quer vender mais online.
       </p>
 
       <div class="hero__acao">
         <BotaoWhatsApp origem="hero">Quero conversar com a equipe</BotaoWhatsApp>
       </div>
-
-      <ul class="hero__provas" role="list">
-        {provas.map((prova, i) => <li style={`--i:${i}`}>{prova}</li>)}
-      </ul>
     </div>
 
     <div class="hero__palco">
@@ -470,41 +459,16 @@ const dados = [
     animation: hero-sobe 1000ms var(--saida) 920ms backwards;
   }
 
-  .hero__provas {
-    animation: hero-linha 1200ms var(--saida) 1000ms backwards;
-  }
-
-  @keyframes hero-linha {
-    from {
-      border-top-color: transparent;
-    }
-  }
-
-  .hero__provas li {
-    animation: hero-sobe 800ms var(--saida) calc(1080ms + var(--i) * 110ms) backwards;
-  }
-
-  /* os losangos giram até os 45° da fita e acendem */
-  .hero__provas li::before {
-    animation: hero-losango 900ms cubic-bezier(0.3, 1.6, 0.5, 1) calc(1180ms + var(--i) * 110ms)
-      backwards;
-  }
-
-  @keyframes hero-losango {
-    from {
-      scale: 0;
-      rotate: calc(var(--ang-fita) + 180deg);
-      box-shadow: 0 0 22px 6px var(--azul-luz);
-    }
-  }
-
+  /* um pouco menor que o h1 padrão: a frase é longa e precisa caber em ~4 linhas */
   .hero__titulo {
-    font-size: var(--fs-h1);
+    font-size: clamp(2rem, 1.3rem + 2.6vw, 3.5rem);
   }
 
   /* segunda frase com luz azulada, como o título da ref-01 */
   .hero__titulo-luz {
-    display: block;
+    /* continua na mesma linha da primeira parte (economiza uma linha) */
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
     background: linear-gradient(100deg, var(--offwhite) 10%, var(--azul-luz) 95%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -524,35 +488,6 @@ const dados = [
 
   .hero__acao :global(.botao) {
     width: 100%;
-  }
-
-  .hero__provas {
-    display: grid;
-    gap: 10px;
-    margin-top: 32px;
-    padding: 20px 0 0;
-    list-style: none;
-    border-top: 1px solid color-mix(in oklab, var(--offwhite) 10%, transparent);
-    font-family: var(--fonte-mono);
-    font-size: 0.8125rem;
-    color: var(--texto-suave);
-  }
-
-  .hero__provas li {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  /* marcador: losango a 45° (a diagonal da fita) */
-  .hero__provas li::before {
-    content: '';
-    flex: none;
-    width: 7px;
-    height: 7px;
-    background: var(--azul);
-    rotate: var(--ang-fita);
-    box-shadow: 0 0 10px var(--azul);
   }
 
   /* ---------- Palco: foto + placas ---------- */
@@ -766,8 +701,7 @@ const dados = [
       gap: 48px;
     }
 
-    /* o palco alinha pelo bloco que se vê (selo → botão), e não pela coluna inteira de texto,
-       que inclui as provas lá embaixo; centralizado na coluna, a foto ficava baixa demais */
+    /* o palco alinha pelo topo do texto (selo); centralizado na coluna, a foto ficava baixa demais */
     .hero__palco {
       aspect-ratio: 1 / 1.08;
       align-self: start;
@@ -852,14 +786,6 @@ const dados = [
     .hero__orbita--4 :global(.hero__dado) {
       --entra-x: 48px;
       --entra-y: 0px;
-    }
-  }
-
-  @media (min-width: 1280px) {
-    .hero__provas {
-      grid-auto-flow: column;
-      justify-content: start;
-      gap: 28px;
     }
   }
 
