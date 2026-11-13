@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1190 610" width="1190" height="610">
+  <title>Marcelo Zotti</title>
+  <defs>
+    <linearGradient id="mz-band" gradientUnits="userSpaceOnUse" x1="0.0" y1="0.0" x2="373.5" y2="300.5"><stop offset="0" stop-color="#F4F7FB"/><stop offset="1" stop-color="#D3D9E0"/></linearGradient>
+    <linearGradient id="mz-rise" gradientUnits="userSpaceOnUse" x1="328.2" y1="255.2" x2="519.5" y2="64.0"><stop offset="0" stop-color="#1B49A8"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
+    <linearGradient id="mz-top" gradientUnits="userSpaceOnUse" x1="519.5" y1="64.0" x2="910.0" y2="64.0"><stop offset="0" stop-color="#1F54C4"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
+    <linearGradient id="mz-diag" gradientUnits="userSpaceOnUse" x1="755.5" y1="128.0" x2="453.5" y2="430.0"><stop offset="0" stop-color="#AEB6C1"/><stop offset="1" stop-color="#E6EAEF"/></linearGradient>
+    <linearGradient id="mz-bar" gradientUnits="userSpaceOnUse" x1="608.0" y1="366.0" x2="836.0" y2="366.0"><stop offset="0" stop-color="#1D4FB6"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
+  </defs>
+  <g>
+    <g transform="translate(90.00,90.00) scale(1.00000)">
+      <polygon points="0.00,108.02 128.00,236.02 128.00,302.00 0.00,430.00" fill="#B3BBC5"/>
+      <polygon points="0.00,0.00 73.00,0.00 373.49,300.49 282.98,391.00 0.00,108.02" fill="url(#mz-band)"/>
+      <polygon points="282.98,209.98 492.96,0.00 545.98,128.00 373.49,300.49" fill="url(#mz-rise)"/>
+      <polygon points="492.96,0.00 974.00,0.00 846.00,128.00 545.98,128.00" fill="url(#mz-top)"/>
+      <polygon points="664.98,128.00 846.00,128.00 544.00,430.00 362.98,430.00" fill="url(#mz-diag)"/>
+      <polygon points="672.00,302.00 772.00,302.00 900.00,430.00 544.00,430.00" fill="url(#mz-bar)"/>
+      <polygon points="772.00,302.00 882.00,302.00 1010.00,430.00 900.00,430.00" fill="#F59E0B"/>
+    </g>
+  </g>
+</svg>
